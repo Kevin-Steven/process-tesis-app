@@ -1,9 +1,9 @@
 <?php 
     $host = 'localhost';
-    $usuario = '';
+    $usuario = 'root';
     $clave = '';
-    $baseDeDatos = '';
-    $puerto = '3306';
+    $baseDeDatos = 'procesotitulacion';
+    $puerto = '3308';
 
     $conn = new mysqli($host, $usuario ,$clave, $baseDeDatos, $puerto);
 

@@ -97,20 +97,45 @@ $result = $stmt->get_result();
             <div class="row justify-content-center">
                 <div class="col-md-8">
 
-                    <div style="min-height: 60px;"> 
-                        <?php if (isset($_GET['status'])): ?>
-                            <div class="alert alert-<?php echo $_GET['status'] == 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert">
-                                <?php if ($_GET['status'] == 'success'): ?>
-                                    Rol actualizado correctamente.
-                                <?php elseif ($_GET['status'] == 'error'): ?>
-                                    Hubo un error al actualizar el rol.
-                                <?php else: ?>
-                                    Solicitud inválida.
-                                <?php endif; ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <!-- Toast -->
+                    <?php if (isset($_GET['status'])): ?>
+                        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="toast-header">
+                                    <?php if ($_GET['status'] === 'success'): ?>
+                                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                                        <strong class="me-auto">Actualización Exitosa</strong>
+                                    <?php elseif ($_GET['status'] === 'error'): ?>
+                                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                                        <strong class="me-auto">Rol Inválido</strong>
+                                    <?php elseif ($_GET['status'] === 'invalid_request'): ?>
+                                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                                        <strong class="me-auto">Error en el Formulario</strong>
+                                    <?php endif; ?>
+                                    <small>Justo ahora</small>
+                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                                <div class="toast-body">
+                                    <?php
+                                    switch ($_GET['status']) {
+                                        case 'success':
+                                            echo "Rol actualizado con éxito.";
+                                            break;
+                                        case 'error':
+                                            echo "Hubo un error al actualizar el rol.";
+                                            break;
+                                        case 'invalid_request':
+                                            echo "Hubo un error en el envío del formulario.";
+                                            break;
+                                        default:
+                                            echo "Ha ocurrido un error desconocido.";
+                                            break;
+                                    }
+                                    ?>
+                                </div>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+                    <?php endif; ?>
 
                     <div class="card shadow-lg">
                         <div class="card-body">
@@ -164,6 +189,7 @@ $result = $stmt->get_result();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js" defer></script>
+    <script src="../js/toast.js" defer></script>
 </body>
 
 </html>

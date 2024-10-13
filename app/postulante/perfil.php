@@ -287,7 +287,7 @@ $conn->close();
                 $actividad_reciente = false;
 
                 // Verificar si hay fecha de envío del formulario
-                if (!empty($usuario['fecha_envio_formulario'] ) && $usuario['estado_registro'] === 0) {
+                if (!empty($usuario['fecha_envio_formulario']) && $usuario['estado_registro'] === 0) {
                   $actividad_reciente = true;
                 ?>
                   <li class="list-group-item">
@@ -364,13 +364,18 @@ $conn->close();
                 ?>
 
                 <?php
-                // Mostrar la confirmación de correo solo si la inscripción ha sido aprobada o rechazada
-                if (($tema['estado_tema'] === 'Aprobado' && $tema['estado_registro'] === 0 && !empty($tema['observaciones_anteproyecto']))) {
+                // Verificar que $tema no sea null y que tenga los índices necesarios
+                if (isset($tema) && isset($tema['estado_tema'], $tema['estado_registro'], $tema['observaciones_anteproyecto'])) {
+                  // Mostrar la confirmación de correo solo si la inscripción ha sido aprobada o rechazada
+                  if ($tema['estado_tema'] === 'Aprobado' && $tema['estado_registro'] === 0 && !empty($tema['observaciones_anteproyecto'])) {
                 ?>
-                  <li class="list-group-item">
-                    <i class='bx bx-info-circle text-warning'></i> Tiene observaciones en su anteproyecto.
-                  </li>
-                <?php } ?>
+                    <li class="list-group-item">
+                      <i class='bx bx-info-circle text-warning'></i> Tiene observaciones en su anteproyecto.
+                    </li>
+                <?php
+                  }
+                }
+                ?>
 
                 <?php if (!$actividad_reciente): ?>
                   <!-- Si no hay actividad reciente -->
