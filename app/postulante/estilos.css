@@ -1,0 +1,473 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Ajustar el topbar para que se vea el ícono */
+.topbar {
+  background-color: #f8f9fa;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  transition: all 0.3s;
+}
+
+.menu-toggle {
+  font-size: 30px;
+  cursor: pointer;
+  color: #191919;
+  transition: all .6s;
+  margin-left: 250px; 
+}
+
+.menu-toggle-small {
+  margin-left: 0px; 
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.topbar-right .search-bar {
+  width: 250px;
+  margin-right: 20px;
+}
+
+.topbar i, span {
+  transition: .3s ease;
+}
+
+.topbar i:hover, .topbar .user-profile:hover{
+  color: #3a57e8;
+}
+
+.topbar .dropdown-item:focus, 
+.topbar .dropdown-item:active {
+    background-color: transparent !important; 
+    color: inherit;
+    outline: none; 
+}
+
+.topbar-right i {
+  font-size: 20px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-profile img {
+  width: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* Estilo de la barra lateral */
+.sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: #04087c;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
+  transition: all .6s;
+}
+
+.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.sidebar .nav-link {
+  color: #d3d3d3;
+  padding: 12px 15px;
+  display: block;
+  font-size: 17px;
+  transition: .3s ease;
+  box-shadow: inset 0 0 0 0 white;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #03054d;
+  color: white;
+  box-shadow: inset 3px 0 0 0 white;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.profile {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile img {
+  width: 80px;
+  border-radius: 50%;
+}
+
+.profile h5 {
+  margin-top: 10px;
+  font-size: 18px;
+  color: white;
+}
+
+.profile p {
+  font-size: 14px;
+  color: #d3d3d3;
+}
+
+/* Ajustar contenido cuando el menú está oculto */
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  transition: all .6s;
+  min-height: 85vh;
+  background: #f5f7fb;
+}
+
+.content .card .btn {
+  background: #04087c;
+  color: white;
+}
+
+.content .card a {
+  color: #3a57e8;
+}
+
+.content-full {
+  margin-left: 0;
+}
+
+.container-fluid .display-4 {
+  font-weight: 700;
+}
+
+.container-fluid .lead {
+  font-size: 1.25rem;
+}
+
+/* Estilo de la tarjeta en la sección de contenido */
+.container-fluid .card {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
+  padding: 20px; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.container-fluid .card:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25); 
+}
+
+.container-fluid .card-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.container-fluid .card .btn {
+  padding: 12px 30px;
+  border-radius: 50px; 
+  background: #04087c; 
+  color: white;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4); 
+  
+}
+
+.container-fluid .card .btn:hover {
+  transform: translateY(-2px); 
+  box-shadow: 0 6px 15px rgba(58, 87, 232, 0.3); 
+}
+
+.requisitos .card {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
+  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.requisitos .card:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.requisitos .card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333; 
+}
+
+.requisitos .card i {
+  color: #04087c; 
+}
+
+.requisitos .card-text {
+  font-size: 1rem;
+  color: #555; 
+}
+
+/* Estilo general del formulario */
+.formulario-inscripcion, .formularioCambioClave {
+  border-radius: 1rem; 
+  padding: 1.5rem;
+}
+
+.formularioCambioClave {
+  background: white;
+}
+
+.formulario-inscripcion label, .formularioCambioClave label {
+  font-weight: 500;
+  color: #333; 
+}
+
+.content .title-crd {
+  color: #333;
+}
+
+.formulario-inscripcion .form-control, .formularioCambioClave {
+  border-radius: 0.5rem; 
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease;
+}
+
+.formulario-inscripcion .form-select:focus, .form-control:focus, .formularioCambioClave .form-control:focus {
+  border-color: #04087c; 
+  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2); 
+}
+
+.formulario-inscripcion .btn, .formularioCambioClave .btn, .boton-subir-perfil .btn-upload,
+ .formulario-perfil .btn, .card-footer .btn, .actualizar-inscripcion .btn, 
+ .envio-inscripcion .btn, .enviar-tema .btn{
+  background-color: #04087c;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px; 
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.formulario-inscripcion .btn:hover, .formularioCambioClave .btn:hover, 
+.boton-subir-perfil .btn-upload:hover, .formulario-perfil .btn:hover , 
+.card-footer .btn:hover, .actualizar-inscripcion .btn:hover, .envio-inscripcion 
+.btn:hover, .enviar-tema .btn:hover{
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3); 
+}
+
+.formularioCambioClave .btn:hover {
+  background: #04087c;
+  color: white;
+}
+
+.formulario-inscripcion .mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Estilo de las tarjetas */
+.container .card, .formularioCambioClave{
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+}
+
+.card-header .card-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333; 
+}
+
+/* FORMULARIO PARA ACTUALIZAR EL PERFIL */
+.boton-subir-perfil .btn-upload {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+
+.boton-subir-perfil .file-input {
+  display: none;
+}
+
+.boton-subir-perfil .btn-upload i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.profile img, .formulario-perfil img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+.user-profile img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+/* Diseño informacion de la inscripcion */
+.card-footer {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.content .card .color-rojo{
+  background: rgb(212, 37, 37);
+}
+
+.content .card .color-rojo:hover {
+  background: rgb(179, 32, 32);
+}
+
+/* FOCUS */
+.container-fluid .card .btn:active, 
+.container-fluid .card .btn:focus,
+.formulario-perfil .text-center .btn:active,
+.formulario-perfil .text-center .btn:focus,
+.envio-inscripcion .row .btn:active,
+.envio-inscripcion .row .btn:focus,
+.card .card-footer .btn:active,
+.card .card-footer .btn:focus,
+.card .actualizar-inscripcion .btn:active,
+.card .actualizar-inscripcion .btn:focus, 
+.card .enviar-tema .btn:active, 
+.card .enviar-tema .btn:focus { 
+  background: #04087c;
+  color: white;
+  border-color: #04087c;
+}
+
+.content .card .color-rojo:active,
+.content .card .color-rojo:focus {
+  background: rgb(179, 32, 32);
+  color: white;
+  border-color: rgb(179, 32, 32);
+}
+
+.no-modificable {
+  resize: none;
+}
+
+.enviar-tema .btns .cancelar-btn {
+  background: #ccc;
+  color: #373737;
+  transition: .3s;
+}
+
+.enviar-tema .btns .cancelar-btn:hover {
+  border-color: #ccc;
+  background: #ccc;
+  color: #373737;
+}
+
+.enviar-tema .btns .cancelar-btn:active,
+.enviar-tema .btns .cancelar-btn:focus {
+  border-color: #ccc;
+  background: #ccc;
+  color: #373737;
+}
+
+/* Estilos para el Footer */
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+  padding: 1rem 0;
+  color: #6c757d;
+  margin-left: 250px;
+  transition: all .6s;
+}
+
+.footer-full {
+  margin-left: 0;
+}
+
+.footer p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+
+@media (max-width: 768px) {
+  .topbar .user-profile span {
+    display: none;
+  }
+
+  .sidebar {
+    top: 60px;
+    position: fixed;
+    width: 250px;
+    transition: all .6s;
+    z-index: 100;
+    transform: translateX(-100%);
+  }
+
+  .sidebar-hidden {
+    transform: translateX(0);
+  }
+
+  .content, .footer {
+    margin-left: 0; 
+    transition: filter 0.6s; 
+  }
+
+  .blurred {
+    filter: blur(5px);
+  }
+
+  .menu-toggle {
+    margin-left: 0; 
+  }
+
+  .topbar {
+    background: #f8f9fa;
+  }
+
+  .topbar-right .search-bar {
+    display: none;
+  }
+
+  .formulario-inscripcion {
+    border-radius: 1rem; 
+    padding: 0;
+  }
+
+  .title-crd {
+    font-size: 1.2rem;
+    padding-bottom: 1rem;
+  }
+  
+  .card-footer {
+    display: block;
+    text-align: center;
+  }
+
+  .card-footer .btn {
+    margin: .5rem 0;
+  }
+
+}

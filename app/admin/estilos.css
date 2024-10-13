@@ -1,0 +1,345 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Ajustar el topbar para que se vea el ícono */
+.topbar {
+  background-color: #f8f9fa;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  transition: all 0.3s;
+}
+
+.menu-toggle {
+  font-size: 30px;
+  cursor: pointer;
+  color: #191919;
+  transition: all .6s;
+  margin-left: 250px; 
+}
+
+.menu-toggle-small {
+  margin-left: 0px; 
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.topbar-right .search-bar {
+  width: 250px;
+  margin-right: 20px;
+}
+
+.topbar i, span {
+  transition: .3s ease;
+}
+
+.topbar i:hover, .topbar span:hover {
+  color: #3a57e8;
+}
+
+.topbar-right i {
+  font-size: 20px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.topbar .dropdown-item:focus, 
+.topbar .dropdown-item:active {
+    background-color: transparent !important; 
+    color: inherit;
+    outline: none; 
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-profile img {
+  width: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* Estilo de la barra lateral */
+.sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: #04087c;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
+  transition: all .6s;
+}
+
+.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.sidebar .nav-link {
+  color: #d3d3d3;
+  padding: 12px 15px;
+  display: block;
+  font-size: 17px;
+  transition: .3s ease;
+  box-shadow: inset 0 0 0 0 white;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #03054d;
+  color: white;
+  box-shadow: inset 3px 0 0 0 white;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.profile {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile img {
+  width: 80px;
+  border-radius: 50%;
+}
+
+.profile h5 {
+  margin-top: 10px;
+  font-size: 18px;
+  color: white;
+}
+
+.profile p {
+  font-size: 14px;
+  color: #d3d3d3;
+}
+
+/* Ajustar contenido cuando el menú está oculto */
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  transition: all .6s;
+  min-height: 85vh;
+  background: #f5f7fb;
+}
+
+.content-full {
+  margin-left: 0;
+}
+
+.container-fluid .card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.container-fluid .btn {
+  padding: 10px 20px;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+  background: #04087c;
+  color: white;
+}
+
+.container-fluid .btn:hover {
+  color: white;
+}
+
+.container-fluid .card-principal {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.container-fluid .card-principal:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.card-principal i {
+  color: #04087c;
+  margin-bottom: 10px;
+}
+
+/* Estilo general del formulario */
+.formularioCambioClave {
+  border-radius: 1rem; 
+  padding: 1.5rem;
+  background: white;
+}
+
+.formularioCambioClave label {
+  font-weight: 500;
+  color: #333; 
+}
+
+.formularioCambioClave {
+  border-radius: 0.5rem; 
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus, .formularioCambioClave .form-control:focus {
+  border-color: #04087c; 
+  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2); 
+}
+
+.formularioCambioClave .btn, .boton-subir-perfil .btn-upload, 
+.formulario-perfil .btn {
+  background-color: #04087c;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px; 
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.formularioCambioClave .btn:hover, 
+.boton-subir-perfil .btn-upload:hover, .formulario-perfil .btn:hover {
+  color: white;
+  background-color: #04087c;
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3); 
+}
+
+/* Botón principal de la tarjeta */
+.container-fluid .card .btn {
+  padding: 10px 30px;
+  border-radius: 50px; 
+  background: #04087c; 
+  color: white;
+  transition: background-color 0.3s ease, transform 0.3s ease; 
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4); 
+}
+
+.container-fluid .card .btn:hover {
+  color: white;
+}
+
+/* Estilo de las tarjetas */
+.container .card, .formularioCambioClave{
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+}
+
+.card-header .card-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333; 
+}
+
+/* FORMULARIO PARA ACTUALIZAR EL PERFIL */
+.boton-subir-perfil .btn-upload {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.boton-subir-perfil .file-input {
+  display: none;
+}
+
+.boton-subir-perfil .btn-upload i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.profile img, .formulario-perfil img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+.user-profile img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+/* FOCUS Y ACTIVE DE LOS BUTTONS */
+.container-fluid .card .btn:active,
+.container-fluid .card .btn:focus {
+  background: #04087c;
+  color: white;
+}
+
+/* Estilos para el Footer */
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+  padding: 1rem 0;
+  color: #6c757d;
+  margin-left: 250px;
+  transition: all .6s;
+}
+
+.footer-full {
+  margin-left: 0;
+}
+
+.footer p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    top: 60px;
+    position: fixed;
+    width: 250px;
+    transition: all .6s;
+    z-index: 100;
+    transform: translateX(-100%);
+  }
+
+  .sidebar-hidden {
+    transform: translateX(0);
+  }
+
+  .content, .footer {
+    margin-left: 0; 
+    transition: filter 0.6s; 
+  }
+
+  .blurred {
+    filter: blur(5px);
+  }
+
+  .menu-toggle {
+    margin-left: 0; 
+  }
+
+  .topbar {
+    background: #f8f9fa;
+  }
+
+  .topbar .user-profile span {
+    display: none;
+  }
+
+  .topbar-right .search-bar {
+    display: none;
+  }
+
+}

@@ -1,0 +1,589 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Ajustar el topbar para que se vea el ícono */
+.topbar {
+  background-color: #f8f9fa;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  transition: all 0.3s;
+}
+
+.menu-toggle {
+  font-size: 30px;
+  cursor: pointer;
+  color: #191919;
+  transition: all .6s;
+  margin-left: 250px; 
+}
+
+.menu-toggle-small {
+  margin-left: 0px; 
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.topbar-right .search-bar {
+  width: 250px;
+  margin-right: 20px;
+}
+
+.topbar i, span {
+  transition: .3s ease;
+}
+
+.topbar i:hover, .topbar span:hover {
+  color: #3a57e8;
+}
+
+.topbar-right i {
+  font-size: 20px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.topbar .dropdown-item:focus, 
+.topbar .dropdown-item:active {
+    background-color: transparent !important; 
+    color: inherit;
+    outline: none; 
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-profile img {
+  width: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* Estilo de la barra lateral */
+.sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: #04087c;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
+  transition: all .6s;
+}
+
+.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.sidebar .nav-link {
+  color: #d3d3d3;
+  padding: 12px 15px;
+  display: block;
+  font-size: 17px;
+  transition: .3s ease;
+  box-shadow: inset 0 0 0 0 white;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #03054d;
+  color: white;
+  box-shadow: inset 3px 0 0 0 white;
+}
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.profile {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile img {
+  width: 80px;
+  border-radius: 50%;
+}
+
+.profile h5 {
+  margin-top: 10px;
+  font-size: 18px;
+  color: white;
+}
+
+.profile p {
+  font-size: 14px;
+  color: #d3d3d3;
+}
+
+/* Ajustar contenido cuando el menú está oculto */
+.content {
+  margin-left: 250px;
+  padding: 20px;
+  transition: all .6s;
+  min-height: 85vh;
+  background: #f5f7fb;
+}
+
+.content-full {
+  margin-left: 0;
+}
+
+.container-fluid .display-4 {
+  font-weight: 700;
+}
+
+.container-fluid .lead {
+  font-size: 1.25rem;
+}
+
+/* Estilo de la tarjeta en la sección de contenido */
+.container-fluid .card, .container .documentos-aprobados {
+  border-radius: 0.4rem;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+.container-fluid .card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.container-fluid .btn {
+  padding: 10px 20px;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+  background: #04087c;
+  color: white;
+}
+
+.container-fluid .btn:hover {
+  color: white;
+}
+
+.container-fluid .card {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.container-fluid .card:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.container-fluid .card-title {
+  color: #333;
+}
+
+.card-principal i {
+  color: #04087c;
+  margin-bottom: 10px;
+}
+
+/* Estilo general del formulario */
+.formulario-inscripcion, .formularioCambioClave {
+  border-radius: 1rem; 
+  padding: 1.5rem;
+}
+
+.formularioCambioClave {
+  background: white;
+}
+
+.formulario-inscripcion label, .formularioCambioClave label {
+  font-weight: 500;
+  color: #333; 
+}
+
+.content .title-crd {
+  color: #333;
+}
+
+.formulario-inscripcion .form-control, .formularioCambioClave {
+  border-radius: 0.5rem; 
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease;
+}
+
+.formulario-inscripcion .form-select:focus, .form-control:focus, .formularioCambioClave .form-control:focus {
+  border-color: #04087c; 
+  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2); 
+}
+
+.anteproyecto .btns .btn, 
+.formulario-inscripcion .btn, .formularioCambioClave .btn, .boton-subir-perfil .btn-upload, 
+.formulario-perfil .btn, .botones-detalle-tema .btn, .generar-reporte .btn{
+  background-color: #04087c;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px; 
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.formulario-inscripcion .btn:hover, .formularioCambioClave .btn:hover, 
+.boton-subir-perfil .btn-upload:hover, .formulario-perfil .btn:hover,
+.botones-detalle-tema .btn:hover, .generar-reporte .btn:hover, .anteproyecto .btns .btn:hover {
+  color: white;
+  background-color: #04087c;
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3); 
+}
+
+#cancelar-btn, .anteproyecto  .btns .cancelar-btn {
+  background: #ccc;
+  color: #373737;
+  transition: .3s;
+}
+
+#cancelar-btn:hover, .anteproyecto .btns .cancelar-btn:hover {
+  border-color: #ccc;
+  background: #ccc;
+  color: #373737;
+}
+
+
+
+.formulario-inscripcion .mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Botón principal de la tarjeta */
+.container-fluid .card .btn, .formulario-aceptar-rechazar .btn {
+  padding: 10px 30px;
+  border-radius: 50px; 
+  background: #04087c; 
+  color: white;
+  transition: background-color 0.3s ease, transform 0.3s ease; 
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4); 
+}
+
+
+.container-fluid .card .btn:hover, .formulario-aceptar-rechazar .btn:hover {
+  color: white;
+}
+
+.card .formulario-aceptar-rechazar .btn:active, 
+.card .formulario-aceptar-rechazar .btn:focus,
+.card .botones-detalle-tema .btn:active,
+.card .botones-detalle-tema .btn:focus,
+.card .generar-reporte .btn:active,
+.card .generar-reporte .btn:focus,
+.card .anteproyecto .btns .btn:active,
+.card .anteproyecto .btns .btn:focus {
+  background: #04087c; 
+  color: white;
+  border-color: #04087c;
+}
+
+.card .anteproyecto .btns .cancelar-btn:active,
+.card .anteproyecto .btns .cancelar-btn:focus {
+  border-color: #ccc;
+  background: #ccc;
+  color: #373737;
+}
+
+.card .formulario-aceptar-rechazar .color-rojo:active, 
+.card .formulario-aceptar-rechazar .color-rojo:focus,
+.card .botones-detalle-tema .color-rojo:active,
+.card .botones-detalle-tema .color-rojo:focus {
+  background: rgb(212, 37, 37);
+  color: white;
+  border-color: rgb(212, 37, 37);
+}
+
+.card .formulario-aceptar-rechazar .color-naranja:active, 
+.card .formulario-aceptar-rechazar .color-naranja:focus,
+.card .botones-detalle-tema .devolver-tema:active,
+.card .botones-detalle-tema .devolver-tema:focus {
+  background: rgb(207, 157, 39);
+  color: white;
+  border-color: rgb(207, 157, 39);
+}
+
+
+.formulario-aceptar-rechazar .btn:hover {
+  background: #04087c; 
+  
+}
+
+.formulario-aceptar-rechazar .color-rojo, .botones-detalle-tema .color-rojo{
+  background: rgb(212, 37, 37);
+}
+
+.formulario-aceptar-rechazar .color-rojo:hover, .botones-detalle-tema .color-rojo:hover {
+  background: rgb(179, 32, 32);
+}
+
+.formulario-aceptar-rechazar .color-naranja, .botones-detalle-tema .devolver-tema{
+  padding-inline: 25px;
+  background: rgb(207, 157, 39);
+}
+
+.formulario-aceptar-rechazar .color-naranja:hover, .botones-detalle-tema .devolver-tema:hover {
+  background: rgb(181, 138, 35);
+
+}
+
+.formulario-aceptar-rechazar {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.formulario-aceptar-rechazar .btn {
+  padding-inline: 50px;
+}
+
+.formulario-aceptar-rechazar .aprobar{
+  padding-inline: 80px;
+}
+
+/* Estilo de las tarjetas */
+.container .card, .formularioCambioClave{
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+}
+
+.card-header .card-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333; 
+}
+
+/* FORMULARIO PARA ACTUALIZAR EL PERFIL */
+.boton-subir-perfil .btn-upload {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.boton-subir-perfil .file-input {
+  display: none;
+}
+
+.boton-subir-perfil .btn-upload i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.profile img, .formulario-perfil img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+.user-profile img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+/* TAMAÑO ICONO TABLA DE INSCRIPCIONES */
+.table-responsive {
+  max-height: 500px;
+  overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.table-responsive a{
+  color: #04087c;
+}
+
+.table-header-fixed {
+  position: sticky;
+  top: 0;
+  background-color: #fff; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+}
+
+.table-header-fixed th {
+  padding: 15px 10px; 
+  vertical-align: middle;
+}
+
+table a i {
+  font-size: 20px;
+  margin-right: 1px;
+  color: #04087c;
+}
+
+
+.tabla-descargar a{
+  font-size: 16px;
+  font-weight: bold;
+  color: #04087c;
+}
+
+.tabla-descargar a i {
+  font-size: 25px;
+  margin-right: 5px;
+}
+
+.tabla-descargar th, table td {
+  vertical-align: middle; 
+}
+
+/* FOCUS Y ACTIVE DE LOS BUTTONS */
+.container-fluid .card .btn:active,
+.container-fluid .card .btn:focus {
+  background: #04087c;
+  color: white;
+}
+
+.no-modificable {
+  resize: none;
+}
+
+.tabla-anchura-th {
+  white-space: nowrap;
+  width: 20%;
+}
+
+.altura-card {
+  max-height: 400px;
+}
+
+
+.container .documentos-aprobados {
+  border: 2px solid #04087c;
+}
+
+.container .documentos-aprobados .card-title {
+  color: #04087c;
+}
+
+/* Estilos para el Footer */
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #ddd;
+  padding: 1rem 0;
+  color: #6c757d;
+  margin-left: 250px;
+  transition: all .6s;
+}
+
+.footer-full {
+  margin-left: 0;
+}
+
+.footer p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+#color-verde {
+  background: rgb(5, 137, 5);
+  color: white;
+  border: 2px solid rgb(5, 137, 5);
+}
+
+.container .temas-aprobados {
+  border: 2px solid rgb(5, 137, 5);
+}
+
+.container .temas-aprobados .card-title {
+  color: rgb(5, 137, 5);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    top: 60px;
+    position: fixed;
+    width: 250px;
+    transition: all .6s;
+    z-index: 100;
+    transform: translateX(-100%);
+  }
+
+  .sidebar-hidden {
+    transform: translateX(0);
+  }
+
+  .content, .footer {
+    margin-left: 0; 
+    transition: filter 0.6s; 
+  }
+
+  .blurred {
+    filter: blur(5px);
+  }
+
+  .menu-toggle {
+    margin-left: 0; 
+  }
+
+  .topbar {
+    background: #f8f9fa;
+  }
+
+  .topbar .user-profile span {
+    display: none;
+  }
+
+  .topbar-right .search-bar {
+    display: none;
+  }
+
+  .formulario-aceptar-rechazar {
+    display: block;
+  }
+  
+  .formulario-aceptar-rechazar .btn {
+    margin-bottom: 1rem;
+    font-size: 13px;
+  }
+
+  .tabla-descargar {
+    font-size: 13px;
+  }
+
+  .tabla-descargar a {
+    font-size: 13px;
+
+  }
+
+  .tabla-anchura-th {
+    white-space: wrap;
+    width: auto;
+  }
+
+  .table-responsive {
+    font-size: 13px;
+    overflow-x: auto;
+  }
+
+  .table-responsive i {
+    font-size: 13px;
+
+  }
+
+}
