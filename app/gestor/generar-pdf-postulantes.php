@@ -51,12 +51,12 @@ class CustomPDF extends TCPDF
 // Inicializar TCPDF
 $pdf = new CustomPDF();
 $pdf->AddPage();
-$pdf->SetY(25); // Ajusta la posición del contenido si es necesario
+$pdf->SetY(25); // Ajusta la posición del contenido 
 
 // Configurar la fuente para el título de la tabla
 $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, 'Listado de Postulantes Aprobados', 0, 1, 'C');
-$pdf->Ln(5); // Ajusta para añadir más espacio debajo del título si es necesario
+$pdf->Ln(5); // Ajuste para añadir más espacio debajo del título 
 
 
 // Encabezados de la tabla
