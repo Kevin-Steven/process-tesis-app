@@ -20,8 +20,9 @@ $pareja_id = isset($_POST['id_pareja']) ? $_POST['id_pareja'] : null;
 $sql = "SELECT u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos,
                pareja.nombres AS pareja_nombres, pareja.apellidos AS pareja_apellidos
         FROM usuarios u
-        LEFT JOIN usuarios pareja ON u.id = pareja.id
+        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
         WHERE u.id = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $postulante_id);
 $stmt->execute();
@@ -63,34 +64,31 @@ if (isset($_FILES['archivo_observaciones']) && $_FILES['archivo_observaciones'][
         $error = 'invalid_extension';
     } elseif ($fileSize > $maxFileSize) {
         $error = 'too_large';
-    } elseif (!move_uploaded_file($fileTmpPath, $uploadDir . $fileName)) {
-        $error = 'upload_error';
     } else {
         // Generar el nombre del archivo
         $newFileName = 'Observaciones_' . $postulante_apellido . '_' . $postulante_nombre;
         if ($pareja_nombre && $pareja_apellido) {
             $newFileName .= '_' . $pareja_apellido . '_' . $pareja_nombre;
         }
-        $newFileName .= '.' . $fileExtension;
+        $newFileName .= '.' . $fileExtension;  // Se eliminan los números adicionales aquí
         $destPath = $uploadDir . $newFileName;
 
         // Mover el archivo al directorio de destino
         if (move_uploaded_file($fileTmpPath, $destPath)) {
             // Actualizar la tabla `tema` con el nombre del archivo para el campo `observaciones_anteproyecto`
-            $sql_update = "UPDATE tema SET observaciones_anteproyecto = ? WHERE usuario_id = ?";
+            $sql_update = "UPDATE tema SET observaciones_anteproyecto = ? WHERE usuario_id = ? AND estado_registro = 0"; // Evitar registros eliminados
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bind_param("si", $newFileName, $postulante_id);
             $stmt_update->execute();
 
             // Si existe pareja, actualizar también para la pareja
             if ($pareja_id) {
-                $sql_update_pareja = "UPDATE tema SET observaciones_anteproyecto = ? WHERE usuario_id = ?";
-                $stmt_update_pareja = $conn->prepare($sql_update_pareja);
+                $stmt_update_pareja = $conn->prepare($sql_update);
                 $stmt_update_pareja->bind_param("si", $newFileName, $pareja_id);
                 $stmt_update_pareja->execute();
             }
 
-            if ($stmt_update->execute()) {
+            if ($stmt_update->execute() && (!$pareja_id || $stmt_update_pareja->execute())) {
                 header("Location: revisar-anteproyecto.php?status=success");
                 exit();
             } else {

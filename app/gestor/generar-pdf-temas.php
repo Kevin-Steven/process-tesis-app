@@ -67,12 +67,14 @@ $pdf->MultiCellRow($headers, $widths, $height);
 
 // Consulta para obtener los temas aprobados
 $sql = "SELECT t.tema, 
-               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos,
-               p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios p ON t.pareja_id = p.id
-        WHERE t.estado_tema = 'Aprobado'";
+       u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos,
+       p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos
+FROM tema t
+JOIN usuarios u ON t.usuario_id = u.id
+LEFT JOIN usuarios p ON t.pareja_id = p.id
+WHERE t.estado_tema = 'Aprobado'
+AND (t.pareja_id IS NULL OR t.usuario_id < t.pareja_id OR t.pareja_id = -1);
+";
 $result = $conn->query($sql);
 
 // Llenar la tabla con datos

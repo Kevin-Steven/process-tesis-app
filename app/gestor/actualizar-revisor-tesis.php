@@ -7,8 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tema_id']) && isset($
     $tema_id = $_POST['tema_id'];
     $revisor_id = $_POST['revisor_id'];
 
-    // Consultar el tema para obtener el ID del postulante y su pareja (si tiene)
-    $sql = "SELECT usuario_id, pareja_id FROM tema WHERE id = ?";
+    // Consultar el tema para obtener el ID del postulante y su pareja (si tiene), solo si estado_registro es 0
+    $sql = "SELECT usuario_id, pareja_id FROM tema WHERE id = ? AND estado_registro = 0";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $tema_id);
     $stmt->execute();
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tema_id']) && isset($
 
         try {
             // Asignar el revisor al postulante
-            $sql_update = "UPDATE tema SET revisor_tesis_id = ? WHERE usuario_id = ?";
+            $sql_update = "UPDATE tema SET revisor_tesis_id = ? WHERE usuario_id = ? AND estado_registro = 0";
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bind_param("ii", $revisor_id, $usuario_id);
             $stmt_update->execute();
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tema_id']) && isset($
             exit();
         }
     } else {
-        // Si no se encontró el tema, redireccionar con un mensaje de error
+        // Si no se encontró el tema o está borrado lógicamente, redireccionar con un mensaje de error
         header("Location: tabla-revisor-tesis.php?status=not_found");
         exit();
     }

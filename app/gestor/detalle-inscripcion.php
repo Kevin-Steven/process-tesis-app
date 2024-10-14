@@ -91,11 +91,11 @@ if (isset($_GET['id'])) {
       <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
     </div>
     <nav class="nav flex-column">
-      <a class="nav-link " href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
+      <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
       <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
+      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
+      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
       <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Ver Temas</a>
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Generar Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>
@@ -145,17 +145,17 @@ if (isset($_GET['id'])) {
 
           <hr class="my-4">
 
-          
+
           <div class="text-center mt-4 formulario-aceptar-rechazar">
-            
+
             <button type="button" class="btn aprobar" data-bs-toggle="modal" data-bs-target="#modalConfirmarAprobar">
               Aprobar
             </button>
-            
+
             <button type="button" class="btn color-rojo" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarSolicitud">
               Eliminar Solicitud
             </button>
-            
+
             <!-- <button type="button" name="devolver" class="btn color-naranja" data-bs-toggle="modal" data-bs-target="#modalDevolver">Devolver documentación</button> -->
           </div>
         </div>

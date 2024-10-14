@@ -15,15 +15,19 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id,
-               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
-               tutores.nombres AS tutor_nombre, p.id AS pareja_id
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios p ON t.pareja_id = p.id
-        JOIN tutores ON t.tutor_id = tutores.id
-        WHERE t.estado_tema = 'Aprobado' AND t.estado_registro = 0";
+$sql = "
+    SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id,
+           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
+           tutores.nombres AS tutor_nombre, p.id AS pareja_id
+    FROM tema t
+    JOIN usuarios u ON t.usuario_id = u.id
+    LEFT JOIN usuarios p ON t.pareja_id = p.id
+    JOIN tutores ON t.tutor_id = tutores.id
+    WHERE t.estado_tema = 'Aprobado' 
+    AND t.estado_registro = 0
+    AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)";
+
 $result = $conn->query($sql);
 ?>
 
@@ -91,10 +95,10 @@ $result = $conn->query($sql);
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
       <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
+      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
+      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
       <a class="nav-link active" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Ver Temas</a>
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Generar Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>

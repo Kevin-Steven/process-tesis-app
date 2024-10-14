@@ -18,17 +18,19 @@ if (!$conn) {
   die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Consultar el último anteproyecto asignado al docente que tenga el estado de registro en 0 y no tenga observaciones
-$sql = "SELECT t.id, t.tema, t.documento_tesis, u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               pareja.nombres AS pareja_nombres, pareja.apellidos AS pareja_apellidos
+// Consulta para obtener los documentos de tesis asignados al revisor de tesis, 
+// asegurando que no se muestren duplicados para aquellos con pareja.
+$sql = "SELECT t.id, t.tema, t.documento_tesis, 
+               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
         FROM tema t
         JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios pareja ON t.pareja_id = pareja.id
+        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
         WHERE t.revisor_tesis_id = ? 
         AND t.estado_registro = 0
         AND (t.observaciones_tesis IS NULL OR t.observaciones_tesis = '')
-        ORDER BY t.fecha_subida DESC 
-        LIMIT 1";
+        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
+        ORDER BY t.fecha_subida DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -102,8 +104,8 @@ $result = $stmt->get_result();
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link active" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
-      <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
+      <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
+      <a class="nav-link active" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
       <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
     </nav>
   </div>
@@ -173,18 +175,13 @@ $result = $stmt->get_result();
               <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                  <td>
-                    <?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'Sin pareja'; ?>
-                  </td>
-                  <td>
-                    <?php echo $row['tema'] ?>
-                  </td>
+                  <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td> <!-- Aquí está el cambio -->
+                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td class="text-center">
-                    <?php if (!empty($row['anteproyecto'])): ?>
+                    <?php if (!empty($row['documento_tesis'])): ?>
                       <a href="detalles-documentos-tesis.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
                         <i class='bx bx-search'></i> Ver detalles
                       </a>
-
                     <?php else: ?>
                       <span class="text-muted">No disponible</span>
                     <?php endif; ?>

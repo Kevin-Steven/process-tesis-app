@@ -18,6 +18,7 @@ if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
+
 ?>
 
 <!doctype html>
@@ -26,7 +27,7 @@ if (!$conn) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ver Observaciones</title>
+    <title>Tus observaciones</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -87,47 +88,62 @@ if (!$conn) {
             <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
-            <a class="nav-link active" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
+            <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content" id="content">
-        <div class="container-fluid py-3">
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h1 class="mb-3 fw-bold">Revisa las Observaciones Realizadas</h1>
-                    <p class="lead mb-5">Desde este panel, podrás revisar las observaciones que ya has realizado a los anteproyectos y tesis. Además, tendrás la opción de actualizar o corregir cualquier observación en caso de haber cometido un error al enviarla.</p>
-
-
-                    <!-- Cards con acciones rápidas -->
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 mb-3">
-                            <div class="card card-principal h-100 shadow">
-                                <div class="card-body text-center">
-                                    <i class='bx bx-book bx-lg mb-3'></i>
-                                    <h5 class="card-title fw-bold mb-3">Ver Observaciones del Anteproyecto</h5>
-                                    <p class="card-text mb-4">Revisa las observaciones realizadas sobre el anteproyecto.</p>
-                                    <a href="obs-realizadas-anteproyecto.php" class="btn">Acceder</a>
-                                </div>
-                            </div>
+        <div class="container mt-3">
+            <h1 class="text-center mb-4 fw-bold">Próximamente</h1>
+            <?php if (isset($_GET['status'])): ?>
+                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <i class='bx bx-send fs-4 me-2'></i>
+                            <strong class="me-auto">Estado de Actualización</strong>
+                            <small>Justo ahora</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card card-principal h-100 shadow">
-                                <div class="card-body text-center">
-                                    <i class='bx bx-file bx-lg mb-3'></i>
-                                    <h5 class="card-title fw-bold mb-3">Ver Observaciones del Documento de Tesis</h5>
-                                    <p class="card-text mb-4">Revisa las observaciones realizadas sobre el documento de tesis.</p>
-                                    <a href="obs-realizadas-tesis.php" class="btn">Acceder</a>
-                                </div>
-                            </div>
+                        <div class="toast-body">
+                            <?php
+                            switch ($_GET['status']) {
+                                case 'success':
+                                    echo "Observaciones enviadas con éxito.";
+                                    break;
+                                case 'not_found':
+                                    echo "No se encontraron detalles para el postulante.";
+                                    break;
+                                case 'invalid_extension':
+                                    echo "Tipo de archivo no permitido. Solo se aceptan archivos ZIP, DOC y DOCX.";
+                                    break;
+                                case 'too_large':
+                                    echo "El archivo excede el tamaño máximo permitido de 20MB.";
+                                    break;
+                                case 'db_error':
+                                    echo "Error al actualizar la base de datos.";
+                                    break;
+                                case 'upload_error':
+                                    echo "Hubo un error al subir el archivo.";
+                                    break;
+                                case 'no_file':
+                                    echo "Por favor, selecciona un archivo para subir.";
+                                    break;
+                                case 'form_error':
+                                    echo "No se ha enviado el formulario correctamente.";
+                                    break;
+                                default:
+                                    echo "Ocurrió un error desconocido.";
+                                    break;
+                            }
+                            ?>
                         </div>
                     </div>
-
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
+
 
 
     <!-- Footer -->

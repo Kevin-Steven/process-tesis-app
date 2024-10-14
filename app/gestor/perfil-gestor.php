@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Actualizar la variable de sesión con la nueva foto
     $_SESSION['usuario_foto'] = $foto_perfil;
   } else {
-    $foto_perfil = $usuario['foto_perfil']; 
+    $foto_perfil = $usuario['foto_perfil'];
   }
 
   // Redirigir para evitar reenvíos de formularios
@@ -126,119 +126,119 @@ $conn->close();
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
       <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
+      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
+      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
       <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Ver Temas</a>
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Generar Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>
   </div>
 
   <!-- Content -->
-<div class="content" id="content">
-  <div class="container mt-3">
-    <div class="row justify-content-center">
-      <!-- Columna del Perfil del Usuario -->
-      <div class="col-md-8 mb-4">
-        <div class="card">
-          <div class="card-header text-center">
-            <h2 class="card-title fw-bold">Mis Datos</h2>
-          </div>
-          <div class="card-body">
+  <div class="content" id="content">
+    <div class="container mt-3">
+      <div class="row justify-content-center">
+        <!-- Columna del Perfil del Usuario -->
+        <div class="col-md-8 mb-4">
+          <div class="card">
+            <div class="card-header text-center">
+              <h2 class="card-title fw-bold">Mis Datos</h2>
+            </div>
+            <div class="card-body">
 
-            <!-- Formulario para actualizar datos -->
-            <form action="actualizar-perfil-gestor.php" method="POST" class="formulario-perfil" enctype="multipart/form-data">
-              <?php if (isset($_GET['status'])): ?>
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                      <i class='bx bx-send me-2'></i>
-                      <strong class="me-auto">Estado de Actualización</strong>
-                      <small>Justo ahora</small>
-                      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+              <!-- Formulario para actualizar datos -->
+              <form action="actualizar-perfil-gestor.php" method="POST" class="formulario-perfil" enctype="multipart/form-data">
+                <?php if (isset($_GET['status'])): ?>
+                  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                      <div class="toast-header">
+                        <i class='bx bx-send me-2'></i>
+                        <strong class="me-auto">Estado de Actualización</strong>
+                        <small>Justo ahora</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                      </div>
+                      <div class="toast-body">
+                        <?php if ($_GET['status'] == 'success'): ?>
+                          Perfil actualizado correctamente.
+                        <?php elseif ($_GET['status'] == 'invalid_phone'): ?>
+                          El número de teléfono o WhatsApp debe tener 10 dígitos.
+                        <?php elseif ($_GET['status'] == 'no_changes'): ?>
+                          No se realizaron cambios en los datos.
+                        <?php else: ?>
+                          Hubo un error al actualizar el perfil.
+                        <?php endif; ?>
+                      </div>
                     </div>
-                    <div class="toast-body">
-                      <?php if ($_GET['status'] == 'success'): ?>
-                        Perfil actualizado correctamente.
-                      <?php elseif ($_GET['status'] == 'invalid_phone'): ?>
-                        El número de teléfono o WhatsApp debe tener 10 dígitos.
-                      <?php elseif ($_GET['status'] == 'no_changes'): ?>
-                        No se realizaron cambios en los datos.
-                      <?php else: ?>
-                        Hubo un error al actualizar el perfil.
-                      <?php endif; ?>
-                    </div>
+                  </div>
+
+                  <script>
+                    document.addEventListener('DOMContentLoaded', (event) => {
+                      var toastEl = document.getElementById('liveToast');
+                      var toast = new bootstrap.Toast(toastEl);
+                      toast.show();
+                    });
+                  </script>
+                <?php endif; ?>
+
+                <!-- Imagen del perfil -->
+                <div class="text-center mb-3">
+                  <img id="preview" src="<?php echo $usuario['foto_perfil'] ? $usuario['foto_perfil'] : '../../images/user.png'; ?>" alt="Perfil" class="rounded-circle" width="120">
+                </div>
+
+                <!-- Botón personalizado para subir foto -->
+                <div class="text-center mb-2 boton-subir-perfil">
+                  <label for="foto_perfil" class="btn-upload">
+                    <i class='bx bx-camera text-white'></i> Cargar Foto
+                  </label>
+                  <input type="file" id="foto_perfil" name="foto_perfil" class="file-input" accept="image/*" onchange="previewImage(event)">
+                  <input type="hidden" name="foto_actual" value="<?php echo $usuario['foto_perfil']; ?>">
+                </div>
+
+                <!-- Distribución en dos columnas -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="nombres" class="form-label"><strong>Nombres:</strong></label>
+                    <input type="text" name="nombres" class="form-control" value="<?php echo $usuario['nombres']; ?>" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="apellidos" class="form-label"><strong>Apellidos:</strong></label>
+                    <input type="text" name="apellidos" class="form-control" value="<?php echo $usuario['apellidos']; ?>" required>
                   </div>
                 </div>
 
-                <script>
-                  document.addEventListener('DOMContentLoaded', (event) => {
-                    var toastEl = document.getElementById('liveToast');
-                    var toast = new bootstrap.Toast(toastEl);
-                    toast.show();
-                  });
-                </script>
-              <?php endif; ?>
-
-              <!-- Imagen del perfil -->
-              <div class="text-center mb-3">
-                <img id="preview" src="<?php echo $usuario['foto_perfil'] ? $usuario['foto_perfil'] : '../../images/user.png'; ?>" alt="Perfil" class="rounded-circle" width="120">
-              </div>
-
-              <!-- Botón personalizado para subir foto -->
-              <div class="text-center mb-2 boton-subir-perfil">
-                <label for="foto_perfil" class="btn-upload">
-                  <i class='bx bx-camera text-white'></i> Cargar Foto
-                </label>
-                <input type="file" id="foto_perfil" name="foto_perfil" class="file-input" accept="image/*" onchange="previewImage(event)">
-                <input type="hidden" name="foto_actual" value="<?php echo $usuario['foto_perfil']; ?>">
-              </div>
-
-              <!-- Distribución en dos columnas -->
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="nombres" class="form-label"><strong>Nombres:</strong></label>
-                  <input type="text" name="nombres" class="form-control" value="<?php echo $usuario['nombres']; ?>" required>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label"><strong>Email:</strong></label>
+                    <input type="email" name="email" class="form-control" value="<?php echo $usuario['email']; ?>" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="cedula" class="form-label"><strong>Cédula:</strong></label>
+                    <input type="text" name="cedula" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['cedula']; ?>" readonly>
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label for="apellidos" class="form-label"><strong>Apellidos:</strong></label>
-                  <input type="text" name="apellidos" class="form-control" value="<?php echo $usuario['apellidos']; ?>" required>
-                </div>
-              </div>
 
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="email" class="form-label"><strong>Email:</strong></label>
-                  <input type="email" name="email" class="form-control" value="<?php echo $usuario['email']; ?>" required>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="telefono" class="form-label"><strong>Teléfono:</strong></label>
+                    <input type="text" name="telefono" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['telefono']; ?>" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="whatsapp" class="form-label"><strong>WhatsApp:</strong></label>
+                    <input type="text" name="whatsapp" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['whatsapp']; ?>" required>
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label for="cedula" class="form-label"><strong>Cédula:</strong></label>
-                  <input type="text" name="cedula" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['cedula']; ?>" readonly>
-                </div>
-              </div>
 
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="telefono" class="form-label"><strong>Teléfono:</strong></label>
-                  <input type="text" name="telefono" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['telefono']; ?>" required>
+                <div class="text-center mt-3">
+                  <button type="submit" class="btn btn-primary w-50">Actualizar</button>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label for="whatsapp" class="form-label"><strong>WhatsApp:</strong></label>
-                  <input type="text" name="whatsapp" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['whatsapp']; ?>" required>
-                </div>
-              </div>
-
-              <div class="text-center mt-3">
-                <button type="submit" class="btn btn-primary w-50">Actualizar</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <!-- Footer -->

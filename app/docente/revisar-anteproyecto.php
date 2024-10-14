@@ -3,8 +3,8 @@ session_start();
 require '../config/config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-  header("Location: ../../index.php");
-  exit();
+    header("Location: ../../index.php");
+    exit();
 }
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
@@ -15,20 +15,21 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 $usuario_id = $_SESSION['usuario_id'];
 
 if (!$conn) {
-  die("Error al conectar con la base de datos: " . mysqli_connect_error());
+    die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
 // Consultar el último anteproyecto asignado al docente que tenga el estado de registro en 0 y no tenga observaciones
-$sql = "SELECT t.id, t.tema, t.anteproyecto, u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               pareja.nombres AS pareja_nombres, pareja.apellidos AS pareja_apellidos
+$sql = "SELECT t.id, t.tema, t.anteproyecto, 
+               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
         FROM tema t
         JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios pareja ON t.pareja_id = pareja.id
+        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
         WHERE t.revisor_anteproyecto_id = ? 
         AND t.estado_registro = 0
         AND (t.observaciones_anteproyecto IS NULL OR t.observaciones_anteproyecto = '')
-        ORDER BY t.fecha_subida DESC 
-        LIMIT 1";
+        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
+        ORDER BY t.fecha_subida DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -59,7 +60,7 @@ $result = $stmt->get_result();
     <div class="topbar-right">
       <div class="input-group search-bar">
         <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-        <input type="text" id="search" class="form-control" placeholder="Search">
+        <input type="text" id="search" class="form-control" placeholder="Buscar...">
       </div>
       <i class='bx bx-envelope'></i>
       <i class='bx bx-bell'></i>
@@ -173,18 +174,13 @@ $result = $stmt->get_result();
               <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                  <td>
-                    <?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'Sin pareja'; ?>
-                  </td>
-                  <td>
-                    <?php echo $row['tema'] ?>
-                  </td>
+                  <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td>
+                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td class="text-center">
                     <?php if (!empty($row['anteproyecto'])): ?>
                       <a href="detalles-anteproyecto.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
                         <i class='bx bx-search'></i> Ver detalles
                       </a>
-
                     <?php else: ?>
                       <span class="text-muted">No disponible</span>
                     <?php endif; ?>
@@ -197,6 +193,7 @@ $result = $stmt->get_result();
       <?php else: ?>
         <p class="text-center">No hay anteproyectos asignados para revisión.</p>
       <?php endif; ?>
+
     </div>
   </div>
 

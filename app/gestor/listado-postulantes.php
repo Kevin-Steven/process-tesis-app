@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../config/config.php'; 
+require '../config/config.php';
 
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
   header("Location: ../../index.php");
@@ -19,7 +19,7 @@ $sql = "SELECT u.nombres, u.apellidos, u.carrera, d.estado_inscripcion
         FROM usuarios u 
         LEFT JOIN documentos_postulante d ON u.id = d.usuario_id 
         WHERE d.estado_inscripcion = 'Aprobado' AND d.estado_registro = 0
-        ORDER BY d.fecha_subida DESC";  
+        ORDER BY d.fecha_subida DESC";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -95,10 +95,10 @@ $result = $stmt->get_result();
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link active" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
       <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
+      <a class="nav-link active" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
+      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
       <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Ver Temas</a>
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Generar Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>

@@ -3,8 +3,8 @@ session_start();
 require '../config/config.php';
 
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
-    header("Location: ../../index.php");
-    exit();
+  header("Location: ../../index.php");
+  exit();
 }
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
@@ -13,31 +13,31 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 
 // Obtener el ID del tema desde la URL
 if (isset($_GET['id'])) {
-    $tema_id = intval($_GET['id']);
+  $tema_id = intval($_GET['id']);
 
-    // Consulta para obtener los detalles del tema y el tutor actual
-    $sql = "SELECT t.tema, tut.nombres AS tutor_nombres, tut.id AS tutor_id 
+  // Consulta para obtener los detalles del tema y el tutor actual
+  $sql = "SELECT t.tema, tut.nombres AS tutor_nombres, tut.id AS tutor_id 
             FROM tema t
             JOIN tutores tut ON t.tutor_id = tut.id
             WHERE t.id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $tema_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $tema_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $tema = $result->fetch_assoc();
-    } else {
-        echo "No se encontraron detalles para este tema.";
-        exit();
-    }
-
-    // Obtener todos los tutores disponibles
-    $sql_tutores = "SELECT id, nombres FROM tutores";
-    $result_tutores = $conn->query($sql_tutores);
-} else {
-    echo "No se especificó ningún ID de tema.";
+  if ($result->num_rows > 0) {
+    $tema = $result->fetch_assoc();
+  } else {
+    echo "No se encontraron detalles para este tema.";
     exit();
+  }
+
+  // Obtener todos los tutores disponibles
+  $sql_tutores = "SELECT id, nombres FROM tutores";
+  $result_tutores = $conn->query($sql_tutores);
+} else {
+  echo "No se especificó ningún ID de tema.";
+  exit();
 }
 ?>
 
@@ -94,10 +94,10 @@ if (isset($_GET['id'])) {
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
-      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
       <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
+      <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
+      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
       <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Ver Temas</a>
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Generar Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>
@@ -114,7 +114,7 @@ if (isset($_GET['id'])) {
           <h5 class="card-title text-center fw-bold mb-3">Editar Tutor del Tema: "<?php echo htmlspecialchars($tema['tema']); ?>"</h5>
           <form action="logica-actualizar-tutor-ap.php" class="actualizar-tutor" method="POST">
             <input type="hidden" name="tema_id" value="<?php echo $tema_id; ?>">
-            
+
             <!-- Tutor actual -->
             <div class="mb-3">
               <label for="tutor_actual" class="form-label fw-bold">Tutor Actual</label>
