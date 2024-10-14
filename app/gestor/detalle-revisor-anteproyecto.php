@@ -140,13 +140,13 @@ if (isset($_GET['id'])) {
                                 <?php endwhile; ?>
                             </select>
                         </div>
-                        <div class="text-center btns mt-4 d-flex justify-content-center gap-4">
+                        <div class="text-center btns mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3">
                             <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modalActualizarRevisor">
                                 Actualizar Revisor
                             </button>
                             <a href="tabla-revisor-anteproyecto.php" class="btn cancelar-btn">Cancelar</a>
-
                         </div>
+
 
                         <!-- Modal para confirmar actualización -->
                         <div class="modal fade" id="modalActualizarRevisor" tabindex="-1" aria-labelledby="modalActualizarRevisorLabel" aria-hidden="true">

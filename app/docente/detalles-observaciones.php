@@ -14,8 +14,8 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 if (isset($_GET['id'])) {
     $anteproyecto_id = $_GET['id'];
 
-    // Obtener los detalles del anteproyecto, incluyendo el postulante, su pareja (si tiene), y el tema
-    $sql = "SELECT t.tema, t.anteproyecto, t.usuario_id, t.pareja_id, 
+    // Obtener los detalles del anteproyecto, incluyendo el postulante, su pareja (si tiene), el tema y las observaciones
+    $sql = "SELECT t.tema, t.anteproyecto, t.observaciones_anteproyecto, t.usuario_id, t.pareja_id, 
                u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
                pareja.nombres AS pareja_nombres, pareja.apellidos AS pareja_apellidos
         FROM tema t
@@ -45,7 +45,7 @@ if (isset($_GET['id'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Detalle del Anteproyecto</title>
+    <title>Detalles observaciones</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -101,7 +101,7 @@ if (isset($_GET['id'])) {
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-2">
-            <h1 class="mb-4 text-center fw-bold">Detalle del Anteproyecto</h1>
+            <h1 class="mb-4 text-center fw-bold">Detalles Observaciones</h1>
             <div class="card shadow-lg">
                 <div class="card-body">
                     <h5 class="card-title text-primary text-center fw-bold mb-4">Información del Anteproyecto</h5>
@@ -136,11 +136,24 @@ if (isset($_GET['id'])) {
                                         </a>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th><i class="bx bx-file"></i> Observaciones</th>
+                                    <td>
+                                        <?php if (!empty($anteproyecto['observaciones_anteproyecto'])): ?>
+                                            <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/observaciones/<?php echo urlencode($anteproyecto['observaciones_anteproyecto']); ?>" download>
+                                                <i class='bx bx-cloud-download'></i> Descargar Observaciones
+                                            </a>
+                                        <?php else: ?>
+                                            No se han subido observaciones.
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
+
                     <div class="text-center mt-4 formulario-aceptar-rechazar">
-                        <button type="button" class="btn aprobar" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarSolicitud">Enviar observaciones</button>
+                        <button type="button" class="btn aprobar" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarSolicitud">Actualizar observaciones</button>
                         <button type="button" id="cancelar-btn" class="btn" onclick="history.back()">Cancelar</button>
                     </div>
                 </div>
@@ -156,7 +169,7 @@ if (isset($_GET['id'])) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formObservaciones" action="enviar-observaciones.php" method="POST" enctype="multipart/form-data">
+                    <form id="formObservaciones" action="actualizar-observaciones.php" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id_anteproyecto" value="<?php echo $anteproyecto_id; ?>">
                         <input type="hidden" name="id_postulante" value="<?php echo $anteproyecto['usuario_id']; ?>">
                         <!-- Campo oculto para el ID de la pareja si existe -->
@@ -178,8 +191,6 @@ if (isset($_GET['id'])) {
             </div>
         </div>
     </div>
-
-
 
 
     <footer class="footer mt-auto py-3 bg-light text-center">

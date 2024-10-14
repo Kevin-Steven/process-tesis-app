@@ -158,6 +158,12 @@ if ($conn->connect_error) {
         </div>
     </div>
 
+    <div class="btn-regresarA">
+        <a href="asignar-revisores.php" class="regresar-enlace">
+            <i class='bx bx-left-arrow-circle'></i>
+        </a>
+    </div>
+
     <footer class="footer mt-auto py-3 bg-light text-center">
         <div class="container">
             <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>

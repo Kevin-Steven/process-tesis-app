@@ -26,7 +26,7 @@ if (!$conn) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inicio</title>
-    <link href="estilos.css" rel="stylesheet">
+    <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" href="../../images/favicon.png" type="image/png">
@@ -100,7 +100,7 @@ if (!$conn) {
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
                     <h1 class="display-4 mb-3 fw-bold">Bienvenido a tu panel de Docente</h1>
-                    <p class="lead mb-5">Desde este panel podrás revisar anteproyectos y tesis, así como gestionar las revisiones pendientes de los estudiantes.</p>
+                    <p id="lead" class="lead mb-5">Desde este panel podrás revisar anteproyectos y tesis, así como gestionar las revisiones pendientes de los estudiantes.</p>
 
                     <!-- Cards con acciones rápidas -->
                     <div class="row justify-content-center">

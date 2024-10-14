@@ -500,6 +500,24 @@ table a i {
   font-size: 0.9rem;
 }
 
+.btn-regresarA {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  z-index: 1000; 
+}
+
+.regresar-enlace {
+  font-size: 50px;
+  color: #04087c; 
+  text-decoration: none;
+  transition: .3s;
+}
+
+.regresar-enlace:hover {
+  color: #007bff; 
+}
+
 #color-verde {
   background: rgb(5, 137, 5);
   color: white;
@@ -535,6 +553,18 @@ table a i {
 
   .blurred {
     filter: blur(5px);
+  }
+
+  .content .container-fluid .lead {
+    font-size: 16px;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+
+  .formulario-aceptar-rechazar .aprobar {
+    padding-inline: 20px;
   }
 
   .menu-toggle {

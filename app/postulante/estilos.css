@@ -470,4 +470,12 @@ body {
     margin: .5rem 0;
   }
 
+  .container-fluid .lead {
+    font-size: 16px;
+  }
+
+  .container .lead {
+    font-size: 16px;
+  }
+
 }

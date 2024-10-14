@@ -18,6 +18,25 @@ if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
+// Consultar el último anteproyecto asignado al docente que tenga el estado de registro en 0 y no tenga observaciones
+$sql = "SELECT t.id, t.tema, t.anteproyecto, t.observaciones_tesis, 
+               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
+        FROM tema t
+        JOIN usuarios u ON t.usuario_id = u.id
+        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
+        WHERE t.revisor_tesis_id = ? 
+        AND t.estado_registro = 0
+        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
+        AND t.observaciones_tesis IS NOT NULL
+        AND t.observaciones_tesis != ''
+        ORDER BY t.fecha_subida DESC";
+
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $usuario_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 ?>
 
@@ -27,7 +46,7 @@ if (!$conn) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tus observaciones</title>
+    <title>Tus Observaciones</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -43,7 +62,7 @@ if (!$conn) {
         <div class="topbar-right">
             <div class="input-group search-bar">
                 <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-                <input type="text" id="search" class="form-control" placeholder="Search">
+                <input type="text" id="search" class="form-control" placeholder="Buscar...">
             </div>
             <i class='bx bx-envelope'></i>
             <i class='bx bx-bell'></i>
@@ -95,7 +114,7 @@ if (!$conn) {
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-3">
-            <h1 class="text-center mb-4 fw-bold">Próximamente</h1>
+            <h1 class="text-center mb-4 fw-bold">Revisar Anteproyectos Asignados</h1>
             <?php if (isset($_GET['status'])): ?>
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                     <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -141,10 +160,53 @@ if (!$conn) {
                     </div>
                 </div>
             <?php endif; ?>
+
+            <?php if ($result->num_rows > 0): ?>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="table-header-fixed">
+                            <tr>
+                                <th>Postulante</th>
+                                <th>Pareja</th>
+                                <th>Tema</th>
+                                <th>Observaciones</th> 
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['tema']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['observaciones_tesis']); ?></td> 
+                                    <td class="text-center">
+                                        <?php if (!empty($row['anteproyecto'])): ?>
+                                            <a href="detalles-observaciones-tesis.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
+                                                <i class='bx bx-search'></i> Ver detalles
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted">No disponible</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+
+                </div>
+            <?php else: ?>
+                <p class="text-center">No hay observaciones realizadas.</p>
+            <?php endif; ?>
+
         </div>
     </div>
 
-
+    <div class="btn-regresarA">
+        <a href="ver-observaciones.php" class="regresar-enlace">
+            <i class='bx bx-left-arrow-circle'></i>
+        </a>
+    </div>
 
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-light text-center">
