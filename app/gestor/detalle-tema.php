@@ -236,7 +236,7 @@ if (isset($_GET['id'])) {
           <div class="text-center mt-4 botones-detalle-tema">
             <button type="button" class="btn  me-2" data-bs-toggle="modal" data-bs-target="#modalAprobar">Aprobar</button>
             <button type="button" class="btn devolver-tema me-2" onclick="location.href='editar-tutor.php?id=<?php echo $tema['id']; ?>'">Editar Tutor</button>
-            <button type="button" class="btn color-rojo me-2" data-bs-toggle="modal" data-bs-target="#modalEliminar">Eliminar</button>
+            <button type="button" class="btn color-rojo me-2" data-bs-toggle="modal" data-bs-target="#modalEliminar">Rechazar</button>
             <!-- <button type="button" class="btn text-white devolver-tema" data-bs-toggle="modal" data-bs-target="#modalDevolverTema">Devolver Tema</button> -->
           </div>
 
@@ -274,18 +274,18 @@ if (isset($_GET['id'])) {
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalEliminarLabel">Confirmar Eliminación</h5>
+          <h5 class="modal-title" id="modalEliminarLabel">Confirmar rechazo</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          ¿Estás seguro de que deseas eliminar este tema?
+          ¿Estás seguro de que deseas rechazar este tema?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           <!-- Formulario para eliminar el tema -->
           <form action="eliminar-tema.php" method="POST">
             <input type="hidden" name="tema_id" value="<?php echo $tema['id']; ?>">
-            <button type="submit" class="btn btn-danger">Eliminar</button>
+            <button type="submit" class="btn btn-danger">Rechazar</button>
           </form>
         </div>
       </div>

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tema_id = intval($_POST['tema_id']);
 
     // Actualizar el estado del tema a 1 (borrado lógico)
-    $sql_update = "UPDATE tema SET estado_registro = 1, estado_tema = 'Eliminado' WHERE id = ?";
+    $sql_update = "UPDATE tema SET estado_registro = 1, estado_tema = 'Rechazado' WHERE id = ?";
     $stmt_update = $conn->prepare($sql_update);
     $stmt_update->bind_param("i", $tema_id);
 
@@ -31,10 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Enviar correo al postulante informando la eliminación del tema
        //  enviarCorreoEliminacion($tema_data['postulante_email'], $tema_data['postulante_nombres'], $tema_data['postulante_apellidos'], $tema_data['tema']);
 
-        header("Location: ver-temas.php?mensaje=Tema eliminado con éxito");
+        header("Location: ver-temas.php?mensaje=Tema Rechazado con éxito");
         exit();
     } else {
-        echo "Error al eliminar el tema.";
+        echo "Error al Rechazar el tema.";
     }
 } else {
     header("Location: ver-temas.php");
