@@ -88,6 +88,7 @@ $result = $stmt->get_result();
         <nav class="nav flex-column">
             <a class="nav-link" href="inicio-administrador.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link active" href="modificar-rol.php"><i class='bx bx-user'></i> Modificar Rol</a>
+            <a class="nav-link" href="restaurar-claves.php"><i class='bx bx-lock'></i> Restarurar clave</a>
         </nav>
     </div>
 

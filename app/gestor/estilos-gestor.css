@@ -532,6 +532,10 @@ table a i {
   color: rgb(5, 137, 5);
 }
 
+#card-restaurar {
+  transform: none;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     top: 60px;
