@@ -180,7 +180,20 @@ if (isset($_GET['id'])) {
                 </tr>
                 <tr>
                   <th class="tabla-anchura-th"><i class="bx bx-user"></i> Pareja</th>
-                  <td><?php echo $tema['pareja_nombres'] ? $tema['pareja_nombres'] . ' ' . $tema['pareja_apellidos'] : 'Sin pareja'; ?></td>
+                  <td>
+                    <?php if ($tema['pareja_nombres']): ?>
+                      <?php
+                      // Verificar si el tema de la pareja está aprobado
+                      if ($pareja_tema_aprobado):
+                        echo $tema['pareja_nombres'] . ' ' . $tema['pareja_apellidos'] . ' - Aprobado';
+                      else:
+                        echo $tema['pareja_nombres'] . ' ' . $tema['pareja_apellidos'];
+                      endif;
+                      ?>
+                    <?php else: ?>
+                      Sin pareja
+                    <?php endif; ?>
+                  </td>
                 </tr>
                 <tr>
                   <th class="tabla-anchura-th"><i class="bx bx-book-reader"></i> Tutor</th>

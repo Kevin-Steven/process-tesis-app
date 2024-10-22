@@ -18,25 +18,37 @@ if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Consultar el último anteproyecto asignado al docente que tenga el estado de registro en 0 y no tenga observaciones
-$sql = "SELECT t.id, t.tema, t.anteproyecto, t.observaciones_anteproyecto, 
-               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
-        WHERE t.revisor_anteproyecto_id = ? 
-        AND t.estado_registro = 0
-        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
-        AND t.observaciones_anteproyecto IS NOT NULL
-        AND t.observaciones_anteproyecto != ''
-        ORDER BY t.fecha_subida DESC";
-
+// Obtener la cédula del docente actual desde la tabla usuarios
+$sql = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
+$docente = $result->fetch_assoc();
 
+if ($docente) {
+  $cedula_docente = $docente['cedula'];
+
+  $sql = "
+    SELECT t.id, t.tema, t.anteproyecto, t.observaciones_anteproyecto, 
+           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
+           tu.nombres AS tutor_nombres
+    FROM tema t
+    JOIN usuarios u ON t.usuario_id = u.id
+    LEFT JOIN usuarios p ON t.pareja_id = p.id
+    JOIN tutores tu ON t.tutor_id = tu.id
+    WHERE tu.cedula = ?
+    AND t.estado_tema = 'Aprobado'
+    AND t.estado_registro = 0
+    AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)
+    ORDER BY t.fecha_subida DESC";
+
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("s", $cedula_docente);
+  $stmt->execute();
+  $result = $stmt->get_result();
+}
 ?>
 
 <!doctype html>
@@ -53,7 +65,7 @@ $result = $stmt->get_result();
 </head>
 
 <body>
-    <!-- Topbar con ícono de menú hamburguesa (fuera del menú) -->
+    <!-- Topbar con ícono de menú hamburguesa -->
     <div class="topbar z-1">
         <div class="menu-toggle">
             <i class='bx bx-menu'></i>
@@ -106,7 +118,7 @@ $result = $stmt->get_result();
             <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
-            <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
+            <a class="nav-link active" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
         </nav>
     </div>
 
@@ -176,9 +188,9 @@ $result = $stmt->get_result();
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td>
+                                    <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'Sin pareja'; ?></td>
                                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['observaciones_anteproyecto']); ?></td> <!-- Muestra las observaciones -->
+                                    <td><?php echo !empty($row['observaciones_anteproyecto']) ? htmlspecialchars($row['observaciones_anteproyecto']) : 'Sin observaciones'; ?></td>
                                     <td class="text-center">
                                         <?php if (!empty($row['anteproyecto'])): ?>
                                             <a href="detalles-observaciones.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
@@ -192,19 +204,12 @@ $result = $stmt->get_result();
                             <?php endwhile; ?>
                         </tbody>
                     </table>
-
                 </div>
             <?php else: ?>
                 <p class="text-center">No hay observaciones realizadas.</p>
             <?php endif; ?>
 
         </div>
-    </div>
-    
-    <div class="btn-regresarA">
-        <a href="ver-observaciones.php" class="regresar-enlace">
-            <i class='bx bx-left-arrow-circle'></i>
-        </a>
     </div>
 
     <!-- Footer -->
@@ -214,10 +219,8 @@ $result = $stmt->get_result();
         </div>
     </footer>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js" defer></script>
-    <script src="../js/toast.js" defer></script>
 </body>
 
 </html>

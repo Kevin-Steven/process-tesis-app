@@ -3,8 +3,8 @@ session_start();
 require '../config/config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header("Location: ../../index.php");
-    exit();
+  header("Location: ../../index.php");
+  exit();
 }
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
@@ -15,27 +15,41 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 $usuario_id = $_SESSION['usuario_id'];
 
 if (!$conn) {
-    die("Error al conectar con la base de datos: " . mysqli_connect_error());
+  die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Consultar el último anteproyecto asignado al docente que tenga el estado de registro en 0 y no tenga observaciones
-$sql = "SELECT t.id, t.tema, t.anteproyecto, 
-               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
-        WHERE t.revisor_anteproyecto_id = ? 
-        AND t.estado_registro = 0
-        AND (t.observaciones_anteproyecto IS NULL OR t.observaciones_anteproyecto = '')
-        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
-        ORDER BY t.fecha_subida DESC";
-
+// Obtener la cédula del docente actual desde la tabla usuarios
+$sql = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
+$docente = $result->fetch_assoc();
 
+if ($docente) {
+  $cedula_docente = $docente['cedula'];
+
+  $sql = "
+    SELECT t.id, t.tema, t.anteproyecto, 
+           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
+           tu.nombres AS tutor_nombres
+    FROM tema t
+    JOIN usuarios u ON t.usuario_id = u.id
+    LEFT JOIN usuarios p ON t.pareja_id = p.id
+    JOIN tutores tu ON t.tutor_id = tu.id
+    WHERE tu.cedula = ?
+    AND t.estado_tema = 'Aprobado'  -- Solo mostrar temas aprobados
+    AND t.estado_registro = 0
+    AND (t.observaciones_anteproyecto IS NULL OR t.observaciones_anteproyecto = '') -- Excluir temas con observaciones
+    AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)
+    ORDER BY t.fecha_subida DESC";
+
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("s", $cedula_docente);
+  $stmt->execute();
+  $result = $stmt->get_result();
+}
 ?>
 
 <!doctype html>
@@ -113,53 +127,8 @@ $result = $stmt->get_result();
   <div class="content" id="content">
     <div class="container mt-3">
       <h1 class="text-center mb-4 fw-bold">Revisar Anteproyectos Asignados</h1>
-      <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-          <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-              <i class='bx bx-send fs-4 me-2'></i>
-              <strong class="me-auto">Estado de Actualización</strong>
-              <small>Justo ahora</small>
-              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-              <?php
-              switch ($_GET['status']) {
-                case 'success':
-                  echo "Observaciones enviadas con éxito.";
-                  break;
-                case 'not_found':
-                  echo "No se encontraron detalles para el postulante.";
-                  break;
-                case 'invalid_extension':
-                  echo "Tipo de archivo no permitido. Solo se aceptan archivos ZIP, DOC y DOCX.";
-                  break;
-                case 'too_large':
-                  echo "El archivo excede el tamaño máximo permitido de 20MB.";
-                  break;
-                case 'db_error':
-                  echo "Error al actualizar la base de datos.";
-                  break;
-                case 'upload_error':
-                  echo "Hubo un error al subir el archivo.";
-                  break;
-                case 'no_file':
-                  echo "Por favor, selecciona un archivo para subir.";
-                  break;
-                case 'form_error':
-                  echo "No se ha enviado el formulario correctamente.";
-                  break;
-                default:
-                  echo "Ocurrió un error desconocido.";
-                  break;
-              }
-              ?>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
 
-      <?php if ($result->num_rows > 0): ?>
+      <?php if ($result && $result->num_rows > 0): ?>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead class="table-header-fixed">
@@ -174,7 +143,14 @@ $result = $stmt->get_result();
               <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                  <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td>
+                  <td>
+                    <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
+                      <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
+                    <?php else: ?>
+                      Sin pareja
+                    <?php endif; ?>
+                  </td>
+
                   <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td class="text-center">
                     <?php if (!empty($row['anteproyecto'])): ?>
@@ -206,7 +182,6 @@ $result = $stmt->get_result();
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js" defer></script>
-  <script src="../js/toast.js" defer></script>
 </body>
 
 </html>

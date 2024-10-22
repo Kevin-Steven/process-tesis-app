@@ -615,9 +615,20 @@ table a i {
     overflow-x: auto;
   }
 
+  .table-responsive .form-control {
+    font-size: 13px;
+  }
+
   .table-responsive i {
     font-size: 13px;
+  }
 
+  .table-responsive a {
+    font-size: 13px;
+  }
+
+  .botones-detalle-tema .btn{
+    margin-bottom: 10px;
   }
 
 }
