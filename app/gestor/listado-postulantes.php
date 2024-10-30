@@ -15,7 +15,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consultar los postulantes que han sido aceptados
-$sql = "SELECT u.nombres, u.apellidos, u.carrera, d.estado_inscripcion 
+$sql = "SELECT u.cedula, u.nombres, u.apellidos, u.carrera, d.estado_inscripcion, d.documento_carpeta 
         FROM usuarios u 
         LEFT JOIN documentos_postulante d ON u.id = d.usuario_id 
         WHERE d.estado_inscripcion = 'Aprobado' AND d.estado_registro = 0
@@ -90,8 +90,8 @@ $result = $stmt->get_result();
   <div class="sidebar z-2" id="sidebar">
     <div class="profile">
       <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-      <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5> <!-- Aquí también mostramos solo el primer nombre y primer apellido -->
-      <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p> <!-- Mostramos el rol del usuario -->
+      <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5>
+      <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
@@ -109,13 +109,21 @@ $result = $stmt->get_result();
     <div class="container mt-2">
       <h1 class="text-center mb-4 fw-bold">Postulantes Aprobados</h1>
 
+      <!-- Campo de búsqueda -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class='bx bx-search'></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por cédula, nombre o carrera...">
+      </div>
+
       <div class="table-responsive">
-        <table class="table table-striped ">
+        <table class="table table-striped" id="postulantesTable">
           <thead class="table-header-fixed">
             <tr>
+              <th>Cédula</th>
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Carrera</th>
+              <th>Documentos</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -123,9 +131,17 @@ $result = $stmt->get_result();
             <?php if ($result->num_rows > 0): ?>
               <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
+                  <td><?php echo $row['cedula']; ?></td>
                   <td><?php echo $row['nombres']; ?></td>
                   <td><?php echo $row['apellidos']; ?></td>
                   <td><?php echo $row['carrera']; ?></td>
+                  <td>
+                    <?php if (!empty($row['documento_carpeta'])): ?>
+                      <a href="<?php echo $row['documento_carpeta']; ?>" target="_blank" class="text-decoration-none" download>Descargar documento</a>
+                    <?php else: ?>
+                      <span>No disponible</span>
+                    <?php endif; ?>
+                  </td>
                   <td><?php echo $row['estado_inscripcion']; ?></td>
                 </tr>
               <?php endwhile; ?>
@@ -134,6 +150,11 @@ $result = $stmt->get_result();
                 <td colspan="6" class="text-center">No hay postulantes aprobados.</td>
               </tr>
             <?php endif; ?>
+            <tr id="noResultsRow" style="display: none;">
+              <td colspan="6" class="text-center">
+                No se encontraron resultados.
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -148,8 +169,8 @@ $result = $stmt->get_result();
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/sidebar.js" defer></script>
-
+  <script src="../js/sidebar.js"></script>
+  <script src="../js/search.js" defer></script>
 </body>
 
 </html>

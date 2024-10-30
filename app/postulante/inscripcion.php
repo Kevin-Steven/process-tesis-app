@@ -225,13 +225,13 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
         <!-- Formulario de nueva inscripción -->
         <div class="card shadow-lg">
           <div class="card-body">
-            <h5 class="card-title title-crd text-center mb-4 fw-bold">Sube la carpeta con todos tus documentos en formato ZIP o RAR.</h5>
+            <h5 class="card-title title-crd text-center mb-4 fw-bold">Sube la carpeta con todos tus documentos en formato ZIP.</h5>
             <form id="inscripcionForm" action="logica-inscripcion.php" class="envio-inscripcion" method="POST" enctype="multipart/form-data">
               <div class="row">
                 <!-- Cargar carpeta ZIP/RAR -->
                 <div class="col-md-12 mb-12 text-center">
-                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP o RAR MÁXIMO 2 MB)</label>
-                  <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip,.rar" required onchange="validarTamanoArchivo()">
+                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP MÁXIMO 2 MB)</label>
+                  <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip" required onchange="validarTamanoArchivo()">
                 </div>
               </div>
 
@@ -279,7 +279,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/sidebar.js" defer></script>
+  <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/validarTamaño.js" defer></script>
 

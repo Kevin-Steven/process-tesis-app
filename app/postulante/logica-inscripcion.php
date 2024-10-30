@@ -63,7 +63,7 @@ function uploadFile($file, $target_dir, $input_name, $allowed_mime_types, $max_s
 }
 
 $allowed_mime_types = ['application/zip', 'application/x-rar-compressed', 'application/octet-stream'];
-$max_size = 2 * 1024 * 1024; // 2 MB
+$max_size = 20 * 1024 * 1024; // 20 MB
 
 // Nomenclatura del archivo: Anteproyecto_(1er apellido)_(1er nombre)
 $nombre_archivo = 'Documentos_' . explode(' ', $apellido_postulante)[0] . '_' . explode(' ', $nombre_postulante)[0];

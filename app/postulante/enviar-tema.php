@@ -343,8 +343,8 @@ if ($pareja_seleccionado_id) {
 
                   <!-- Subir Anteproyecto -->
                   <div class="mb-3">
-                    <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 2 MB)</label>
-                    <input type="file" class="form-control" id="documentoCarpeta" name="anteproyecto" accept=".zip, .rar" required onchange="validarTamanoArchivo()">
+                    <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP MÁXIMO 2 MB)</label>
+                    <input type="file" class="form-control" id="documentoCarpeta" name="anteproyecto" accept=".zip" required onchange="validarTamanoArchivo()">
                   </div>
                 </div>
               </div>
@@ -377,7 +377,7 @@ if ($pareja_seleccionado_id) {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/sidebar.js" defer></script>
+  <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/validarTamaño.js" defer></script>
 

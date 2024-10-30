@@ -22,11 +22,11 @@ body {
   cursor: pointer;
   color: #191919;
   transition: all .6s;
-  margin-left: 250px; 
+  margin-left: 250px;
 }
 
 .menu-toggle-small {
-  margin-left: 0px; 
+  margin-left: 0px;
 }
 
 .topbar-right {
@@ -40,19 +40,21 @@ body {
   margin-right: 20px;
 }
 
-.topbar i, span {
+.topbar i,
+span {
   transition: .3s ease;
 }
 
-.topbar i:hover, .topbar .user-profile:hover{
+.topbar i:hover,
+.topbar .user-profile:hover {
   color: #3a57e8;
 }
 
-.topbar .dropdown-item:focus, 
+.topbar .dropdown-item:focus,
 .topbar .dropdown-item:active {
-    background-color: transparent !important; 
-    color: inherit;
-    outline: none; 
+  background-color: transparent !important;
+  color: inherit;
+  outline: none;
 }
 
 .topbar-right i {
@@ -162,15 +164,15 @@ body {
 
 /* Estilo de la tarjeta en la sección de contenido */
 .container-fluid .card {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
-  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
-  padding: 20px; 
-  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #ffffff, #f1f3f6);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .container-fluid .card:hover {
-  transform: translateY(-5px); 
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25); 
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
 
 .container-fluid .card-title {
@@ -181,48 +183,49 @@ body {
 
 .container-fluid .card .btn {
   padding: 12px 30px;
-  border-radius: 50px; 
-  background: #04087c; 
+  border-radius: 50px;
+  background: #04087c;
   color: white;
   transition: background-color 0.3s ease, transform 0.3s ease;
-  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4); 
-  
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4);
+
 }
 
 .container-fluid .card .btn:hover {
-  transform: translateY(-2px); 
-  box-shadow: 0 6px 15px rgba(58, 87, 232, 0.3); 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(58, 87, 232, 0.3);
 }
 
 .requisitos .card {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); 
-  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
-  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff, #f1f3f6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .requisitos .card:hover {
-  transform: translateY(-5px); 
+  transform: translateY(-5px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 
 .requisitos .card-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #333; 
+  color: #333;
 }
 
 .requisitos .card i {
-  color: #04087c; 
+  color: #04087c;
 }
 
 .requisitos .card-text {
   font-size: 1rem;
-  color: #555; 
+  color: #555;
 }
 
 /* Estilo general del formulario */
-.formulario-inscripcion, .formularioCambioClave {
-  border-radius: 1rem; 
+.formulario-inscripcion,
+.formularioCambioClave {
+  border-radius: 1rem;
   padding: 1.5rem;
 }
 
@@ -230,44 +233,57 @@ body {
   background: white;
 }
 
-.formulario-inscripcion label, .formularioCambioClave label {
+.formulario-inscripcion label,
+.formularioCambioClave label {
   font-weight: 500;
-  color: #333; 
+  color: #333;
 }
 
 .content .title-crd {
   color: #333;
 }
 
-.formulario-inscripcion .form-control, .formularioCambioClave {
-  border-radius: 0.5rem; 
+.formulario-inscripcion .form-control,
+.formularioCambioClave {
+  border-radius: 0.5rem;
   font-size: 1rem;
   border: 1px solid #ddd;
   transition: border-color 0.3s ease;
 }
 
-.formulario-inscripcion .form-select:focus, .form-control:focus, .formularioCambioClave .form-control:focus {
-  border-color: #04087c; 
-  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2); 
+.formulario-inscripcion .form-select:focus,
+.form-control:focus,
+.formularioCambioClave .form-control:focus {
+  border-color: #04087c;
+  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2);
 }
 
-.formulario-inscripcion .btn, .formularioCambioClave .btn, .boton-subir-perfil .btn-upload,
- .formulario-perfil .btn, .card-footer .btn, .actualizar-inscripcion .btn, 
- .envio-inscripcion .btn, .enviar-tema .btn{
+.formulario-inscripcion .btn,
+.formularioCambioClave .btn,
+.boton-subir-perfil .btn-upload,
+.formulario-perfil .btn,
+.card-footer .btn,
+.actualizar-inscripcion .btn,
+.envio-inscripcion .btn,
+.enviar-tema .btn {
   background-color: #04087c;
   color: white;
   padding: 12px 30px;
-  border-radius: 50px; 
+  border-radius: 50px;
   font-size: 1rem;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.formulario-inscripcion .btn:hover, .formularioCambioClave .btn:hover, 
-.boton-subir-perfil .btn-upload:hover, .formulario-perfil .btn:hover , 
-.card-footer .btn:hover, .actualizar-inscripcion .btn:hover, .envio-inscripcion 
-.btn:hover, .enviar-tema .btn:hover{
-  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3); 
+.formulario-inscripcion .btn:hover,
+.formularioCambioClave .btn:hover,
+.boton-subir-perfil .btn-upload:hover,
+.formulario-perfil .btn:hover,
+.card-footer .btn:hover,
+.actualizar-inscripcion .btn:hover,
+.envio-inscripcion .btn:hover,
+.enviar-tema .btn:hover {
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3);
 }
 
 .formularioCambioClave .btn:hover {
@@ -286,14 +302,15 @@ body {
 }
 
 /* Estilo de las tarjetas */
-.container .card, .formularioCambioClave{
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+.container .card,
+.formularioCambioClave {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .card-header .card-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: #333; 
+  color: #333;
 }
 
 /* FORMULARIO PARA ACTUALIZAR EL PERFIL */
@@ -313,7 +330,8 @@ body {
   font-size: 18px;
 }
 
-.profile img, .formulario-perfil img {
+.profile img,
+.formulario-perfil img {
   width: 110px;
   height: 110px;
   object-fit: cover;
@@ -336,7 +354,7 @@ body {
   gap: 2rem;
 }
 
-.content .card .color-rojo{
+.content .card .color-rojo {
   background: rgb(212, 37, 37);
 }
 
@@ -345,7 +363,7 @@ body {
 }
 
 /* FOCUS */
-.container-fluid .card .btn:active, 
+.container-fluid .card .btn:active,
 .container-fluid .card .btn:focus,
 .formulario-perfil .text-center .btn:active,
 .formulario-perfil .text-center .btn:focus,
@@ -354,9 +372,9 @@ body {
 .card .card-footer .btn:active,
 .card .card-footer .btn:focus,
 .card .actualizar-inscripcion .btn:active,
-.card .actualizar-inscripcion .btn:focus, 
-.card .enviar-tema .btn:active, 
-.card .enviar-tema .btn:focus { 
+.card .actualizar-inscripcion .btn:focus,
+.card .enviar-tema .btn:active,
+.card .enviar-tema .btn:focus {
   background: #04087c;
   color: white;
   border-color: #04087c;
@@ -430,17 +448,37 @@ body {
     transform: translateX(0);
   }
 
-  .content, .footer {
-    margin-left: 0; 
-    transition: filter 0.6s; 
+  .content,
+  .footer {
+    margin-left: 0;
+    transition: filter 0.6s;
   }
 
   .blurred {
-    filter: blur(5px);
+    filter: blur(2px);
+  }
+
+  /* Desactivar animaciones en otros elementos */
+  .topbar,
+  .menu-toggle,
+  .topbar i,
+  .topbar span,
+  .container-fluid .card,
+  .container-fluid .btn,
+  .sidebar .nav-link,
+  .formulario-inscripcion .form-control,
+  .formularioCambioClave .form-control,
+  .boton-subir-perfil .btn-upload,
+  .content .card,
+  .footer,
+  .enviar-tema .btns .btn,
+  .requisitos .card {
+    transition: none !important;
+    /* Desactiva todas las transiciones */
   }
 
   .menu-toggle {
-    margin-left: 0; 
+    margin-left: 0;
   }
 
   .topbar {
@@ -452,7 +490,7 @@ body {
   }
 
   .formulario-inscripcion {
-    border-radius: 1rem; 
+    border-radius: 1rem;
     padding: 0;
   }
 
@@ -460,7 +498,7 @@ body {
     font-size: 1.2rem;
     padding-bottom: 1rem;
   }
-  
+
   .card-footer {
     display: block;
     text-align: center;

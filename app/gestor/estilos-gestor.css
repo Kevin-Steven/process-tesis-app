@@ -556,8 +556,21 @@ table a i {
   }
 
   .blurred {
-    filter: blur(5px);
+    filter: blur(2px);
   }
+
+   /* Desactivar animaciones en otros elementos */
+   .topbar, .menu-toggle, .topbar i, .topbar span, 
+   .container-fluid .card, .container-fluid .btn, 
+   .sidebar .nav-link, .formulario-inscripcion .form-control, 
+   .formularioCambioClave .form-control, 
+   .boton-subir-perfil .btn-upload, 
+   .container .card, .footer, 
+   .anteproyecto .btns .btn, 
+   .botones-detalle-tema .btn, 
+   .generar-reporte .btn {
+     transition: none !important; /* Desactiva todas las transiciones */
+   }
 
   .content .container-fluid .lead {
     font-size: 16px;
