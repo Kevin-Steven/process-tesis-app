@@ -41,6 +41,8 @@ if ($docente) {
     WHERE tu.cedula = ?
     AND t.estado_tema = 'Aprobado'
     AND t.estado_registro = 0
+    AND t.observaciones_anteproyecto IS NOT NULL
+    AND t.observaciones_anteproyecto != ''
     AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)
     ORDER BY t.fecha_subida DESC";
 

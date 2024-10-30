@@ -115,6 +115,74 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
   <!-- Content -->
   <div class="content" id="content">
     <div class="container py-2">
+      <!-- Toast para varios estados -->
+      <?php if (isset($_GET['status']) || isset($_GET['file_error'])): ?>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+          <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+              <?php
+              if ($_GET['status'] === 'success') {
+                echo "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+                echo "<strong class='me-auto'>Documentos enviados</strong>";
+              } elseif ($_GET['status'] === 'error' || isset($_GET['file_error'])) {
+                echo "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
+                echo "<strong class='me-auto'>Error de Tamaño</strong>";
+              } elseif ($_GET['status'] === 'invalid_request') {
+                echo "<i class='bx bx-error-circle fs-4 me-2 text-danger'></i>";
+                echo "<strong class='me-auto'>Error en el Formulario</strong>";
+              } elseif ($_GET['status'] === 'deleted') {
+                echo "<i class='bx bx-check-circle fs-4 me-2 text-success'></i>";
+                echo "<strong class='me-auto'>Inscripción Eliminada</strong>";
+              }
+              ?>
+              <small>Justo ahora</small>
+              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+              <?php
+              // Utilizamos `file_error` como un caso más dentro del switch
+              $status = $_GET['status'] ?? (isset($_GET['file_error']) ? 'file_error' : null);
+              switch ($status) {
+                case 'success':
+                  echo "Documentos enviados con éxito.";
+                  break;
+                case 'error':
+                  echo "Ha sobrepasado el límite especificado.";
+                  break;
+                case 'invalid_request':
+                  echo "Hubo un error en el envío del formulario.";
+                  break;
+                case 'file_error':
+                  echo "El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.";
+                  break;
+                case 'deleted':
+                  echo "La inscripción ha sido eliminada correctamente.";
+                  break;
+                default:
+                  echo "Ha ocurrido un error desconocido.";
+                  break;
+              }
+              ?>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <!-- Toast para error de tamaño de archivo -->
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+            <strong class="me-auto">Error de Tamaño</strong>
+            <small>Justo ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+          </div>
+        </div>
+      </div>
+
       <h1 class="mb-4 text-center fw-bold">Formulario de Inscripción</h1>
 
       <?php if ($inscripcion && $inscripcion['estado_inscripcion'] === 'Aprobado'): ?>
@@ -162,8 +230,8 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
               <div class="row">
                 <!-- Cargar carpeta ZIP/RAR -->
                 <div class="col-md-12 mb-12 text-center">
-                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP o RAR MÁXIMO 20MB)</label>
-                  <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip,.rar" required>
+                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP o RAR MÁXIMO 2 MB)</label>
+                  <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip,.rar" required onchange="validarTamanoArchivo()">
                 </div>
               </div>
 
@@ -212,6 +280,9 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js" defer></script>
+  <script src="../js/toast.js" defer></script>
+  <script src="../js/validarTamaño.js" defer></script>
 
 </body>
+
 </html>

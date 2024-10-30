@@ -148,6 +148,21 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 
+    <!-- Toast para error de tamaño de archivo -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+            <strong class="me-auto">Error de Tamaño</strong>
+            <small>Justo ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+          </div>
+        </div>
+      </div>
+
     <div class="modal fade" id="modalConfirmarEliminarSolicitud" tabindex="-1" aria-labelledby="modalConfirmarEliminarSolicitudLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -166,8 +181,8 @@ if (isset($_GET['id'])) {
 
                         <div class="mb-3">
                             <label for="archivoObservaciones" class="form-label fw-bold">Subir archivo con las observaciones</label>
-                            <input type="file" class="form-control" id="archivoObservaciones" name="archivo_observaciones" accept=".zip,.doc,.docx" required>
-                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 20MB.</small>
+                            <input type="file" class="form-control" id="documentoCarpeta" name="archivo_observaciones" accept=".zip,.doc,.docx" required onchange="validarTamanoArchivo()">
+                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 2 MB.</small>
                         </div>
                     </form>
                 </div>
@@ -179,9 +194,6 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 
-
-
-
     <footer class="footer mt-auto py-3 bg-light text-center">
         <div class="container">
             <p class="mb-0">&copy; 2024 Gestoria de Titulación Desarrollo de Software - Instituto Superior Tecnológico Juan Bautista Aguirre.</p>
@@ -190,6 +202,8 @@ if (isset($_GET['id'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js" defer></script>
+    <script src="../js/toast.js" defer></script>
+    <script src="../js/validarTamaño.js" defer></script>
 </body>
 
 </html>

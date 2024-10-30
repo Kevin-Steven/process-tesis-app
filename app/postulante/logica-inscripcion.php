@@ -13,7 +13,6 @@ if (!isset($_SESSION['usuario_id'])) {
     exit();
 }
 
-// Variables del formulario
 $usuario_id = $_SESSION['usuario_id'];
 $nombre_postulante = $_SESSION['usuario_nombre'];
 $apellido_postulante = $_SESSION['usuario_apellido'];
@@ -64,7 +63,7 @@ function uploadFile($file, $target_dir, $input_name, $allowed_mime_types, $max_s
 }
 
 $allowed_mime_types = ['application/zip', 'application/x-rar-compressed', 'application/octet-stream'];
-$max_size = 20 * 1024 * 1024; // 20MB
+$max_size = 2 * 1024 * 1024; // 2 MB
 
 // Nomenclatura del archivo: Anteproyecto_(1er apellido)_(1er nombre)
 $nombre_archivo = 'Documentos_' . explode(' ', $apellido_postulante)[0] . '_' . explode(' ', $nombre_postulante)[0];
@@ -73,7 +72,7 @@ $nombre_archivo = 'Documentos_' . explode(' ', $apellido_postulante)[0] . '_' . 
 $documento_carpeta = uploadFile($_FILES, $target_dir, 'documentoCarpeta', $allowed_mime_types, $max_size, $nombre_archivo);
 
 if (!$documento_carpeta) {
-    die("Error: Solo se permiten archivos ZIP o RAR, y el tamaño máximo es de 20MB.");
+    header("Location: inscripcion.php?status=error");
 }
 
 // Guardar los datos en la base de datos
@@ -92,10 +91,10 @@ if ($stmt->execute()) {
     // enviarCorreoInscripcion($nombre_postulante, $apellido_postulante); 
 
     echo "Inscripción completada con éxito.";
-    header("Location: inscripcion.php?mensaje=Inscripción completada con éxito");
+    header("Location: inscripcion.php?status=success");
     exit();
 } else {
-    echo "Error al procesar la inscripción: " . $stmt->error;
+    header("Location: inscripcion.php?status=invalid_request");
 }   
 
 $stmt->close();

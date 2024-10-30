@@ -92,8 +92,8 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
     <div class="sidebar z-2" id="sidebar">
         <div class="profile">
             <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-            <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5> 
-            <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p> 
+            <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5>
+            <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
             <a class="nav-link" href="inicio-postulante.php"><i class='bx bx-home-alt'></i> Inicio</a>
@@ -106,6 +106,21 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
     <!-- Content -->
     <div class="content" id="content">
         <div class="container py-2">
+            <!-- Toast para error de tamaño de archivo -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+                        <strong class="me-auto">Error de Tamaño</strong>
+                        <small>Justo ahora</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+                    </div>
+                </div>
+            </div>
+
             <h1 class="mb-4 text-center fw-bold">Editar Inscripción</h1>
             <div class="card shadow-lg mb-4">
                 <div class="card-header text-center">
@@ -117,7 +132,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
                         <!-- Carpeta de Documentos -->
                         <div class="mb-4">
                             <label for="documentoCarpeta" class="form-label">Subir Nueva Carpeta de Documentos (ZIP o RAR)</label>
-                            <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip,.rar">
+                            <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip,.rar" required onchange="validarTamanoArchivo()">
                             <p class="mt-2">Documento actual: <a href="../uploads/<?php echo $inscripcion['documento_carpeta']; ?>" target="_blank" class="link-primary">Ver Documentos</a></p>
                         </div>
 
@@ -140,6 +155,8 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js" defer></script>
+    <script src="../js/validarTamaño.js" defer></script>
+    <script src="../js/toast.js" defer></script>
 
 </body>
 

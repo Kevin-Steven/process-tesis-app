@@ -165,6 +165,20 @@ $result_parejas = $stmt_parejas->get_result();
     <div class="container py-2">
       <h1 class="mb-4 text-center fw-bold">Editar Tema</h1>
 
+      <!-- Toast para error de tamaño de archivo -->
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+            <strong class="me-auto">Error de Tamaño</strong>
+            <small>Justo ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+          </div>
+        </div>
+      </div>
       <!-- Card con el formulario -->
       <div class="card shadow-lg">
         <div class="card-body">
@@ -247,10 +261,10 @@ $result_parejas = $stmt_parejas->get_result();
 
                 <!-- Subir Anteproyecto -->
                 <div class="mb-3">
-                  <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 20MB)</label>
+                  <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 2 MB)</label>
 
                   <!-- Campo para subir un nuevo archivo -->
-                  <input type="file" class="form-control" id="anteproyecto" name="anteproyecto" accept=".zip,.rar">
+                  <input type="file" class="form-control" id="documentoCarpeta" name="anteproyecto" accept=".zip,.rar" onchange="validarTamanoArchivo()">
 
                   <!-- Enlace para visualizar el archivo actual, si existe -->
                   <?php if (!empty($tema['anteproyecto'])): ?>
@@ -287,6 +301,8 @@ $result_parejas = $stmt_parejas->get_result();
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js" defer></script>
+  <script src="../js/toast.js" defer></script>
+  <script src="../js/validarTamaño.js" defer></script>
 
 </body>
 

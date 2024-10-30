@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../config/config.php'; // Conexión a la base de datos
+require '../config/config.php'; 
 require '../PHPMailer/PHPMailer.php';
 require '../PHPMailer/SMTP.php';
 require '../PHPMailer/Exception.php';
@@ -53,9 +53,9 @@ if ($stmt_update->execute()) {
        // enviarCorreo($mensaje_cambios, $_SESSION['usuario_nombre'], $_SESSION['usuario_apellido']);
     }
 
-    header("Location: inscripcion.php?mensaje=Inscripción actualizada con éxito");
+    header("Location: inscripcion.php?status=success");
 } else {
-    echo "Error al actualizar la inscripción: " . $stmt_update->error;
+    header("Location: inscripcion.php?status=error");
 }
 
 $stmt_update->close();

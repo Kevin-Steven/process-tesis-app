@@ -104,6 +104,17 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card card-principal h-100 shadow">
+                                <div class="card-body text-center">
+                                    <i class='bx bx-lock bx-lg mb-3'></i>
+                                    <h5 class="card-title">Restaurar clave</h5>
+                                    <p class="card-text">Modifica la clave de los postulantes.</p>
+                                    <a href="restaurar-claves.php" class="btn">Acceder</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

@@ -155,6 +155,21 @@ if ($pareja_seleccionado_id) {
     <div class="container py-2">
       <h1 class="mb-4 text-center fw-bold">Enviar Tema</h1>
 
+      <!-- Toast para error de tamaño de archivo -->
+      <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+            <strong class="me-auto">Error de Tamaño</strong>
+            <small>Justo ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+          </div>
+        </div>
+      </div>
+
       <?php if (isset($tema) && $tema['estado_tema'] === 'Aprobado' && $tema['estado_registro'] === 0): ?>
         <div class="card shadow-lg mb-4 border-0">
           <div class="card-header bg-light text-center mb-3 py-3">
@@ -167,10 +182,10 @@ if ($pareja_seleccionado_id) {
             </p>
             <?php if (!empty($tema['observaciones_anteproyecto'])): ?>
               <p>Descarga aquí las observaciones realizadas por el revisor.</p>
-                <p class="mb-3 d-flex justify-content-center align-items-center">
-                  <i class="bx bx-download me-1 text-primary fw-bold "></i>
-                  <strong><a class="text-decoration-none" href="../uploads/observaciones/<?php echo htmlspecialchars($tema['observaciones_anteproyecto']); ?>" download>Descargar observaciones</a></strong>
-                </p>
+              <p class="mb-3 d-flex justify-content-center align-items-center">
+                <i class="bx bx-download me-1 text-primary fw-bold "></i>
+                <strong><a class="text-decoration-none" href="../uploads/observaciones/<?php echo htmlspecialchars($tema['observaciones_anteproyecto']); ?>" download>Descargar observaciones</a></strong>
+              </p>
             <?php endif; ?>
           </div>
         </div>
@@ -328,8 +343,8 @@ if ($pareja_seleccionado_id) {
 
                   <!-- Subir Anteproyecto -->
                   <div class="mb-3">
-                    <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 20MB)</label>
-                    <input type="file" class="form-control" id="anteproyecto" name="anteproyecto" accept=".zip, .rar" required>
+                    <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 2 MB)</label>
+                    <input type="file" class="form-control" id="documentoCarpeta" name="anteproyecto" accept=".zip, .rar" required onchange="validarTamanoArchivo()">
                   </div>
                 </div>
               </div>
@@ -363,6 +378,8 @@ if ($pareja_seleccionado_id) {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js" defer></script>
+  <script src="../js/toast.js" defer></script>
+  <script src="../js/validarTamaño.js" defer></script>
 
 </body>
 

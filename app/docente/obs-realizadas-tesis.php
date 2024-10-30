@@ -114,7 +114,7 @@ $result = $stmt->get_result();
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-3">
-            <h1 class="text-center mb-4 fw-bold">Revisar Anteproyectos Asignados</h1>
+            <h1 class="text-center mb-4 fw-bold">Revisar Tesis Asignadas</h1>
             <?php if (isset($_GET['status'])): ?>
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                     <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">

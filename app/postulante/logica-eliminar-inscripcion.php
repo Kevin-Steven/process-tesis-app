@@ -27,10 +27,10 @@ if ($stmt_update_inscripcion->execute()) {
     //enviarCorreoEliminacion($_SESSION['usuario_nombre'], $_SESSION['usuario_apellido']);
 
     // Redirigir con mensaje de éxito
-    header("Location: inscripcion.php?mensaje=Inscripción eliminada correctamente");
+    header("Location: inscripcion.php?status=deleted");
     exit();
 } else {
-    echo "Error al eliminar la inscripción: " . $stmt_update_inscripcion->error;
+    header("Location: inscripcion.php?status=invalid_request");
 }
 
 $stmt_update_inscripcion->close();
