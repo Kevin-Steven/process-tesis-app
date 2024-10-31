@@ -474,7 +474,6 @@ span {
   .enviar-tema .btns .btn,
   .requisitos .card {
     transition: none !important;
-    /* Desactiva todas las transiciones */
   }
 
   .menu-toggle {

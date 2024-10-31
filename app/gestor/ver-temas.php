@@ -11,11 +11,13 @@ $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
-// Consulta para obtener los temas con tutor y postulante
+// Consulta para obtener los temas con tutor, postulante y pareja (si existe)
 $sql = "SELECT t.id, u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+        p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos,
         tr.nombres AS tutor_nombres
         FROM tema t
         JOIN usuarios u ON t.usuario_id = u.id
+        LEFT JOIN usuarios p ON t.pareja_id = p.id
         JOIN tutores tr ON t.tutor_id = tr.id
         WHERE t.estado_registro = 0 AND t.estado_tema = 'Pendiente'"; 
 $result = $conn->query($sql);
@@ -32,7 +34,6 @@ $result = $conn->query($sql);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="icon" href="../../images/favicon.png" type="image/png">
-
 </head>
 
 <body>
@@ -88,7 +89,7 @@ $result = $conn->query($sql);
       <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
     </div>
     <nav class="nav flex-column">
-    <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
+      <a class="nav-link" href="inicio-gestor.php"><i class='bx bx-home-alt'></i> Inicio</a>
       <a class="nav-link" href="ver-inscripciones.php"><i class='bx bx-user'></i> Ver Inscripciones</a>
       <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
       <a class="nav-link active" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
@@ -106,7 +107,8 @@ $result = $conn->query($sql);
         <table class="table table-striped">
           <thead class="table-header-fixed">
             <tr>
-              <th>Postulante</th>
+              <th>Postulante 1</th>
+              <th>Postulante 2</th>
               <th>Tutor</th>
               <th class="text-center">Acciones</th>
             </tr>
@@ -116,6 +118,15 @@ $result = $conn->query($sql);
               <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
                   <td><?php echo $row['postulante_nombres'] . ' ' . $row['postulante_apellidos']; ?></td>
+                  <td>
+                    <?php 
+                      if (!empty($row['pareja_nombres'])) {
+                        echo $row['pareja_nombres'] . ' ' . $row['pareja_apellidos'];
+                      } else {
+                        echo "No aplica";
+                      }
+                    ?>
+                  </td>
                   <td><?php echo $row['tutor_nombres']; ?></td>
                   <td class="text-center">
                     <a href="detalle-tema.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
@@ -126,7 +137,7 @@ $result = $conn->query($sql);
               <?php endwhile; ?>
             <?php else: ?>
               <tr>
-                <td colspan="3" class="text-center">No se encontraron temas registrados.</td>
+                <td colspan="4" class="text-center">No se encontraron temas registrados.</td>
               </tr>
             <?php endif; ?>
           </tbody>

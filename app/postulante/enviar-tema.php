@@ -84,6 +84,29 @@ if ($pareja_seleccionado_id) {
   $stmt_tutor_seleccionado->close();
 }
 
+// Verificar si el tema de la pareja ha sido aprobado
+$tema_pareja_aprobado = false;
+if ($pareja_seleccionado_id) {
+  $sql_tema_pareja = "SELECT estado_tema FROM tema WHERE usuario_id = ? AND estado_tema = 'Aprobado' LIMIT 1";
+  $stmt_tema_pareja = $conn->prepare($sql_tema_pareja);
+  $stmt_tema_pareja->bind_param("i", $pareja_seleccionado_id);
+  $stmt_tema_pareja->execute();
+  $result_tema_pareja = $stmt_tema_pareja->get_result();
+  $tema_pareja_aprobado = $result_tema_pareja->num_rows > 0;
+  $stmt_tema_pareja->close();
+}
+
+$tema_pareja = null;
+if ($pareja_seleccionado_id) {
+  $sql_tema_pareja = "SELECT * FROM tema WHERE usuario_id = ? AND estado_tema = 'Aprobado' LIMIT 1";
+  $stmt_tema_pareja = $conn->prepare($sql_tema_pareja);
+  $stmt_tema_pareja->bind_param("i", $pareja_seleccionado_id);
+  $stmt_tema_pareja->execute();
+  $result_tema_pareja = $stmt_tema_pareja->get_result();
+  $tema_pareja = $result_tema_pareja->fetch_assoc();
+  $stmt_tema_pareja->close();
+}
+
 ?>
 
 <!doctype html>
@@ -170,7 +193,7 @@ if ($pareja_seleccionado_id) {
         </div>
       </div>
 
-      <?php if (isset($tema) && $tema['estado_tema'] === 'Aprobado' && $tema['estado_registro'] === 0): ?>
+      <?php if ((isset($tema) && $tema['estado_tema'] === 'Aprobado' && $tema['estado_registro'] === 0) || $tema_pareja): ?>
         <div class="card shadow-lg mb-4 border-0">
           <div class="card-header bg-light text-center mb-3 py-3">
             <h3 class="mb-0 fw-bold text-success">¡Felicitaciones!</h3>
@@ -178,13 +201,23 @@ if ($pareja_seleccionado_id) {
           <div class="card-body text-center">
             <p class="fs-5 mb-3">
               <i class="bx bxs-award me-1"></i>
-              <strong>Tu tema de tesis "<?php echo htmlspecialchars($tema['tema']); ?>" ha sido aprobado.</strong>
+              <strong>
+                <?php if ($tema_pareja): ?>
+                  El tema de tesis de tu pareja, "<?php echo htmlspecialchars($tema_pareja['tema']); ?>", ha sido aprobado, ¡lo que significa que también has aprobado!
+                <?php else: ?>
+                  Tu tema de tesis "<?php echo htmlspecialchars($tema['tema']); ?>" ha sido aprobado.
+                <?php endif; ?>
+              </strong>
             </p>
-            <?php if (!empty($tema['observaciones_anteproyecto'])): ?>
+            <?php
+            // Mostrar las observaciones del tema correspondiente (propio o de la pareja)
+            $observaciones = $tema_pareja ? $tema_pareja['observaciones_anteproyecto'] : $tema['observaciones_anteproyecto'];
+            ?>
+            <?php if (!empty($observaciones)): ?>
               <p>Descarga aquí las observaciones realizadas por el revisor.</p>
               <p class="mb-3 d-flex justify-content-center align-items-center">
-                <i class="bx bx-download me-1 text-primary fw-bold "></i>
-                <strong><a class="text-decoration-none" href="../uploads/observaciones/<?php echo htmlspecialchars($tema['observaciones_anteproyecto']); ?>" download>Descargar observaciones</a></strong>
+                <i class="bx bx-download me-1 text-primary fw-bold"></i>
+                <strong><a class="text-decoration-none" href="../uploads/observaciones/<?php echo htmlspecialchars($observaciones); ?>" download>Descargar observaciones</a></strong>
               </p>
             <?php endif; ?>
           </div>
@@ -351,15 +384,12 @@ if ($pareja_seleccionado_id) {
 
               <!-- Botón para enviar el tema -->
               <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
-                <button type="submit" class="btn d-inline-block">Enviar Tema</button>
+                <button type="submit" class="btn d-inline-block" <?php echo ($pareja_seleccionado) ? 'disabled' : ''; ?>>Enviar Tema</button>
             </form> <!-- Cierre del formulario principal -->
 
             <!-- Formulario separado para eliminar pareja -->
             <?php if ($pareja_seleccionado && $pareja_seleccionado_id): ?>
-              <form action="logica-eliminar-pareja.php" method="POST" class="enviar-tema">
-                <input type="hidden" name="pareja_id" value="<?php echo $pareja_seleccionado_id; ?>">
-                <button type="submit" class="btn color-rojo ms-2">Eliminar Pareja</button>
-              </form>
+              <button type="button" class="btn color-rojo ms-2" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarPareja">Eliminar Pareja</button>
             <?php endif; ?>
 
           </div>
@@ -367,6 +397,29 @@ if ($pareja_seleccionado_id) {
     </div>
   <?php endif; ?>
   </div>
+  </div>
+
+  <!-- Modal de Confirmación para Eliminar Pareja -->
+  <div class="modal fade" id="modalConfirmarEliminarPareja" tabindex="-1" aria-labelledby="modalLabelEliminarPareja" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabelEliminarPareja">Confirmar Eliminación de Pareja</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro de que deseas eliminar a tu pareja de tesis?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <!-- Formulario de eliminación que se envía al confirmar -->
+          <form action="logica-eliminar-pareja.php" method="POST" class="d-inline">
+            <input type="hidden" name="pareja_id" value="<?php echo $pareja_seleccionado_id; ?>">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Footer -->
