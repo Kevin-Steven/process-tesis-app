@@ -66,9 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_update_usuario->bind_param("i", $usuario_id);
         $stmt_update_usuario->execute();
 
-        // Si hay una pareja, actualizar el campo `pareja_tesis` de la pareja a -1
+        // Si hay una pareja, actualizar el campo `pareja_tesis` de la pareja a 0
         if ($pareja_id) {
-            $sql_update_pareja = "UPDATE usuarios SET pareja_tesis = -1 WHERE id = ?";
+            $sql_update_pareja = "UPDATE usuarios SET pareja_tesis = 0 WHERE id = ?";
             $stmt_update_pareja = $conn->prepare($sql_update_pareja);
             $stmt_update_pareja->bind_param("i", $pareja_id);
             $stmt_update_pareja->execute();

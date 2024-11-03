@@ -15,11 +15,11 @@ $usuario_id = $_SESSION['usuario_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Capturar los datos del formulario
-    $tema = mysqli_real_escape_string($conn, $_POST['tema']);
-    $objetivo_general = mysqli_real_escape_string($conn, $_POST['objetivo_general']);
-    $objetivo_especifico_uno = mysqli_real_escape_string($conn, $_POST['objetivo_especifico_uno']);
-    $objetivo_especifico_dos = mysqli_real_escape_string($conn, $_POST['objetivo_especifico_dos']);
-    $objetivo_especifico_tres = mysqli_real_escape_string($conn, $_POST['objetivo_especifico_tres']);
+    $tema = $_POST['tema'];
+    $objetivo_general = $_POST['objetivo_general'];
+    $objetivo_especifico_uno = $_POST['objetivo_especifico_uno'];
+    $objetivo_especifico_dos = $_POST['objetivo_especifico_dos'];
+    $objetivo_especifico_tres = $_POST['objetivo_especifico_tres'];
     $tutor_id = intval($_POST['tutor_id']);
     $nuevo_pareja_id = intval($_POST['pareja_id']);
 
@@ -73,41 +73,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Verificar si el usuario ha seleccionado una nueva pareja o ha cambiado a "Sin Pareja"
+    if ($nuevo_pareja_id !== $pareja_actual) {
+        // Si el usuario cambió de pareja
+        if ($nuevo_pareja_id == -1) {
+            // Si selecciona "Sin Pareja", establecer el campo `pareja_tesis` del usuario a -1
+            $sql_update_usuario = "UPDATE usuarios SET pareja_tesis = -1 WHERE id = ?";
+            $stmt_update_usuario = $conn->prepare($sql_update_usuario);
+            $stmt_update_usuario->bind_param("i", $usuario_id);
+            $stmt_update_usuario->execute();
 
-    // Actualizar el estado de `pareja_tesis` de acuerdo a la selección
-    if ($nuevo_pareja_id == -1) {
-        // Si selecciona "Sin Pareja", establecer el campo `pareja_tesis` del usuario a -1
-        $sql_update_usuario = "UPDATE usuarios SET pareja_tesis = -1 WHERE id = ?";
-        $stmt_update_usuario = $conn->prepare($sql_update_usuario);
-        $stmt_update_usuario->bind_param("i", $usuario_id);
-        $stmt_update_usuario->execute();
+            // Restablecer el campo `pareja_tesis` de la pareja actual a `0`
+            if ($pareja_actual && $pareja_actual != -1) {
+                $sql_update_pareja_anterior = "UPDATE usuarios SET pareja_tesis = 0 WHERE id = ?";
+                $stmt_update_pareja_anterior = $conn->prepare($sql_update_pareja_anterior);
+                $stmt_update_pareja_anterior->bind_param("i", $pareja_actual);
+                $stmt_update_pareja_anterior->execute();
+            }
+        } else {
+            // Si selecciona un nuevo compañero, actualizar el `pareja_tesis` del usuario y del nuevo compañero
+            $sql_update_usuario = "UPDATE usuarios SET pareja_tesis = ? WHERE id = ?";
+            $stmt_update_usuario = $conn->prepare($sql_update_usuario);
+            $stmt_update_usuario->bind_param("ii", $nuevo_pareja_id, $usuario_id);
+            $stmt_update_usuario->execute();
 
-        // Restablecer el campo `pareja_tesis` de la pareja actual a `0`
-        if ($pareja_actual && $pareja_actual != -1) {
-            $sql_update_pareja_anterior = "UPDATE usuarios SET pareja_tesis = 0 WHERE id = ?";
-            $stmt_update_pareja_anterior = $conn->prepare($sql_update_pareja_anterior);
-            $stmt_update_pareja_anterior->bind_param("i", $pareja_actual);
-            $stmt_update_pareja_anterior->execute();
-        }
-    } else {
-        // Si selecciona un nuevo compañero, actualizar el `pareja_tesis` del usuario y del nuevo compañero
-        $sql_update_usuario = "UPDATE usuarios SET pareja_tesis = ? WHERE id = ?";
-        $stmt_update_usuario = $conn->prepare($sql_update_usuario);
-        $stmt_update_usuario->bind_param("ii", $nuevo_pareja_id, $usuario_id);
-        $stmt_update_usuario->execute();
+            // Actualizar el campo `pareja_tesis` del nuevo compañero para que sea el ID del usuario actual
+            $sql_update_nueva_pareja = "UPDATE usuarios SET pareja_tesis = ? WHERE id = ?";
+            $stmt_update_nueva_pareja = $conn->prepare($sql_update_nueva_pareja);
+            $stmt_update_nueva_pareja->bind_param("ii", $usuario_id, $nuevo_pareja_id);
+            $stmt_update_nueva_pareja->execute();
 
-        // Actualizar el campo `pareja_tesis` del nuevo compañero para que sea el ID del usuario actual
-        $sql_update_nueva_pareja = "UPDATE usuarios SET pareja_tesis = ? WHERE id = ?";
-        $stmt_update_nueva_pareja = $conn->prepare($sql_update_nueva_pareja);
-        $stmt_update_nueva_pareja->bind_param("ii", $usuario_id, $nuevo_pareja_id);
-        $stmt_update_nueva_pareja->execute();
-
-        // Si el usuario ya tenía una pareja anterior, restablecer el campo `pareja_tesis` de la pareja anterior a `0`
-        if ($pareja_actual && $pareja_actual != -1) {
-            $sql_update_pareja_anterior = "UPDATE usuarios SET pareja_tesis = 0 WHERE id = ?";
-            $stmt_update_pareja_anterior = $conn->prepare($sql_update_pareja_anterior);
-            $stmt_update_pareja_anterior->bind_param("i", $pareja_actual);
-            $stmt_update_pareja_anterior->execute();
+            // Si el usuario ya tenía una pareja anterior, restablecer el campo `pareja_tesis` de la pareja anterior a `0`
+            if ($pareja_actual && $pareja_actual != -1) {
+                $sql_update_pareja_anterior = "UPDATE usuarios SET pareja_tesis = 0 WHERE id = ?";
+                $stmt_update_pareja_anterior = $conn->prepare($sql_update_pareja_anterior);
+                $stmt_update_pareja_anterior->bind_param("i", $pareja_actual);
+                $stmt_update_pareja_anterior->execute();
+            }
         }
     }
 

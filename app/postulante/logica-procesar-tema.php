@@ -28,14 +28,14 @@ $postulante_apellido = explode(' ', $postulante['apellidos'])[0];
 $postulante_nombre_completo = $postulante['nombres'] . ' ' . $postulante['apellidos'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    $tema = mysqli_real_escape_string($conn, $_POST['tema']);
-    $objetivo_general = mysqli_real_escape_string($conn, $_POST['objetivo_general']);
-    $objetivo_especifico_uno = mysqli_real_escape_string($conn, $_POST['objetivo_especifico_uno']);
-    $objetivo_especifico_dos = mysqli_real_escape_string($conn, $_POST['objetivo_especifico_dos']);
-    $objetivo_especifico_tres = mysqli_real_escape_string($conn, $_POST['objetivo_especifico_tres']);
-    $tutor_id = mysqli_real_escape_string($conn, $_POST['tutor_id']);
-    $pareja_id = mysqli_real_escape_string($conn, $_POST['pareja_id']);
+
+    $tema = $_POST['tema'];
+    $objetivo_general = $_POST['objetivo_general'];
+    $objetivo_especifico_uno = $_POST['objetivo_especifico_uno'];
+    $objetivo_especifico_dos = $_POST['objetivo_especifico_dos'];
+    $objetivo_especifico_tres = $_POST['objetivo_especifico_tres'];
+    $tutor_id = intval($_POST['tutor_id']);
+    $pareja_id = intval($_POST['pareja_id']);
 
     if (empty($tema) || empty($objetivo_general) || empty($objetivo_especifico_uno) || empty($objetivo_especifico_dos) || empty($objetivo_especifico_tres) || empty($tutor_id) || empty($pareja_id)) {
         echo "Todos los campos son obligatorios.";
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Validar el tipo de archivo (solo permitir ZIP y RAR)
-        $allowedfileExtensions = array('zip', 'rar');
+        $allowedfileExtensions = array('zip');
         if (in_array($fileExtension, $allowedfileExtensions)) {
             // Establecer la nomenclatura "Anteproyecto_(1 apellido)_(1 nombre)"
             $newFileName = "Anteproyecto_" . $postulante_apellido . "_" . $postulante_nombre . "." . $fileExtension;
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
         } else {
-            echo "Solo se permiten archivos ZIP o RAR.";
+            echo "Solo se permiten archivos ZIP.";
             exit();
         }
     }

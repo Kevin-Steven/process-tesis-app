@@ -13,7 +13,14 @@ class CustomPDF extends TCPDF
         $this->Image('../../images/TDSL.png', 140, 10, 60);
         
         // Salto de línea para separar el encabezado del contenido
-        $this->Ln(10); // Ajusta para añadir espacio si es necesario
+        $this->Ln(10);
+
+        // Ajustar la posición del inicio del contenido después del encabezado
+        if ($this->PageNo() == 1) {
+            $this->SetY(25); // Menor separación para la primera página
+        } else {
+            $this->SetY(30); // Espaciado estándar para las siguientes páginas
+        }
     }
 
     function MultiCellRow($data, $widths, $height)
@@ -44,6 +51,7 @@ class CustomPDF extends TCPDF
     {
         if ($this->GetY() + $h > $this->getPageHeight() - $this->getBreakMargin()) {
             $this->AddPage($this->CurOrientation);
+            $this->SetY(30); // Asegura el espacio después del encabezado en cada nueva página
         }
     }
 }
@@ -51,18 +59,18 @@ class CustomPDF extends TCPDF
 // Inicializar TCPDF
 $pdf = new CustomPDF();
 $pdf->AddPage();
-$pdf->SetY(25); // Ajusta la posición del contenido si es necesario
+$pdf->SetY(25); // Ajusta la posición del contenido en la primera página
 
 // Configurar la fuente para el título de la tabla
 $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, 'Listado de Temas Aprobados', 0, 1, 'C');
-$pdf->Ln(5); // Ajusta para añadir más espacio debajo del título si es necesario
+$pdf->Ln(5); // Ajuste para añadir más espacio debajo del título
 
 // Encabezados de la tabla
 $pdf->SetFont('helvetica', 'B', 12);
 $widths = [50, 50, 90];
 $height = 7;
-$headers = ['Postulante', 'Pareja', 'Tema'];
+$headers = ['Postulante 1', 'Postulante 2', 'Tema'];
 $pdf->MultiCellRow($headers, $widths, $height);
 
 // Consulta para obtener los temas aprobados
@@ -73,7 +81,7 @@ FROM tema t
 JOIN usuarios u ON t.usuario_id = u.id
 LEFT JOIN usuarios p ON t.pareja_id = p.id
 WHERE t.estado_tema = 'Aprobado'
-AND (t.pareja_id IS NULL OR t.usuario_id < t.pareja_id OR t.pareja_id = -1);
+AND t.estado_registro = 0;
 ";
 $result = $conn->query($sql);
 
@@ -83,7 +91,7 @@ while ($row = $result->fetch_assoc()) {
     $postulante = $row['postulante_nombres'] . ' ' . $row['postulante_apellidos'];
     $pareja = ($row['pareja_nombres'] && $row['pareja_apellidos']) 
         ? $row['pareja_nombres'] . ' ' . $row['pareja_apellidos'] 
-        : 'Sin pareja';
+        : 'No aplica';
     $tema = $row['tema'];
 
     // Agregar la fila a la tabla

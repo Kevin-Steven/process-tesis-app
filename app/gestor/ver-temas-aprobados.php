@@ -25,8 +25,7 @@ $sql = "
     LEFT JOIN usuarios p ON t.pareja_id = p.id
     JOIN tutores ON t.tutor_id = tutores.id
     WHERE t.estado_tema = 'Aprobado' 
-    AND t.estado_registro = 0
-    AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)";
+    AND t.estado_registro = 0";
 
 $result = $conn->query($sql);
 ?>
@@ -160,9 +159,9 @@ $result = $conn->query($sql);
           <thead class="table-header-fixed">
             <tr>
               <th>Tema</th>
-              <th>Postulante</th>
-              <th>Pareja</th>
-              <th>Tutor</th> <!-- Columna Tutor agregada -->
+              <th>Postulante 1</th>
+              <th>Postulante 2</th>
+              <th>Tutor</th> 
               <th>Acciones</th>
             </tr>
           </thead>
@@ -191,7 +190,7 @@ $result = $conn->query($sql);
                         <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
                       <?php endif; ?>
                     <?php else: ?>
-                      Sin Pareja
+                      No aplica
                     <?php endif; ?>
                   </td>
                   <td><?php echo htmlspecialchars($row['tutor_nombre']); ?></td> <!-- Tutor mostrado -->

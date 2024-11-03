@@ -14,6 +14,13 @@ class CustomPDF extends TCPDF
 
         // Salto de línea para separar el encabezado del contenido
         $this->Ln(10);
+
+        // Ajustar la posición del inicio del contenido después del encabezado
+        if ($this->PageNo() == 1) {
+            $this->SetY(25); // Menor separación para la primera página
+        } else {
+            $this->SetY(30); 
+        }
     }
 
     function MultiCellRow($data, $widths, $height)
@@ -44,6 +51,7 @@ class CustomPDF extends TCPDF
     {
         if ($this->GetY() + $h > $this->getPageHeight() - $this->getBreakMargin()) {
             $this->AddPage($this->CurOrientation);
+            $this->SetY(30); // Asegura el espacio después del encabezado en cada nueva página
         }
     }
 }
@@ -51,13 +59,12 @@ class CustomPDF extends TCPDF
 // Inicializar TCPDF
 $pdf = new CustomPDF();
 $pdf->AddPage();
-$pdf->SetY(25); // Ajusta la posición del contenido 
+$pdf->SetY(25); // Ajusta la posición del contenido en la primera página
 
 // Configurar la fuente para el título de la tabla
 $pdf->SetFont('helvetica', 'B', 16);
 $pdf->Cell(0, 10, 'Listado de Postulantes Aprobados', 0, 1, 'C');
-$pdf->Ln(5); // Ajuste para añadir más espacio debajo del título 
-
+$pdf->Ln(5); // Ajuste para añadir más espacio debajo del título
 
 // Encabezados de la tabla
 $pdf->SetFont('helvetica', 'B', 12);
