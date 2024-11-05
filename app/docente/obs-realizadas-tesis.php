@@ -27,7 +27,6 @@ $sql = "SELECT t.id, t.tema, t.anteproyecto, t.observaciones_tesis,
         LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
         WHERE t.revisor_tesis_id = ? 
         AND t.estado_registro = 0
-        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
         AND t.observaciones_tesis IS NOT NULL
         AND t.observaciones_tesis != ''
         ORDER BY t.fecha_subida DESC";

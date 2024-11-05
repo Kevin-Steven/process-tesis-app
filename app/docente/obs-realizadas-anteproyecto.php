@@ -27,9 +27,9 @@ $result = $stmt->get_result();
 $docente = $result->fetch_assoc();
 
 if ($docente) {
-  $cedula_docente = $docente['cedula'];
+    $cedula_docente = $docente['cedula'];
 
-  $sql = "
+    $sql = "
     SELECT t.id, t.tema, t.anteproyecto, t.observaciones_anteproyecto, 
            u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
            p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
@@ -43,13 +43,12 @@ if ($docente) {
     AND t.estado_registro = 0
     AND t.observaciones_anteproyecto IS NOT NULL
     AND t.observaciones_anteproyecto != ''
-    AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)
     ORDER BY t.fecha_subida DESC";
 
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("s", $cedula_docente);
-  $stmt->execute();
-  $result = $stmt->get_result();
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $cedula_docente);
+    $stmt->execute();
+    $result = $stmt->get_result();
 }
 ?>
 
@@ -192,7 +191,14 @@ if ($docente) {
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                                     <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'Sin pareja'; ?></td>
                                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
-                                    <td><?php echo !empty($row['observaciones_anteproyecto']) ? htmlspecialchars($row['observaciones_anteproyecto']) : 'Sin observaciones'; ?></td>
+                                    <td>
+                                        <?php if (!empty($row['observaciones_anteproyecto'])): ?>
+                                            <a href="../uploads/observaciones/<?php echo $row['observaciones_anteproyecto']; ?>" download class="text-decoration-none">Descargar</a>
+                                        <?php else: ?>
+                                            No disponible
+                                        <?php endif; ?>
+                                    </td>
+
                                     <td class="text-center">
                                         <?php if (!empty($row['anteproyecto'])): ?>
                                             <a href="detalles-observaciones.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
@@ -222,7 +228,7 @@ if ($docente) {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/sidebar.js" ></script>
+    <script src="../js/sidebar.js"></script>
 </body>
 
 </html>

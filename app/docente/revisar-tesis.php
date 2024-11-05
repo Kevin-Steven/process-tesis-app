@@ -19,7 +19,6 @@ if (!$conn) {
 }
 
 // Consulta para obtener los documentos de tesis asignados al revisor de tesis, 
-// asegurando que no se muestren duplicados para aquellos con pareja.
 $sql = "SELECT t.id, t.tema, t.documento_tesis, 
                u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
                IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
@@ -29,7 +28,6 @@ $sql = "SELECT t.id, t.tema, t.documento_tesis,
         WHERE t.revisor_tesis_id = ? 
         AND t.estado_registro = 0
         AND (t.observaciones_tesis IS NULL OR t.observaciones_tesis = '')
-        AND (t.usuario_id = IF(u.pareja_tesis = -1, t.usuario_id, LEAST(t.usuario_id, u.pareja_tesis)))
         ORDER BY t.fecha_subida DESC";
 
 $stmt = $conn->prepare($sql);

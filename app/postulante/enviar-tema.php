@@ -8,14 +8,10 @@ if (!isset($_SESSION['usuario_id'])) {
   exit();
 }
 
-// Obtener el primer nombre y el primer apellido
+// Obtener el primer nombre, apellido, y foto de perfil
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
-
-// Verificar si la foto de perfil está configurada en la sesión
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
-
-// Obtener el ID del usuario
 $usuario_id = $_SESSION['usuario_id'];
 
 // Consulta para obtener el estado de la inscripción
@@ -26,8 +22,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $inscripcion = $result->fetch_assoc();
 $stmt->close();
-
-// Verificar el estado de la inscripción
 $estado_inscripcion = $inscripcion['estado_inscripcion'] ?? null;
 
 // Consulta para obtener los tutores
@@ -56,26 +50,26 @@ $stmt_pareja_seleccionado->execute();
 $result_pareja_seleccionado = $stmt_pareja_seleccionado->get_result();
 $pareja_seleccionado = $result_pareja_seleccionado->fetch_assoc();
 $stmt_pareja_seleccionado->close();
-
-// Validar si existe una pareja seleccionada antes de continuar
 $pareja_seleccionado_id = $pareja_seleccionado['seleccionador_id'] ?? null;
 
-// Consulta para obtener el estado del tema
-$sql_tema = "SELECT * FROM tema WHERE usuario_id = ? AND estado_registro = 0 LIMIT 1";
-$stmt_tema = $conn->prepare($sql_tema);
-$stmt_tema->bind_param("i", $usuario_id);
-$stmt_tema->execute();
-$result_tema = $stmt_tema->get_result();
-$tema = $result_tema->fetch_assoc();
-$stmt_tema->close();
+// Consulta para obtener el tema aprobado del usuario
+$sql_tema_aprobado = "SELECT * FROM tema WHERE usuario_id = ? AND estado_tema = 'Aprobado' AND estado_registro = 0 LIMIT 1";
+$stmt_tema_aprobado = $conn->prepare($sql_tema_aprobado);
+$stmt_tema_aprobado->bind_param("i", $usuario_id);
+$stmt_tema_aprobado->execute();
+$result_tema_aprobado = $stmt_tema_aprobado->get_result();
+$tema_aprobado = $result_tema_aprobado->fetch_assoc();
+$stmt_tema_aprobado->close();
 
-// Consulta para obtener el tutor seleccionado por la pareja
+// Consulta para obtener el tutor seleccionado por la pareja si existe
 $tutor_seleccionado = null;
 if ($pareja_seleccionado_id) {
   $sql_tutor_seleccionado = "SELECT t.tutor_id, tut.nombres AS tutor_nombre 
                                FROM tema t
                                JOIN tutores tut ON t.tutor_id = tut.id
-                               WHERE t.usuario_id = ?";
+                               WHERE t.usuario_id = ?
+                               ORDER BY t.id DESC 
+                               LIMIT 1";
   $stmt_tutor_seleccionado = $conn->prepare($sql_tutor_seleccionado);
   $stmt_tutor_seleccionado->bind_param("i", $pareja_seleccionado_id);
   $stmt_tutor_seleccionado->execute();
@@ -86,16 +80,6 @@ if ($pareja_seleccionado_id) {
 
 // Verificar si el tema de la pareja ha sido aprobado
 $tema_pareja_aprobado = false;
-if ($pareja_seleccionado_id) {
-  $sql_tema_pareja = "SELECT estado_tema FROM tema WHERE usuario_id = ? AND estado_tema = 'Aprobado' LIMIT 1";
-  $stmt_tema_pareja = $conn->prepare($sql_tema_pareja);
-  $stmt_tema_pareja->bind_param("i", $pareja_seleccionado_id);
-  $stmt_tema_pareja->execute();
-  $result_tema_pareja = $stmt_tema_pareja->get_result();
-  $tema_pareja_aprobado = $result_tema_pareja->num_rows > 0;
-  $stmt_tema_pareja->close();
-}
-
 $tema_pareja = null;
 if ($pareja_seleccionado_id) {
   $sql_tema_pareja = "SELECT * FROM tema WHERE usuario_id = ? AND estado_tema = 'Aprobado' LIMIT 1";
@@ -104,8 +88,38 @@ if ($pareja_seleccionado_id) {
   $stmt_tema_pareja->execute();
   $result_tema_pareja = $stmt_tema_pareja->get_result();
   $tema_pareja = $result_tema_pareja->fetch_assoc();
+  $tema_pareja_aprobado = $result_tema_pareja->num_rows > 0;
   $stmt_tema_pareja->close();
 }
+
+// Consulta para obtener el tema más reciente en estado Pendiente o Rechazado
+$sql_tema_pendiente = "SELECT * FROM tema 
+                       WHERE (usuario_id = ? OR pareja_id = ?) 
+                       AND (estado_tema = 'Pendiente' OR estado_tema = 'Rechazado') 
+                       ORDER BY id DESC 
+                       LIMIT 1";
+$stmt_tema_pendiente = $conn->prepare($sql_tema_pendiente);
+$stmt_tema_pendiente->bind_param("ii", $usuario_id, $usuario_id);
+$stmt_tema_pendiente->execute();
+$result_tema_pendiente = $stmt_tema_pendiente->get_result();
+$tema_pendiente = $result_tema_pendiente->fetch_assoc();
+$stmt_tema_pendiente->close();
+
+// Obtener el estado de 'pareja_tesis' para el usuario actual
+$sql_pareja_tesis = "SELECT pareja_tesis FROM usuarios WHERE id = ?";
+$stmt_pareja_tesis = $conn->prepare($sql_pareja_tesis);
+$stmt_pareja_tesis->bind_param("i", $usuario_id);
+$stmt_pareja_tesis->execute();
+$result_pareja_tesis = $stmt_pareja_tesis->get_result();
+$usuario = $result_pareja_tesis->fetch_assoc();
+$estado_pareja_tesis = $usuario['pareja_tesis'] ?? null;
+$stmt_pareja_tesis->close();
+
+// Preparar variables para mostrar en HTML
+$usuarioEnvio = $tema_pendiente['usuario_id'] ?? null;
+$parejaId = $tema_pendiente['pareja_id'] ?? null;
+$estadoTema = $tema_pendiente['estado_tema'] ?? null;
+$motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 'Rechazado') ? $tema_pendiente['motivo_rechazo'] : null;
 
 ?>
 
@@ -178,22 +192,7 @@ if ($pareja_seleccionado_id) {
     <div class="container py-2">
       <h1 class="mb-4 text-center fw-bold">Enviar Tema</h1>
 
-      <!-- Toast para error de tamaño de archivo -->
-      <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="toast-header">
-            <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
-            <strong class="me-auto">Error de Tamaño</strong>
-            <small>Justo ahora</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-          </div>
-          <div class="toast-body">
-            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
-          </div>
-        </div>
-      </div>
-
-      <?php if ((isset($tema) && $tema['estado_tema'] === 'Aprobado' && $tema['estado_registro'] === 0) || $tema_pareja): ?>
+      <?php if ($tema_aprobado || $tema_pareja): ?>
         <div class="card shadow-lg mb-4 border-0">
           <div class="card-header bg-light text-center mb-3 py-3">
             <h3 class="mb-0 fw-bold text-success">¡Felicitaciones!</h3>
@@ -205,13 +204,13 @@ if ($pareja_seleccionado_id) {
                 <?php if ($tema_pareja): ?>
                   El tema de tesis de tu pareja, "<?php echo htmlspecialchars($tema_pareja['tema']); ?>", ha sido aprobado, ¡lo que significa que también has aprobado!
                 <?php else: ?>
-                  Tu tema de tesis "<?php echo htmlspecialchars($tema['tema']); ?>" ha sido aprobado.
+                  Tu tema de tesis "<?php echo htmlspecialchars($tema_aprobado['tema']); ?>" ha sido aprobado.
                 <?php endif; ?>
               </strong>
             </p>
             <?php
             // Mostrar las observaciones del tema correspondiente (propio o de la pareja)
-            $observaciones = $tema_pareja ? $tema_pareja['observaciones_anteproyecto'] : $tema['observaciones_anteproyecto'];
+            $observaciones = $tema_pareja ? $tema_pareja['observaciones_anteproyecto'] : $tema_aprobado['observaciones_anteproyecto'];
             ?>
             <?php if (!empty($observaciones)): ?>
               <p>Descarga aquí las observaciones realizadas por el revisor.</p>
@@ -223,22 +222,21 @@ if ($pareja_seleccionado_id) {
           </div>
         </div>
 
-      <?php elseif (isset($tema) && $tema['estado_tema'] === 'Pendiente' && $tema['estado_registro'] === 0): ?>
+      <?php elseif ($tema_pendiente && $tema_pendiente['estado_tema'] === 'Pendiente' && $tema_pendiente['estado_registro'] === 0 && $tema_pendiente['usuario_id'] === $usuario_id): ?>
         <div class="card shadow-lg mb-4">
           <div class="card-header text-center mb-3">
             <h5 class="mb-0 fw-bold">Información del Tema</h5>
           </div>
           <div class="card-body text-center">
-            <p><strong>Tema:</strong> <?php echo htmlspecialchars($tema['tema']); ?></p>
+            <p><strong>Tema:</strong> <?php echo htmlspecialchars($tema_pendiente['tema']); ?></p>
             <p><strong>Pareja:</strong>
               <?php
-              if ($tema['pareja_id'] == -1) {
-                echo "Sin Pareja";
+              if ($tema_pendiente['pareja_id'] == -1) {
+                echo "No aplica";
               } else {
-
                 $sql_pareja = "SELECT CONCAT(nombres, ' ', apellidos) AS nombre_completo FROM usuarios WHERE id = ?";
                 $stmt_pareja = $conn->prepare($sql_pareja);
-                $stmt_pareja->bind_param("i", $tema['pareja_id']);
+                $stmt_pareja->bind_param("i", $tema_pendiente['pareja_id']);
                 $stmt_pareja->execute();
                 $result_pareja = $stmt_pareja->get_result();
                 $pareja = $result_pareja->fetch_assoc();
@@ -248,7 +246,7 @@ if ($pareja_seleccionado_id) {
             </p>
           </div>
           <div class="card-footer text-center">
-            <a href="editar-tema.php?id=<?php echo $tema['id']; ?>" class="btn"><i class='bx bxs-edit'></i> Editar Tema</a>
+            <a href="editar-tema.php?id=<?php echo $tema_pendiente['id']; ?>" class="btn"><i class='bx bxs-edit'></i> Editar Tema</a>
             <button type="button" class="btn color-rojo" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarTema">
               <i class="bx bxs-trash"></i> Eliminar Tema
             </button>
@@ -278,7 +276,17 @@ if ($pareja_seleccionado_id) {
         </div>
 
       <?php else: ?>
-        <!-- Mostrar formulario para enviar tema si no hay tema pendiente -->
+        <!-- Mostrar formulario para enviar tema si no hay tema pendiente o fue rechazado -->
+        <?php
+        // Verifica si el tema está rechazado, existe un motivo de rechazo y cumple con las condiciones de pareja o trabajo individual
+        if ($estadoTema === 'Rechazado' && !empty($motivo_rechazo) && (($estado_pareja_tesis != 0 && $estado_pareja_tesis != -1) || ($estado_pareja_tesis === 0 || $estado_pareja_tesis === -1))): ?>
+          <div class="text-center pb-2">
+            <a href="#" class="text-danger text-center" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
+              Tema rechazado - ver motivo
+            </a>
+          </div>
+        <?php endif; ?>
+
         <div class="card shadow-lg">
           <div class="card-body">
             <form action="logica-procesar-tema.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
@@ -384,7 +392,22 @@ if ($pareja_seleccionado_id) {
 
               <!-- Botón para enviar el tema -->
               <div class="text-center mt-4 d-flex justify-content-center align-items-center gap-3">
-                <button type="submit" class="btn d-inline-block" <?php echo ($pareja_seleccionado) ? 'disabled' : ''; ?>>Enviar Tema</button>
+                <?php
+                // Determina si el botón debe estar deshabilitado para la pareja
+                $botonDeshabilitado = false;
+                // Condición para deshabilitar el botón cuando el usuario es la pareja y el tema está en 'Rechazado' o 'Pendiente'
+                if (($estadoTema === 'Rechazado' || $estadoTema === 'Pendiente') && $parejaId == $usuario_id) {
+                  $botonDeshabilitado = true;
+                }
+
+                // Renderizado del botón
+                if ($botonDeshabilitado) : ?>
+                  <button type="submit" class="btn d-inline-block" disabled>Enviar Tema</button>
+                <?php else: ?>
+                  <button type="submit" class="btn d-inline-block">Enviar Tema</button>
+                <?php endif; ?>
+
+
             </form> <!-- Cierre del formulario principal -->
 
             <!-- Formulario separado para eliminar pareja -->
@@ -397,6 +420,24 @@ if ($pareja_seleccionado_id) {
     </div>
   <?php endif; ?>
   </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalMotivoRechazo" tabindex="-1" aria-labelledby="modalLabelMotivoRechazo" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabelMotivoRechazo">Motivo de Rechazo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <?php echo htmlspecialchars($motivo_rechazo); ?>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Modal de Confirmación para Eliminar Pareja -->

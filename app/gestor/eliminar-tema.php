@@ -11,11 +11,13 @@ use PHPMailer\PHPMailer\Exception;
 // Verificar si se ha enviado el formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tema_id = intval($_POST['tema_id']);
+    $motivo_rechazo = isset($_POST['motivo_rechazo']) ? $_POST['motivo_rechazo'] : '';
 
     // Actualizar el estado del tema a 1 (borrado lógico)
-    $sql_update = "UPDATE tema SET estado_registro = 1, estado_tema = 'Rechazado' WHERE id = ?";
+    $sql_update = "UPDATE tema SET estado_registro = 1, estado_tema = 'Rechazado', motivo_rechazo = ? WHERE id = ?";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("i", $tema_id);
+    $stmt_update->bind_param("si", $motivo_rechazo, $tema_id);
+
 
     if ($stmt_update->execute()) {
         // Obtener datos del postulante para enviar el correo
@@ -29,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tema_data = $stmt_data->get_result()->fetch_assoc();
 
         // Enviar correo al postulante informando la eliminación del tema
-       //  enviarCorreoEliminacion($tema_data['postulante_email'], $tema_data['postulante_nombres'], $tema_data['postulante_apellidos'], $tema_data['tema']);
+        //  enviarCorreoEliminacion($tema_data['postulante_email'], $tema_data['postulante_nombres'], $tema_data['postulante_apellidos'], $tema_data['tema']);
 
         header("Location: ver-temas.php?mensaje=Tema Rechazado con éxito");
         exit();
@@ -41,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-function enviarCorreoEliminacion($email, $nombre, $apellido, $tema) {
+function enviarCorreoEliminacion($email, $nombre, $apellido, $tema)
+{
     $mail = new PHPMailer(true);
 
     try {
@@ -75,4 +78,3 @@ function enviarCorreoEliminacion($email, $nombre, $apellido, $tema) {
         error_log("Error al enviar el correo de eliminación: {$mail->ErrorInfo}");
     }
 }
-?>

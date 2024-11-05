@@ -282,7 +282,7 @@ if (isset($_GET['id'])) {
     </div>
   </div>
 
-  <!-- Modal Eliminar -->
+  <!-- Modal Eliminar (Rechazar) -->
   <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -291,14 +291,19 @@ if (isset($_GET['id'])) {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          ¿Estás seguro de que deseas rechazar este tema?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <!-- Formulario para eliminar el tema -->
           <form action="eliminar-tema.php" method="POST">
             <input type="hidden" name="tema_id" value="<?php echo $tema['id']; ?>">
-            <button type="submit" class="btn btn-danger">Rechazar</button>
+
+            <!-- Motivo de rechazo -->
+            <div class="mb-3">
+              <label for="motivo_rechazo" class="form-label">Motivo de Rechazo</label>
+              <textarea class="form-control" id="motivo_rechazo" name="motivo_rechazo" rows="4" required></textarea>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Rechazar</button>
+            </div>
           </form>
         </div>
       </div>

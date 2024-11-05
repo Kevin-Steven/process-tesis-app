@@ -42,7 +42,6 @@ if ($docente) {
     AND t.estado_tema = 'Aprobado'  -- Solo mostrar temas aprobados
     AND t.estado_registro = 0
     AND (t.observaciones_anteproyecto IS NULL OR t.observaciones_anteproyecto = '') -- Excluir temas con observaciones
-    AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)
     ORDER BY t.fecha_subida DESC";
 
   $stmt = $conn->prepare($sql);
