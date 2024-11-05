@@ -1,3 +1,6 @@
+create database procesotitulacion;
+use procesotitulacion;
+
 CREATE TABLE usuarios (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	nombres VARCHAR(100) NOT NULL,
@@ -80,11 +83,11 @@ CREATE TABLE tema (
     revisor_tesis_id int,
     observaciones_anteproyecto VARCHAR(255),
     observaciones_tesis VARCHAR(255),
+    motivo_rechazo TEXT,
     fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (tutor_id) REFERENCES tutores(id) ON DELETE CASCADE
 );
-
 
 DELIMITER $$
 CREATE TRIGGER after_user_insert
