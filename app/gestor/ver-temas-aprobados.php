@@ -3,8 +3,8 @@ session_start();
 require '../config/config.php';
 
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
-    header("Location: ../../index.php");
-    exit();
+  header("Location: ../../index.php");
+  exit();
 }
 
 // Obtener el primer nombre y el primer apellido
@@ -15,10 +15,10 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "
-    SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id,
+$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id,
            u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
+           p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 
+           p.apellidos AS pareja_apellidos, 
            tutores.nombres AS tutor_nombre, p.id AS pareja_id
     FROM tema t
     JOIN usuarios u ON t.usuario_id = u.id
@@ -74,7 +74,9 @@ $result = $conn->query($sql);
               <i class='bx bx-lock me-2'></i> Cambio de Clave
             </a>
           </li>
-          <li><hr class="dropdown-divider"></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
               <i class='bx bx-log-out me-2'></i> Cerrar Sesión
@@ -154,60 +156,77 @@ $result = $conn->query($sql);
         </div>
       <?php endif; ?>
 
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead class="table-header-fixed">
-            <tr>
-              <th>Tema</th>
-              <th>Postulante 1</th>
-              <th>Postulante 2</th>
-              <th>Tutor</th> 
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if ($result->num_rows > 0): ?>
-              <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
-                  <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                  <td>
-                    <?php if ($row['pareja_nombres']): ?>
-                      <?php
-                      // Verificar si la pareja está en estado "Rechazado" para mostrar el estado
-                      $sql_pareja_estado = "SELECT estado_tema FROM tema WHERE usuario_id = ? LIMIT 1";
-                      $stmt_pareja_estado = $conn->prepare($sql_pareja_estado);
-                      $stmt_pareja_estado->bind_param("i", $row['pareja_id']);
-                      $stmt_pareja_estado->execute();
-                      $result_pareja_estado = $stmt_pareja_estado->get_result();
-                      $pareja_estado = $result_pareja_estado->fetch_assoc();
-                      $stmt_pareja_estado->close();
-                      ?>
+      <!-- Campo de búsqueda -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class='bx bx-search'></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema, postulante o tutor">
+      </div>
 
-                      <?php if ($pareja_estado && $pareja_estado['estado_tema'] === 'Rechazado'): ?>
-                        <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?> (Pendiente)
-                      <?php else: ?>
-                        <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
-                      <?php endif; ?>
-                    <?php else: ?>
-                      No aplica
-                    <?php endif; ?>
-                  </td>
-                  <td><?php echo htmlspecialchars($row['tutor_nombre']); ?></td> <!-- Tutor mostrado -->
-                  <td class="text-center">
-                    <a href="editar-tutor-ap.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
-                      <i class='bx bx-search'></i> Ver detalles
-                    </a>
-                  </td>
-                </tr>
-              <?php endwhile; ?>
-            <?php else: ?>
+      <!-- Tabla de temas aprobados -->
+      <div class="table-responsive">
+        <div class="table-responsive">
+          <table class="table table-striped" id="temas">
+            <thead class="table-header-fixed">
               <tr>
-                <td colspan="5" class="text-center">No se encontraron temas aprobados.</td> <!-- Colspan ajustado a 5 -->
+                <th>Tema</th>
+                <th>Postulante 1</th>
+                <th>Postulante 2</th>
+                <th>Tutor</th>
+                <th>Anteproyecto</th>
+                <th>Observaciones Anteproyecto</th>
+                <th>Observaciones Tesis</th>
+                <th>Acciones</th>
               </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                  <tr>
+                    <td><?php echo htmlspecialchars($row['tema']); ?></td>
+                    <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
+                    <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
+                    <td><?php echo htmlspecialchars($row['tutor_nombre']); ?></td>
+                    <td>
+                      <?php if (!empty($row['anteproyecto'])): ?>
+                        <a href="<?php echo '../uploads/' . htmlspecialchars($row['anteproyecto']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        No disponible
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <?php if (!empty($row['observaciones_anteproyecto'])): ?>
+                        <a href="<?php echo '../uploads/observaciones/' . htmlspecialchars($row['observaciones_anteproyecto']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        No disponible
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <?php if (!empty($row['observaciones_tesis'])): ?>
+                        <a href="<?php echo '../uploads/observaciones-tesis/' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        No disponible
+                      <?php endif; ?>
+                    </td>
+                    <td class="text-center">
+                      <a href="editar-tutor-ap.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
+                        <i class='bx bx-search'></i> Ver detalles
+                      </a>
+                    </td>
+                  </tr>
+                <?php endwhile; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="8" class="text-center">No se encontraron temas aprobados.</td>
+                </tr>
+              <?php endif; ?>
+              <!-- Fila para "No se encontraron resultados" -->
+              <tr id="noResultsRow" style="display: none;">
+                <td colspan="8" class="text-center">No se encontraron resultados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
     </div>
   </div>
@@ -222,6 +241,7 @@ $result = $conn->query($sql);
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js" defer></script>
+  <script src="../js/buscarTema.js" defer></script>
 </body>
 
 </html>

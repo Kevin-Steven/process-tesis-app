@@ -1,10 +1,10 @@
 <?php
 session_start();
-require '../config/config.php'; 
+require '../config/config.php';
 
 if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])) {
-    header("Location: ../../index.php");
-    exit();
+  header("Location: ../../index.php");
+  exit();
 }
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
@@ -19,7 +19,7 @@ $sql = "SELECT t.id, u.nombres AS postulante_nombres, u.apellidos AS postulante_
         JOIN usuarios u ON t.usuario_id = u.id
         LEFT JOIN usuarios p ON t.pareja_id = p.id
         JOIN tutores tr ON t.tutor_id = tr.id
-        WHERE t.estado_registro = 0 AND t.estado_tema = 'Pendiente'"; 
+        WHERE t.estado_registro = 0 AND t.estado_tema = 'Pendiente'";
 $result = $conn->query($sql);
 ?>
 
@@ -69,7 +69,9 @@ $result = $conn->query($sql);
               Cambio de Clave
             </a>
           </li>
-          <li><hr class="dropdown-divider"></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
               <i class='bx bx-log-out me-2'></i>
@@ -103,8 +105,15 @@ $result = $conn->query($sql);
   <div class="content" id="content">
     <div class="container mt-2">
       <h1 class="mb-4 text-center fw-bold">Temas Registrados</h1>
+
+      <!-- Campo de búsqueda -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class='bx bx-search'></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por postulante...">
+      </div>
+
       <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-striped" id="postulantesList">
           <thead class="table-header-fixed">
             <tr>
               <th>Postulante 1</th>
@@ -119,12 +128,12 @@ $result = $conn->query($sql);
                 <tr>
                   <td><?php echo $row['postulante_nombres'] . ' ' . $row['postulante_apellidos']; ?></td>
                   <td>
-                    <?php 
-                      if (!empty($row['pareja_nombres'])) {
-                        echo $row['pareja_nombres'] . ' ' . $row['pareja_apellidos'];
-                      } else {
-                        echo "No aplica";
-                      }
+                    <?php
+                    if (!empty($row['pareja_nombres'])) {
+                      echo $row['pareja_nombres'] . ' ' . $row['pareja_apellidos'];
+                    } else {
+                      echo "No aplica";
+                    }
                     ?>
                   </td>
                   <td><?php echo $row['tutor_nombres']; ?></td>
@@ -155,6 +164,7 @@ $result = $conn->query($sql);
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js"></script>
+  <script src="../js/buscarPostulante.js"></script>
 
 </body>
 

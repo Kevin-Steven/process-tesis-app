@@ -15,7 +15,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consultar los postulantes que han sido aceptados
-$sql = "SELECT u.cedula, u.nombres, u.apellidos, u.carrera, d.estado_inscripcion, d.documento_carpeta 
+$sql = "SELECT u.id, u.cedula, u.nombres, u.apellidos, u.carrera, d.estado_inscripcion, d.documento_carpeta 
         FROM usuarios u 
         LEFT JOIN documentos_postulante d ON u.id = d.usuario_id 
         WHERE d.estado_inscripcion = 'Aprobado' AND d.estado_registro = 0
@@ -119,6 +119,7 @@ $result = $stmt->get_result();
         <table class="table table-striped" id="postulantesTable">
           <thead class="table-header-fixed">
             <tr>
+              <th class="d-none">ID</th>
               <th>Cédula</th>
               <th>Nombre</th>
               <th>Apellido</th>
@@ -131,6 +132,7 @@ $result = $stmt->get_result();
             <?php if ($result->num_rows > 0): ?>
               <?php while ($row = $result->fetch_assoc()): ?>
                 <tr>
+                  <td class="d-none"><?php echo $row['id']; ?></td> <!-- Ocultar en pantallas pequeñas -->
                   <td><?php echo $row['cedula']; ?></td>
                   <td><?php echo $row['nombres']; ?></td>
                   <td><?php echo $row['apellidos']; ?></td>

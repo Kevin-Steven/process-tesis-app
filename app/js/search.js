@@ -4,10 +4,10 @@ document.getElementById('searchInput').addEventListener('keyup', function () {
     let hasVisibleRows = false;
 
     rows.forEach(row => {
-        const cedula = row.cells[0].textContent.toLowerCase();
-        const nombres = row.cells[1].textContent.toLowerCase();
-        const apellidos = row.cells[2].textContent.toLowerCase();
-        const carrera = row.cells[3].textContent.toLowerCase();
+        const cedula = row.cells[1].textContent.toLowerCase();
+        const nombres = row.cells[2].textContent.toLowerCase();
+        const apellidos = row.cells[3].textContent.toLowerCase();
+        const carrera = row.cells[4].textContent.toLowerCase();
 
         if (cedula.includes(searchValue) || nombres.includes(searchValue) || apellidos.includes(searchValue) || carrera.includes(searchValue)) {
             row.style.display = '';
