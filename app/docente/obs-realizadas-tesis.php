@@ -9,34 +9,55 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
-
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
-
 $usuario_id = $_SESSION['usuario_id'];
 
 if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Consultar el último anteproyecto asignado al docente que tenga el estado de registro en 0 y no tenga observaciones
-$sql = "SELECT t.id, t.tema, t.anteproyecto, t.observaciones_tesis, 
-               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
-        WHERE t.revisor_tesis_id = ? 
-        AND t.estado_registro = 0
-        AND t.observaciones_tesis IS NOT NULL
-        AND t.observaciones_tesis != ''
-        ORDER BY t.fecha_subida DESC";
-
-
+// Obtener la cédula del docente actual desde la tabla usuarios
+$sql = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
+$docente = $result->fetch_assoc();
 
+if ($docente) {
+    $cedula_docente = $docente['cedula'];
+
+    // Consulta actualizada para priorizar `revisor_tesis_id`
+    $sql = "SELECT 
+                t.id, 
+                t.tema, 
+                t.documento_tesis, 
+                t.observaciones_tesis, 
+                u.nombres AS postulante_nombres, 
+                u.apellidos AS postulante_apellidos, 
+                p.nombres AS pareja_nombres, 
+                p.apellidos AS pareja_apellidos, 
+                tu.nombres AS tutor_nombres,
+                rt.nombres AS revisor_tesis_nombres,
+                rt.apellidos AS revisor_tesis_apellidos
+            FROM tema t
+            JOIN usuarios u ON t.usuario_id = u.id
+            LEFT JOIN usuarios p ON t.pareja_id = p.id
+            LEFT JOIN tutores tu ON t.tutor_id = tu.id
+            LEFT JOIN usuarios rt ON t.revisor_tesis_id = rt.id
+            WHERE 
+                (t.revisor_tesis_id = ? OR (t.revisor_tesis_id IS NULL AND tu.cedula = ?))
+                AND t.estado_tema = 'Aprobado'
+                AND t.estado_registro = 0
+                AND t.observaciones_tesis IS NOT NULL
+                AND t.observaciones_tesis != ''
+            ORDER BY t.fecha_subida DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $usuario_id, $cedula_docente);
+    $stmt->execute();
+    $result = $stmt->get_result();
+}
 ?>
 
 <!doctype html>
@@ -53,7 +74,7 @@ $result = $stmt->get_result();
 </head>
 
 <body>
-    <!-- Topbar con ícono de menú hamburguesa (fuera del menú) -->
+    <!-- Topbar con ícono de menú hamburguesa -->
     <div class="topbar z-1">
         <div class="menu-toggle">
             <i class='bx bx-menu'></i>
@@ -78,7 +99,7 @@ $result = $stmt->get_result();
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
+                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
                             <i class='bx bx-lock me-2'></i> Cambio de Clave
                         </a>
                     </li>
@@ -106,14 +127,14 @@ $result = $stmt->get_result();
             <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
-            <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
+            <a class="nav-link active" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-3">
-            <h1 class="text-center mb-4 fw-bold">Revisar Tesis Asignadas</h1>
+            <h1 class="text-center mb-4 fw-bold">Revisar Observaciones de Tesis</h1>
             <?php if (isset($_GET['status'])): ?>
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                     <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -160,7 +181,7 @@ $result = $stmt->get_result();
                 </div>
             <?php endif; ?>
 
-            <?php if ($result->num_rows > 0): ?>
+            <?php if ($result && $result->num_rows > 0): ?>
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead class="table-header-fixed">
@@ -168,7 +189,7 @@ $result = $stmt->get_result();
                                 <th>Postulante</th>
                                 <th>Pareja</th>
                                 <th>Tema</th>
-                                <th>Observaciones</th> 
+                                <th>Observaciones</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -176,35 +197,30 @@ $result = $stmt->get_result();
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td>
+                                    <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
                                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['observaciones_tesis']); ?></td> 
-                                    <td class="text-center">
-                                        <?php if (!empty($row['anteproyecto'])): ?>
-                                            <a href="detalles-observaciones-tesis.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
-                                                <i class='bx bx-search'></i> Ver detalles
-                                            </a>
+                                    <td>
+                                        <?php if (!empty($row['observaciones_tesis'])): ?>
+                                            <a href="../uploads/observaciones-tesis/<?php echo $row['observaciones_tesis']; ?>" download class="text-decoration-none">Descargar</a>
                                         <?php else: ?>
-                                            <span class="text-muted">No disponible</span>
+                                            No disponible
                                         <?php endif; ?>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <a href="detalles-observaciones-tesis.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
+                                            <i class='bx bx-search'></i> Ver detalles
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>
                     </table>
-
                 </div>
             <?php else: ?>
                 <p class="text-center">No hay observaciones realizadas.</p>
             <?php endif; ?>
-
         </div>
-    </div>
-
-    <div class="btn-regresarA">
-        <a href="ver-observaciones.php" class="regresar-enlace">
-            <i class='bx bx-left-arrow-circle'></i>
-        </a>
     </div>
 
     <!-- Footer -->
@@ -215,8 +231,7 @@ $result = $stmt->get_result();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/sidebar.js" ></script>
-    <script src="../js/toast.js" defer></script>
+    <script src="../js/sidebar.js"></script>
 </body>
 
 </html>

@@ -59,7 +59,7 @@ if (!$conn) {
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
+                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
                             <i class='bx bx-lock me-2'></i> Cambio de Clave
                         </a>
                     </li>

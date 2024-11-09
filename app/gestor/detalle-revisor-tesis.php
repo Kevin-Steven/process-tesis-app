@@ -19,19 +19,29 @@ if ($conn->connect_error) {
 if (isset($_GET['id'])) {
     $tema_id = $_GET['id'];
 
-    // Consulta para obtener los detalles del tema y su revisor actual
-    $sql = "SELECT t.tema, CONCAT(r.nombres, ' ', r.apellidos) AS revisor 
-            FROM tema t 
-            LEFT JOIN usuarios r ON t.revisor_tesis_id = r.id 
-            WHERE t.id = ?";
+    // Consulta para obtener los detalles del tema, el tutor y el revisor actual
+    $sql = "SELECT 
+            t.tema, 
+            CONCAT(r.nombres, ' ', r.apellidos) AS revisor,
+            tu.nombres AS tutor_nombre
+        FROM tema t 
+        LEFT JOIN usuarios r ON t.revisor_tesis_id = r.id 
+        LEFT JOIN tutores tu ON t.tutor_id = tu.id
+        WHERE t.id = ?";
+    
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $tema_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $tema = $result->fetch_assoc();
-    $revisor = $tema['revisor'] ? htmlspecialchars($tema['revisor']) : 'No tiene un revisor asignado';
 
-    // Obtener la lista de revisores (docentes)
+    // Mostrar revisor asignado o un mensaje si no está asignado
+    $revisor = !empty($tema['revisor']) ? htmlspecialchars($tema['revisor']) : 'No tiene un revisor asignado';
+
+    // Mostrar el tutor en mayúsculas o un mensaje si no está asignado
+    $tutor_nombre = !empty($tema['tutor_nombre']) ? strtoupper($tema['tutor_nombre']) : 'No tiene un tutor asignado';
+
+    // Obtener la lista de posibles revisores (docentes)
     $sql_revisores = "SELECT id, CONCAT(nombres, ' ', apellidos) AS nombre_completo FROM usuarios WHERE rol = 'docente'";
     $result_revisores = $conn->query($sql_revisores);
 } else {
@@ -110,14 +120,18 @@ if (isset($_GET['id'])) {
                 <div class="card-body">
                     <h5 class="card-title text-primary fw-bold mb-3">Detalles del Tema</h5>
                     <div class="table-responsive">
-                        <table class="table">
+                    <table class="table">
                             <tbody>
                                 <tr>
                                     <th><i class="bx bx-book"></i> Tema</th>
                                     <td><?php echo htmlspecialchars($tema['tema']); ?></td>
                                 </tr>
                                 <tr>
-                                    <th><i class="bx bx-user"></i> Revisor Actual</th>
+                                    <th><i class="bx bx-user"></i> Tutor elegido por el postulante</th>
+                                    <td><?php echo strtoupper($tutor_nombre); ?></td>
+                                </tr>
+                                <tr>
+                                    <th><i class="bx bx-user"></i> Nuevo Revisor</th>
                                     <td><?php echo $revisor; ?></td>
                                 </tr>
                             </tbody>
@@ -144,7 +158,7 @@ if (isset($_GET['id'])) {
                             <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modalActualizarRevisor">
                                 Actualizar Revisor
                             </button>
-                            <a href="tabla-revisor-anteproyecto.php" class="btn cancelar-btn">Cancelar</a>
+                            <a href="tabla-revisor-tesis.php" class="btn cancelar-btn">Cancelar</a>
                         </div>
 
                         <!-- Modal para confirmar actualización -->

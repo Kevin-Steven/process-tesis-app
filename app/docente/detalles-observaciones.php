@@ -72,8 +72,8 @@ if (isset($_GET['id'])) {
                     <i class='bx bx-chevron-down ms-1'></i>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li><a class="dropdown-item d-flex align-items-center" href="perfil-gestor.php"><i class='bx bx-user me-2'></i>Perfil</a></li>
-                    <li><a class="dropdown-item d-flex align-items-center" href="cambio-clave-gestor.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a></li>
+                    <li><a class="dropdown-item d-flex align-items-center" href="perfil.php"><i class='bx bx-user me-2'></i>Perfil</a></li>
+                    <li><a class="dropdown-item d-flex align-items-center" href="cambio-clave.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -119,7 +119,7 @@ if (isset($_GET['id'])) {
                                         if (!empty($anteproyecto['pareja_nombres']) && !empty($anteproyecto['pareja_apellidos'])) {
                                             echo $anteproyecto['pareja_nombres'] . ' ' . $anteproyecto['pareja_apellidos'];
                                         } else {
-                                            echo "Sin pareja";
+                                            echo "No aplica";
                                         }
                                         ?>
                                     </td>
@@ -137,7 +137,7 @@ if (isset($_GET['id'])) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th><i class="bx bx-file"></i> Observaciones</th>
+                                    <th><i class="bx bx-file"></i> Observaciones realizadas</th>
                                     <td>
                                         <?php if (!empty($anteproyecto['observaciones_anteproyecto'])): ?>
                                             <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/observaciones/<?php echo urlencode($anteproyecto['observaciones_anteproyecto']); ?>" download>

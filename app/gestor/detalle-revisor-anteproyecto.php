@@ -19,27 +19,43 @@ if ($conn->connect_error) {
 if (isset($_GET['id'])) {
     $tema_id = $_GET['id'];
 
-    // Consulta para obtener los detalles del tema y su revisor actual
-    $sql = "SELECT t.tema, CONCAT(r.nombres, ' ', r.apellidos) AS revisor 
-            FROM tema t 
-            LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id 
-            WHERE t.id = ?";
+    // Consulta para obtener los detalles del tema, el revisor actual, y el tutor asignado
+    $sql = "
+        SELECT 
+            t.tema, 
+            CONCAT(r.nombres, ' ', r.apellidos) AS revisor, 
+            COALESCE(CONCAT(tutor_usuario.nombres, ' ', tutor_usuario.apellidos), tu.nombres) AS tutor_nombre
+        FROM tema t
+        LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id 
+        LEFT JOIN tutores tu ON tu.id = t.tutor_id
+        LEFT JOIN usuarios tutor_usuario ON tutor_usuario.cedula = tu.cedula AND tutor_usuario.rol = 'docente'
+        WHERE t.id = ?";
+    
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $tema_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $tema = $result->fetch_assoc();
-    $revisor = $tema['revisor'] ? htmlspecialchars($tema['revisor']) : 'No tiene un revisor asignado';
 
-    // Obtener la lista de revisores (docentes)
+    // Verificar si el tema fue encontrado
+    if ($tema) {
+        $revisor = !empty($tema['revisor']) ? htmlspecialchars($tema['revisor']) : 'No tiene un nuevo revisor asignado';
+        $tutor_nombre = !empty($tema['tutor_nombre']) ? htmlspecialchars($tema['tutor_nombre']) : 'No tiene un tutor asignado';
+    } else {
+        echo "No se encontró el tema.";
+        exit();
+    }
+
+    // Obtener la lista de posibles revisores
     $sql_revisores = "SELECT id, CONCAT(nombres, ' ', apellidos) AS nombre_completo FROM usuarios WHERE rol = 'docente'";
     $result_revisores = $conn->query($sql_revisores);
 } else {
     echo "No se especificó ningún ID de tema.";
     exit();
 }
-
 ?>
+
+
 
 <!doctype html>
 <html lang="es">
@@ -113,11 +129,15 @@ if (isset($_GET['id'])) {
                         <table class="table">
                             <tbody>
                                 <tr>
-                                    <th><i class="bx bx-book"></i> Tema</th>
+                                    <th>Tema</th>
                                     <td><?php echo htmlspecialchars($tema['tema']); ?></td>
                                 </tr>
                                 <tr>
-                                    <th><i class="bx bx-user"></i> Revisor Actual</th>
+                                    <th>Tutor Seleccionado por el Postulante</th>
+                                    <td><?php echo strtoupper($tutor_nombre); ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Revisor Actual</th>
                                     <td><?php echo $revisor; ?></td>
                                 </tr>
                             </tbody>

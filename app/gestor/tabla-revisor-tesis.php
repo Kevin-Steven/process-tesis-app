@@ -15,7 +15,20 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
+// Consulta para obtener los temas aprobados junto con el tutor y revisor de tesis
+$sql_temas_aprobados = "
+    SELECT 
+        t.id, 
+        t.tema, 
+        tu.nombres AS tutor_nombre,
+        CONCAT(r.nombres, ' ', r.apellidos) AS revisor
+    FROM tema t
+    LEFT JOIN tutores tu ON t.tutor_id = tu.id
+    LEFT JOIN usuarios r ON t.revisor_tesis_id = r.id
+    WHERE t.estado_tema = 'Aprobado' 
+    AND t.estado_registro = 0";
 
+$result_temas_aprobados = $conn->query($sql_temas_aprobados);
 ?>
 
 <!doctype html>
@@ -118,38 +131,34 @@ if ($conn->connect_error) {
                     <thead class="table-header-fixed">
                         <tr>
                             <th>Tema</th>
+                            <th>Tutor</th>
                             <th>Revisor</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // Consulta para temas aprobados
-                        $sql_temas_aprobados = "
-                        SELECT t.id, t.tema, 
-                               CONCAT(r.nombres, ' ', r.apellidos) AS revisor
-                        FROM tema t
-                        LEFT JOIN usuarios r ON t.revisor_tesis_id = r.id
-                        WHERE t.estado_tema = 'Aprobado' 
-                        AND t.estado_registro = 0
-                        AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)";
-                        $result_temas_aprobados = $conn->query($sql_temas_aprobados);
-
                         if ($result_temas_aprobados->num_rows > 0) {
                             while ($tema = $result_temas_aprobados->fetch_assoc()) {
-                                $revisor = $tema['revisor'] ? htmlspecialchars($tema['revisor']) : 'Revisor no asignado';
+                                // Mostrar el nombre del tutor en mayúsculas
+                                $tutor_nombre = !empty($tema['tutor_nombre']) ? strtoupper($tema['tutor_nombre']) : 'Tutor no asignado';
+
+                                // Verificar si hay un revisor asignado
+                                $revisor = !empty($tema['revisor']) ? htmlspecialchars($tema['revisor']) : 'Revisor no asignado';
+
                                 echo "<tr>
-                                    <td>" . htmlspecialchars($tema['tema']) . "</td>
-                                    <td>" . $revisor . "</td>
-                                    <td class='text-center'>
-                                        <a href='detalle-revisor-tesis.php?id=" . $tema['id'] . "' class='text-decoration-none d-flex align-items-center justify-content-center'>
-                                            <i class='bx bx-search'></i> Ver detalles
-                                        </a>
-                                    </td>
-                                  </tr>";
+                                        <td>" . htmlspecialchars($tema['tema']) . "</td>
+                                        <td>{$tutor_nombre}</td>
+                                        <td>{$revisor}</td>
+                                        <td class='text-center'>
+                                            <a href='detalle-revisor-tesis.php?id={$tema['id']}' class='text-decoration-none d-flex align-items-center justify-content-center'>
+                                                <i class='bx bx-search'></i> Ver detalles
+                                            </a>
+                                        </td>
+                                    </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='3' class='text-center'>No hay temas aprobados</td></tr>";
+                            echo "<tr><td colspan='4' class='text-center'>No hay temas aprobados</td></tr>";
                         }
                         ?>
                     </tbody>

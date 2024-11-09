@@ -29,24 +29,35 @@ $docente = $result->fetch_assoc();
 if ($docente) {
     $cedula_docente = $docente['cedula'];
 
+    // Consulta para obtener las observaciones, priorizando el campo `revisor_anteproyecto_id`
     $sql = "
-    SELECT t.id, t.tema, t.anteproyecto, t.observaciones_anteproyecto, 
-           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
-           tu.nombres AS tutor_nombres
-    FROM tema t
-    JOIN usuarios u ON t.usuario_id = u.id
-    LEFT JOIN usuarios p ON t.pareja_id = p.id
-    JOIN tutores tu ON t.tutor_id = tu.id
-    WHERE tu.cedula = ?
-    AND t.estado_tema = 'Aprobado'
-    AND t.estado_registro = 0
-    AND t.observaciones_anteproyecto IS NOT NULL
-    AND t.observaciones_anteproyecto != ''
-    ORDER BY t.fecha_subida DESC";
+        SELECT 
+            t.id, 
+            t.tema, 
+            t.anteproyecto, 
+            t.observaciones_anteproyecto, 
+            u.nombres AS postulante_nombres, 
+            u.apellidos AS postulante_apellidos, 
+            p.nombres AS pareja_nombres, 
+            p.apellidos AS pareja_apellidos, 
+            tu.nombres AS tutor_nombres,
+            r.nombres AS revisor_nombres,
+            r.apellidos AS revisor_apellidos
+        FROM tema t
+        JOIN usuarios u ON t.usuario_id = u.id
+        LEFT JOIN usuarios p ON t.pareja_id = p.id
+        LEFT JOIN tutores tu ON t.tutor_id = tu.id
+        LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id
+        WHERE 
+            (t.revisor_anteproyecto_id = ? OR (t.revisor_anteproyecto_id IS NULL AND tu.cedula = ?))
+            AND t.estado_tema = 'Aprobado'
+            AND t.estado_registro = 0
+            AND t.observaciones_anteproyecto IS NOT NULL
+            AND t.observaciones_anteproyecto != ''
+        ORDER BY t.fecha_subida DESC";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $cedula_docente);
+    $stmt->bind_param("is", $usuario_id, $cedula_docente);
     $stmt->execute();
     $result = $stmt->get_result();
 }
@@ -91,7 +102,7 @@ if ($docente) {
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
+                        <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
                             <i class='bx bx-lock me-2'></i> Cambio de Clave
                         </a>
                     </li>
@@ -126,7 +137,7 @@ if ($docente) {
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-3">
-            <h1 class="text-center mb-4 fw-bold">Revisar Anteproyectos Asignados</h1>
+            <h1 class="text-center mb-4 fw-bold">Revisar Observaciones de Anteproyectos</h1>
             <?php if (isset($_GET['status'])): ?>
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                     <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -189,7 +200,7 @@ if ($docente) {
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                                    <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'Sin pareja'; ?></td>
+                                    <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
                                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
                                     <td>
                                         <?php if (!empty($row['observaciones_anteproyecto'])): ?>
@@ -198,15 +209,10 @@ if ($docente) {
                                             No disponible
                                         <?php endif; ?>
                                     </td>
-
                                     <td class="text-center">
-                                        <?php if (!empty($row['anteproyecto'])): ?>
-                                            <a href="detalles-observaciones.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
-                                                <i class='bx bx-search'></i> Ver detalles
-                                            </a>
-                                        <?php else: ?>
-                                            <span class="text-muted">No disponible</span>
-                                        <?php endif; ?>
+                                        <a href="detalles-observaciones.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
+                                            <i class='bx bx-search'></i> Ver detalles
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>

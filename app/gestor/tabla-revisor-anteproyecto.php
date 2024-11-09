@@ -20,6 +20,42 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
+// Consulta para obtener los tutores seleccionados por los postulantes
+$sql_tutores = "SELECT 
+    t.id AS tema_id, 
+    t.tema,
+    tu.nombres AS tutor_nombres,
+    tu.cedula AS tutor_cedula
+FROM tema t
+JOIN tutores tu ON t.tutor_id = tu.id";
+
+// Ejecutar la consulta para tutores
+$result_tutores = $conn->query($sql_tutores);
+
+// Consulta para obtener los revisores asignados a los temas
+$sql_revisores = "SELECT t.id AS tema_id, r.nombres AS revisor_nombres, r.apellidos AS revisor_apellidos
+FROM tema t
+LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id
+";
+
+// Ejecutar la consulta para revisores
+$result_revisores = $conn->query($sql_revisores);
+
+// Almacenar los resultados en arrays para utilizarlos más adelante
+$tutores = [];
+$revisores = [];
+
+if ($result_tutores->num_rows > 0) {
+    while ($row = $result_tutores->fetch_assoc()) {
+        $tutores[$row['tema_id']] = $row;
+    }
+}
+
+if ($result_revisores->num_rows > 0) {
+    while ($row = $result_revisores->fetch_assoc()) {
+        $revisores[$row['tema_id']] = $row;
+    }
+}
 ?>
 
 <!doctype html>
@@ -122,44 +158,59 @@ if ($conn->connect_error) {
                     <thead class="table-header-fixed">
                         <tr>
                             <th>Tema</th>
+                            <th>Tutor (Postulante)</th>
                             <th>Revisor</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // Consulta para temas aprobados
-                        $sql_temas_aprobados = "
-                        SELECT t.id, t.tema, 
-                               CONCAT(r.nombres, ' ', r.apellidos) AS revisor
-                        FROM tema t
-                        LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id
-                        WHERE t.estado_tema = 'Aprobado' 
-                        AND t.estado_registro = 0
-                        AND (t.pareja_id IS NULL OR t.pareja_id = -1 OR t.usuario_id < t.pareja_id)";
+                        // Consulta para obtener los temas aprobados con tutores y revisores
+                        $sql_temas_aprobados = "SELECT 
+                                                t.id, 
+                                                t.tema, 
+                                                t.tutor_id,
+                                                t.revisor_anteproyecto_id,
+                                                tu.nombres AS tutor_nombre,
+                                                r.nombres AS revisor_nombre,
+                                                r.apellidos AS revisor_apellido
+                                            FROM tema t
+                                            LEFT JOIN tutores tu ON t.tutor_id = tu.id
+                                            LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id
+                                            WHERE t.estado_tema = 'Aprobado' AND t.estado_registro = 0";
 
                         $result_temas_aprobados = $conn->query($sql_temas_aprobados);
 
                         if ($result_temas_aprobados->num_rows > 0) {
                             while ($tema = $result_temas_aprobados->fetch_assoc()) {
-                                $revisor = $tema['revisor'] ? htmlspecialchars($tema['revisor']) : 'Revisor no asignado';
+                                // Mostrar el nombre del tutor
+                                $tutor_nombre = !empty($tema['tutor_nombre']) ? strtoupper($tema['tutor_nombre']) : 'Tutor no asignado';
+
+                                // Verificar si hay un revisor asignado
+                                $revisor_nombre = (!empty($tema['revisor_nombre']) && !empty($tema['revisor_apellido']))
+                                    ? $tema['revisor_nombre'] . ' ' . $tema['revisor_apellido']
+                                    : 'No se ha asignado un nuevo revisor';
+
                                 echo "<tr>
-                                    <td>" . htmlspecialchars($tema['tema']) . "</td>
-                                    <td>" . $revisor . "</td>
-                                    <td class='text-center'>
-                                        <a href='detalle-revisor-anteproyecto.php?id=" . $tema['id'] . "' class='text-decoration-none d-flex align-items-center justify-content-center'>
-                                            <i class='bx bx-search'></i> Ver detalles
-                                        </a>
-                                    </td>
-                                  </tr>";
+                                        <td>{$tema['tema']}</td>
+                                        <td>{$tutor_nombre}</td>
+                                        <td>{$revisor_nombre}</td>
+                                        <td class='text-center'>
+                                            <a href='detalle-revisor-anteproyecto.php?id={$tema['id']}' class='text-decoration-none d-flex align-items-center justify-content-center'>
+                                                <i class='bx bx-search'></i> Ver detalles
+                                            </a>
+                                        </td>
+                                    </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='3' class='text-center'>No hay temas aprobados</td></tr>";
+                            echo "<tr><td colspan='4' class='text-center'>No hay temas aprobados</td></tr>";
                         }
                         ?>
                     </tbody>
+
                 </table>
             </div>
+
         </div>
     </div>
 

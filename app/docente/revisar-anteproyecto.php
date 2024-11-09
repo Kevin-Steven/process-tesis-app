@@ -9,45 +9,57 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
-
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 $usuario_id = $_SESSION['usuario_id'];
 
+// Verificar la conexión a la base de datos
 if (!$conn) {
   die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
 // Obtener la cédula del docente actual desde la tabla usuarios
-$sql = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $usuario_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$docente = $result->fetch_assoc();
+$sql_docente = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
+$stmt_docente = $conn->prepare($sql_docente);
+$stmt_docente->bind_param("i", $usuario_id);
+$stmt_docente->execute();
+$result_docente = $stmt_docente->get_result();
+$docente = $result_docente->fetch_assoc();
 
 if ($docente) {
   $cedula_docente = $docente['cedula'];
 
-  $sql = "
-    SELECT t.id, t.tema, t.anteproyecto, 
-           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos, 
-           tu.nombres AS tutor_nombres
-    FROM tema t
-    JOIN usuarios u ON t.usuario_id = u.id
-    LEFT JOIN usuarios p ON t.pareja_id = p.id
-    JOIN tutores tu ON t.tutor_id = tu.id
-    WHERE tu.cedula = ?
-    AND t.estado_tema = 'Aprobado'  -- Solo mostrar temas aprobados
-    AND t.estado_registro = 0
-    AND (t.observaciones_anteproyecto IS NULL OR t.observaciones_anteproyecto = '') -- Excluir temas con observaciones
-    ORDER BY t.fecha_subida DESC";
+  // Nueva consulta que prioriza revisor_anteproyecto_id sobre tutor_id
+  $sql_temas = "SELECT 
+            t.id, 
+            t.tema, 
+            t.anteproyecto, 
+            u.nombres AS postulante_nombres, 
+            u.apellidos AS postulante_apellidos, 
+            p.nombres AS pareja_nombres, 
+            p.apellidos AS pareja_apellidos, 
+            tu.nombres AS tutor_nombres,
+            r.nombres AS revisor_nombres,
+            r.apellidos AS revisor_apellidos
+        FROM tema t
+        JOIN usuarios u ON t.usuario_id = u.id
+        LEFT JOIN usuarios p ON t.pareja_id = p.id
+        LEFT JOIN tutores tu ON t.tutor_id = tu.id
+        LEFT JOIN usuarios r ON t.revisor_anteproyecto_id = r.id
+        WHERE 
+            (t.revisor_anteproyecto_id = ? OR (t.revisor_anteproyecto_id IS NULL AND tu.cedula = ?))
+            AND t.estado_tema = 'Aprobado'
+            AND t.estado_registro = 0
+            AND (t.observaciones_anteproyecto IS NULL OR t.observaciones_anteproyecto = '')
+        ORDER BY t.fecha_subida DESC";
 
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("s", $cedula_docente);
-  $stmt->execute();
-  $result = $stmt->get_result();
+  $stmt_temas = $conn->prepare($sql_temas);
+  $stmt_temas->bind_param("is", $usuario_id, $cedula_docente);
+  $stmt_temas->execute();
+  $result_temas = $stmt_temas->get_result();
+} else {
+  echo "No se encontró la cédula del docente.";
+  exit();
 }
 ?>
 
@@ -90,7 +102,7 @@ if ($docente) {
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
+            <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
               <i class='bx bx-lock me-2'></i> Cambio de Clave
             </a>
           </li>
@@ -127,7 +139,7 @@ if ($docente) {
     <div class="container mt-3">
       <h1 class="text-center mb-4 fw-bold">Revisar Anteproyectos Asignados</h1>
 
-      <?php if ($result && $result->num_rows > 0): ?>
+      <?php if ($result_temas && $result_temas->num_rows > 0): ?>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead class="table-header-fixed">
@@ -135,22 +147,31 @@ if ($docente) {
                 <th>Postulante</th>
                 <th>Pareja</th>
                 <th>Tema</th>
+                <th>Revisor</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <?php while ($row = $result->fetch_assoc()): ?>
+              <?php while ($row = $result_temas->fetch_assoc()): ?>
                 <tr>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                   <td>
                     <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
                       <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
                     <?php else: ?>
-                      Sin pareja
+                      No aplica
                     <?php endif; ?>
                   </td>
-
                   <td><?php echo htmlspecialchars($row['tema']); ?></td>
+                  <td>
+                    <?php
+                    if (!empty($row['revisor_nombres']) && !empty($row['revisor_apellidos'])) {
+                      echo htmlspecialchars($row['revisor_nombres'] . ' ' . $row['revisor_apellidos']);
+                    } else {
+                      echo strtoupper($row['tutor_nombres']);
+                    }
+                    ?>
+                  </td>
                   <td class="text-center">
                     <?php if (!empty($row['anteproyecto'])): ?>
                       <a href="detalles-anteproyecto.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
@@ -168,7 +189,6 @@ if ($docente) {
       <?php else: ?>
         <p class="text-center">No hay anteproyectos asignados para revisión.</p>
       <?php endif; ?>
-
     </div>
   </div>
 
@@ -180,7 +200,7 @@ if ($docente) {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/sidebar.js" ></script>
+  <script src="../js/sidebar.js"></script>
 </body>
 
 </html>

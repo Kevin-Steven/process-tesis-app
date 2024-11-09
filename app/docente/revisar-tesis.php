@@ -9,7 +9,6 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
-
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 $usuario_id = $_SESSION['usuario_id'];
@@ -18,23 +17,48 @@ if (!$conn) {
   die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Consulta para obtener los documentos de tesis asignados al revisor de tesis, 
-$sql = "SELECT t.id, t.tema, t.documento_tesis, 
-               u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-               IF(u.pareja_tesis = -1 OR u.pareja_tesis IS NULL, 'Sin pareja', CONCAT(pareja.nombres, ' ', pareja.apellidos)) AS pareja_nombres_apellidos
+// Obtener la cédula del docente actual desde la tabla usuarios
+$sql_docente = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
+$stmt_docente = $conn->prepare($sql_docente);
+$stmt_docente->bind_param("i", $usuario_id);
+$stmt_docente->execute();
+$result_docente = $stmt_docente->get_result();
+$docente = $result_docente->fetch_assoc();
+
+if ($docente) {
+  $cedula_docente = $docente['cedula'];
+
+  // Consulta para priorizar revisor_tesis_id y luego tutor_id
+  $sql_temas = "SELECT 
+            t.id, 
+            t.tema, 
+            t.documento_tesis, 
+            u.nombres AS postulante_nombres, 
+            u.apellidos AS postulante_apellidos, 
+            p.nombres AS pareja_nombres, 
+            p.apellidos AS pareja_apellidos, 
+            tu.nombres AS tutor_nombres,
+            r.nombres AS revisor_nombres,
+            r.apellidos AS revisor_apellidos
         FROM tema t
         JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios pareja ON u.pareja_tesis = pareja.id
-        WHERE t.revisor_tesis_id = ? 
-        AND t.estado_registro = 0
-        AND (t.observaciones_tesis IS NULL OR t.observaciones_tesis = '')
+        LEFT JOIN usuarios p ON t.pareja_id = p.id
+        LEFT JOIN tutores tu ON t.tutor_id = tu.id
+        LEFT JOIN usuarios r ON t.revisor_tesis_id = r.id
+        WHERE 
+            (t.revisor_tesis_id = ? OR (t.revisor_tesis_id IS NULL AND tu.cedula = ?))
+            AND t.estado_tema = 'Aprobado'
+            AND t.estado_registro = 0
+            AND t.documento_tesis IS NOT NULL 
+            AND t.documento_tesis != ''
+            AND (t.observaciones_tesis IS NULL OR t.observaciones_tesis = '')
         ORDER BY t.fecha_subida DESC";
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $usuario_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
+  $stmt_temas = $conn->prepare($sql_temas);
+  $stmt_temas->bind_param("is", $usuario_id, $cedula_docente);
+  $stmt_temas->execute();
+  $result_temas = $stmt_temas->get_result();
+}
 ?>
 
 <!doctype html>
@@ -59,7 +83,7 @@ $result = $stmt->get_result();
     <div class="topbar-right">
       <div class="input-group search-bar">
         <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-        <input type="text" id="search" class="form-control" placeholder="Search">
+        <input type="text" id="search" class="form-control" placeholder="Buscar...">
       </div>
       <i class='bx bx-envelope'></i>
       <i class='bx bx-bell'></i>
@@ -76,7 +100,7 @@ $result = $stmt->get_result();
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
+            <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
               <i class='bx bx-lock me-2'></i> Cambio de Clave
             </a>
           </li>
@@ -111,54 +135,9 @@ $result = $stmt->get_result();
   <!-- Content -->
   <div class="content" id="content">
     <div class="container mt-3">
-      <h1 class="text-center mb-4 fw-bold">Revisar Documentos de Tesis Asignados</h1>
-      <?php if (isset($_GET['status'])): ?>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-          <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-              <i class='bx bx-send fs-4 me-2'></i>
-              <strong class="me-auto">Estado de Actualización</strong>
-              <small>Justo ahora</small>
-              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-              <?php
-              switch ($_GET['status']) {
-                case 'success':
-                  echo "Observaciones enviadas con éxito.";
-                  break;
-                case 'not_found':
-                  echo "No se encontraron detalles para el postulante.";
-                  break;
-                case 'invalid_extension':
-                  echo "Tipo de archivo no permitido. Solo se aceptan archivos ZIP, DOC y DOCX.";
-                  break;
-                case 'too_large':
-                  echo "El archivo excede el tamaño máximo permitido de 20MB.";
-                  break;
-                case 'db_error':
-                  echo "Error al actualizar la base de datos.";
-                  break;
-                case 'upload_error':
-                  echo "Hubo un error al subir el archivo.";
-                  break;
-                case 'no_file':
-                  echo "Por favor, selecciona un archivo para subir.";
-                  break;
-                case 'form_error':
-                  echo "No se ha enviado el formulario correctamente.";
-                  break;
-                default:
-                  echo "Ocurrió un error desconocido.";
-                  break;
-              }
-              ?>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
+      <h1 class="text-center mb-4 fw-bold">Revisar Tesis Asignadas</h1>
 
-      <?php if ($result->num_rows > 0): ?>
+      <?php if ($result_temas && $result_temas->num_rows > 0): ?>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead class="table-header-fixed">
@@ -166,15 +145,31 @@ $result = $stmt->get_result();
                 <th>Postulante</th>
                 <th>Pareja</th>
                 <th>Tema</th>
+                <th>Revisor</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <?php while ($row = $result->fetch_assoc()): ?>
+              <?php while ($row = $result_temas->fetch_assoc()): ?>
                 <tr>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                  <td><?php echo htmlspecialchars($row['pareja_nombres_apellidos']); ?></td> <!-- Aquí está el cambio -->
+                  <td>
+                    <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
+                      <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
+                    <?php else: ?>
+                      No aplica
+                    <?php endif; ?>
+                  </td>
                   <td><?php echo htmlspecialchars($row['tema']); ?></td>
+                  <td>
+                    <?php
+                    if (!empty($row['revisor_nombres']) && !empty($row['revisor_apellidos'])) {
+                      echo htmlspecialchars($row['revisor_nombres'] . ' ' . $row['revisor_apellidos']);
+                    } else {
+                      echo strtoupper($row['tutor_nombres']);
+                    }
+                    ?>
+                  </td>
                   <td class="text-center">
                     <?php if (!empty($row['documento_tesis'])): ?>
                       <a href="detalles-documentos-tesis.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
@@ -190,7 +185,7 @@ $result = $stmt->get_result();
           </table>
         </div>
       <?php else: ?>
-        <p class="text-center">No hay documentos de tesis asignados para revisión.</p>
+        <p class="text-center">No hay tesis asignadas para revisión.</p>
       <?php endif; ?>
     </div>
   </div>
@@ -203,8 +198,7 @@ $result = $stmt->get_result();
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/sidebar.js" ></script>
-  <script src="../js/toast.js" defer></script>
+  <script src="../js/sidebar.js"></script>
 </body>
 
 </html>

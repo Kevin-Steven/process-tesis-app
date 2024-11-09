@@ -72,8 +72,8 @@ if (isset($_GET['id'])) {
                     <i class='bx bx-chevron-down ms-1'></i>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li><a class="dropdown-item d-flex align-items-center" href="perfil-gestor.php"><i class='bx bx-user me-2'></i>Perfil</a></li>
-                    <li><a class="dropdown-item d-flex align-items-center" href="cambio-clave-gestor.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a></li>
+                    <li><a class="dropdown-item d-flex align-items-center" href="perfil.php"><i class='bx bx-user me-2'></i>Perfil</a></li>
+                    <li><a class="dropdown-item d-flex align-items-center" href="cambio-clave.php"><i class='bx bx-lock me-2'></i>Cambio de Clave</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -129,9 +129,9 @@ if (isset($_GET['id'])) {
                                     <td><?php echo htmlspecialchars($documento_tesis['tema']); ?></td>
                                 </tr>
                                 <tr>
-                                    <th><i class="bx bx-file"></i> Documento de Anteproyecto</th>
+                                    <th><i class="bx bx-file"></i> Documento de Tesis</th>
                                     <td>
-                                        <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/<?php echo urlencode($anteproyecto['anteproyecto']); ?>" download>
+                                        <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/documento-tesis/<?php echo urlencode($documento_tesis['documento_tesis']); ?>" download>
                                             <i class='bx bx-cloud-download'></i> Descargar documento
                                         </a>
                                     </td>
@@ -141,6 +141,7 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="text-center mt-4 formulario-aceptar-rechazar">
                         <button type="button" class="btn aprobar" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarSolicitud">Enviar observaciones</button>
+                        <button type="button" id="cancelar-btn" class="btn" onclick="history.back()">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -155,7 +156,7 @@ if (isset($_GET['id'])) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formObservaciones" action="enviar-observaciones.php" method="POST" enctype="multipart/form-data">
+                    <form id="formObservaciones" action="enviar-observaciones-tesis.php" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id_documento_tesis" value="<?php echo $documento_tesis_id; ?>">
                         <input type="hidden" name="id_postulante" value="<?php echo $documento_tesis['usuario_id']; ?>">
                         <!-- Campo oculto para el ID de la pareja si existe -->

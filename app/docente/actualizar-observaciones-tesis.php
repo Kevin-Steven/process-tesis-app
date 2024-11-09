@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['enviar_observaciones
     exit();
 }
 
-$documento_tesis_id = $_POST['id_documento_tesis'];
+$tesis_id = $_POST['id_tesis'];
 $postulante_id = $_POST['id_postulante'];
 $pareja_id = isset($_POST['id_pareja']) ? $_POST['id_pareja'] : null;
 
@@ -48,10 +48,10 @@ if (!is_dir($uploadDir)) {
 }
 
 // Validación del archivo subido
-if (isset($_FILES['archivo_observaciones-tesis']) && $_FILES['archivo_observaciones-tesis']['error'] === UPLOAD_ERR_OK) {
-    $fileTmpPath = $_FILES['archivo_observaciones-tesis']['tmp_name'];
-    $fileName = $_FILES['archivo_observaciones-tesis']['name'];
-    $fileSize = $_FILES['archivo_observaciones-tesis']['size'];
+if (isset($_FILES['archivo_observaciones']) && $_FILES['archivo_observaciones']['error'] === UPLOAD_ERR_OK) {
+    $fileTmpPath = $_FILES['archivo_observaciones']['tmp_name'];
+    $fileName = $_FILES['archivo_observaciones']['name'];
+    $fileSize = $_FILES['archivo_observaciones']['size'];
     $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
     // Extensiones permitidas
@@ -66,7 +66,7 @@ if (isset($_FILES['archivo_observaciones-tesis']) && $_FILES['archivo_observacio
         $error = 'too_large';
     } else {
         // Generar el nombre del archivo
-        $newFileName = 'Observaciones_Tesis_' . $postulante_apellido . '_' . $postulante_nombre;
+        $newFileName = 'Observaciones_upd_' . $postulante_apellido . '_' . $postulante_nombre;
         if ($pareja_nombre && $pareja_apellido) {
             $newFileName .= '_' . $pareja_apellido . '_' . $pareja_nombre;
         }
@@ -76,17 +76,19 @@ if (isset($_FILES['archivo_observaciones-tesis']) && $_FILES['archivo_observacio
         // Mover el archivo al directorio de destino
         if (move_uploaded_file($fileTmpPath, $destPath)) {
             // Actualizar la tabla `tema` con el nombre del archivo para el campo `observaciones_tesis`
-            $sql_update = "UPDATE tema SET observaciones_tesis = ? WHERE id = ? AND estado_registro = 0"; 
+            $sql_update = "UPDATE tema SET observaciones_tesis = ? WHERE usuario_id = ? AND estado_registro = 0"; // Evitar registros eliminados
             $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bind_param("si", $newFileName, $documento_tesis_id);
-            
-            // Ejecutar la actualización para el postulante
-            if ($stmt_update->execute()) {
-                header("Location: revisar-tesis.php?status=success");
-                exit();
-            } else {
-                $error = 'db_error';
+            $stmt_update->bind_param("si", $newFileName, $postulante_id);
+            $stmt_update->execute();
+
+            // Si existe pareja, actualizar también para la pareja
+            if ($pareja_id) {
+                $stmt_update->bind_param("si", $newFileName, $pareja_id);
+                $stmt_update->execute();
             }
+
+            header("Location: obs-realizadas-tesis.php?status=success");
+            exit();
         } else {
             $error = 'upload_error';
         }
@@ -94,11 +96,11 @@ if (isset($_FILES['archivo_observaciones-tesis']) && $_FILES['archivo_observacio
 
     // Si ocurre algún error, redirigir con el estado correspondiente
     if ($error) {
-        header("Location: revisar-tesis.php?status=$error");
+        header("Location: obs-realizadas-tesis.php?status=$error");
         exit();
     }
 } else {
-    header("Location: revisar-tesis.php?status=no_file");
+    header("Location: obs-realizadas-tesis.php?status=no_file");
     exit();
 }
 ?>
