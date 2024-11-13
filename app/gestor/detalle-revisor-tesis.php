@@ -39,7 +39,7 @@ if (isset($_GET['id'])) {
     $revisor = !empty($tema['revisor']) ? htmlspecialchars($tema['revisor']) : 'No tiene un revisor asignado';
 
     // Mostrar el tutor en mayúsculas o un mensaje si no está asignado
-    $tutor_nombre = !empty($tema['tutor_nombre']) ? strtoupper($tema['tutor_nombre']) : 'No tiene un tutor asignado';
+    $tutor_nombre = !empty($tema['tutor_nombre']) ? mb_strtoupper($tema['tutor_nombre']) : 'No tiene un tutor asignado';
 
     // Obtener la lista de posibles revisores (docentes)
     $sql_revisores = "SELECT id, CONCAT(nombres, ' ', apellidos) AS nombre_completo FROM usuarios WHERE rol = 'docente'";

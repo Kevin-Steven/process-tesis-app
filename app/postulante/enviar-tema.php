@@ -184,6 +184,9 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
       <?php if ($estado_inscripcion === 'Aprobado'): ?>
         <a class="nav-link active" href="enviar-tema.php"><i class='bx bx-file'></i> Enviar Tema</a>
       <?php endif; ?>
+      <?php if ($tema_aprobado): ?>
+        <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
+      <?php endif; ?>
     </nav>
   </div>
 
@@ -193,33 +196,56 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
       <h1 class="mb-4 text-center fw-bold">Enviar Tema</h1>
 
       <?php if ($tema_aprobado || $tema_pareja): ?>
-        <div class="card shadow-lg mb-4 border-0">
-          <div class="card-header bg-light text-center mb-3 py-3">
-            <h3 class="mb-0 fw-bold text-success">¡Felicitaciones!</h3>
-          </div>
-          <div class="card-body text-center">
-            <p class="fs-5 mb-3">
-              <i class="bx bxs-award me-1"></i>
-              <strong>
-                <?php if ($tema_pareja): ?>
-                  El tema de tesis de tu pareja, "<?php echo htmlspecialchars($tema_pareja['tema']); ?>", ha sido aprobado, ¡lo que significa que también has aprobado!
-                <?php else: ?>
-                  Tu tema de tesis "<?php echo htmlspecialchars($tema_aprobado['tema']); ?>" ha sido aprobado.
-                <?php endif; ?>
-              </strong>
-            </p>
-            <?php
-            // Mostrar las observaciones del tema correspondiente (propio o de la pareja)
-            $observaciones = $tema_pareja ? $tema_pareja['observaciones_anteproyecto'] : $tema_aprobado['observaciones_anteproyecto'];
-            ?>
-            <?php if (!empty($observaciones)): ?>
-              <p>Descarga aquí las observaciones realizadas por el revisor.</p>
-              <p class="mb-3 d-flex justify-content-center align-items-center">
-                <i class="bx bx-download me-1 text-primary fw-bold"></i>
-                <strong><a class="text-decoration-none" href="../uploads/observaciones/<?php echo htmlspecialchars($observaciones); ?>" download>Descargar observaciones</a></strong>
-              </p>
-            <?php endif; ?>
-          </div>
+        <div class="table-responsive">
+          <table class="table table-bordered shadow-lg">
+            <thead class="table-light text-center">
+              <tr>
+                <th>Tema</th>
+                <th>Pareja</th>
+                <th>Estado</th>
+                <th>Observaciones Anteproyecto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <!-- Columna: Tema -->
+                <td>
+                  <?php if ($tema_pareja): ?>
+                    <?php echo htmlspecialchars($tema_pareja['tema']); ?>
+                  <?php else: ?>
+                    <?php echo htmlspecialchars($tema_aprobado['tema']); ?>
+                  <?php endif; ?>
+                </td>
+
+                <!-- Columna: Pareja -->
+                <td>
+                  <?php if ($pareja_seleccionado): ?>
+                    <?php echo htmlspecialchars($pareja_seleccionado['nombres'] . ' ' . $pareja_seleccionado['apellidos']); ?>
+                  <?php else: ?>
+                    No aplica
+                  <?php endif; ?>
+                </td>
+
+                <!-- Columna: Estado -->
+                <td class="text-center">
+                  <span class="badge bg-success">Aprobado</span>
+                </td>
+
+                <!-- Columna: Observaciones -->
+                <td>
+                  <?php
+                  $observaciones = $tema_pareja ? $tema_pareja['observaciones_anteproyecto'] : $tema_aprobado['observaciones_anteproyecto'];
+                  if (!empty($observaciones)): ?>
+                    <a href="../uploads/observaciones/<?php echo htmlspecialchars($observaciones); ?>" download class="text-decoration-none">
+                      <i class="bx bx-download me-1 text-primary fw-bold"></i> Descargar
+                    </a>
+                  <?php else: ?>
+                    No hay observaciones
+                  <?php endif; ?>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
       <?php elseif ($tema_pendiente && $tema_pendiente['estado_tema'] === 'Pendiente' && $tema_pendiente['estado_registro'] === 0 && $tema_pendiente['usuario_id'] === $usuario_id): ?>
@@ -280,14 +306,36 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
         <?php
         // Verifica si el tema está rechazado, existe un motivo de rechazo y cumple con las condiciones de pareja o trabajo individual
         if ($estadoTema === 'Rechazado' && !empty($motivo_rechazo) && (($estado_pareja_tesis != 0 && $estado_pareja_tesis != -1) || ($estado_pareja_tesis === 0 || $estado_pareja_tesis === -1))): ?>
-          <div class="text-center pb-2">
-            <a href="#" class="text-danger text-center" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
-              Tema rechazado - ver motivo
-            </a>
+          <div id="card-rechazo" class="card shadow-lg mb-4 border-0">
+            <div class="card-header bg-light text-center mb-3 py-3">
+              <h3 class="mb-0 fw-bold text-danger">Lo sentimos, tu tema ha sido rechazado</h3>
+            </div>
+            <div class="card-body text-center">
+              <p class="fs-5 mb-3">
+                <i class="bx bxs-x-circle me-1 text-danger"></i>
+                <strong>
+                  <?php if ($tema_pendiente): ?>
+                    El tema de tesis "<?php echo htmlspecialchars($tema_pendiente['tema']); ?>" ha sido rechazado.
+                  <?php endif; ?>
+                </strong>
+              </p>
+
+              <!-- Enlace para ver el motivo del rechazo -->
+              <p class="mb-3">
+                <a href="#" class="text-danger fw-bold" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
+                  <i class="bx bx-info-circle"></i> Ver motivo de rechazo
+                </a>
+              </p>
+
+              <div class="enviar-tema">
+                <button class="btn" onclick="mostrarFormulario()">Enviar un nuevo tema</button>
+              </div>
+            </div>
           </div>
+
         <?php endif; ?>
 
-        <div class="card shadow-lg">
+        <div id="formulario-enviar-tema" class="card shadow-lg ">
           <div class="card-body">
             <form action="logica-procesar-tema.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
               <div class="row">
@@ -474,6 +522,27 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
   <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js" defer></script>
   <script src="../js/validarTamaño.js" defer></script>
+  <script>
+    // Función para verificar si la card de rechazo está visible
+    function verificarCardRechazo() {
+      const cardRechazo = document.getElementById('card-rechazo');
+      const formularioEnviarTema = document.getElementById('formulario-enviar-tema');
+
+      // Verifica si la card de rechazo existe y está visible
+      if (cardRechazo && cardRechazo.style.display !== 'none') {
+        formularioEnviarTema.classList.add('d-none'); // Oculta el formulario
+      }
+    }
+
+    // Ejecutar la función al cargar la página
+    window.onload = verificarCardRechazo;
+
+    // Función para mostrar el formulario y ocultar la card de rechazo
+    function mostrarFormulario() {
+      document.getElementById('card-rechazo').style.display = 'none';
+      document.getElementById('formulario-enviar-tema').classList.remove('d-none');
+    }
+  </script>
 
 </body>
 

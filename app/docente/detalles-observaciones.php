@@ -171,7 +171,7 @@ if (isset($_GET['id'])) {
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
           <div class="toast-body">
-            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+            El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
           </div>
         </div>
       </div>
@@ -195,7 +195,7 @@ if (isset($_GET['id'])) {
                         <div class="mb-3">
                             <label for="archivoObservaciones" class="form-label fw-bold">Subir archivo con las observaciones</label>
                             <input type="file" class="form-control" id="documentoCarpeta" name="archivo_observaciones" accept=".zip,.doc,.docx" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 20MB.</small>
+                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 10 MB.</small>
                         </div>
                     </form>
                 </div>
@@ -217,7 +217,7 @@ if (isset($_GET['id'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js" ></script>
     <script src="../js/toast.js" defer></script>
-    <script src="../js/validarTamaño.js" defer></script>
+    <script src="../js/validarTamañoDocente.js" defer></script>
 </body>
 
 </html>

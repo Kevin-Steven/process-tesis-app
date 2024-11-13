@@ -184,7 +184,7 @@ if ($result_revisores->num_rows > 0) {
                         if ($result_temas_aprobados->num_rows > 0) {
                             while ($tema = $result_temas_aprobados->fetch_assoc()) {
                                 // Mostrar el nombre del tutor
-                                $tutor_nombre = !empty($tema['tutor_nombre']) ? strtoupper($tema['tutor_nombre']) : 'Tutor no asignado';
+                                $tutor_nombre = !empty($tema['tutor_nombre']) ? mb_strtoupper($tema['tutor_nombre']) : 'Tutor no asignado';
 
                                 // Verificar si hay un revisor asignado
                                 $revisor_nombre = (!empty($tema['revisor_nombre']) && !empty($tema['revisor_apellido']))
