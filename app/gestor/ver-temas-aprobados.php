@@ -185,7 +185,7 @@ $result = $conn->query($sql);
                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                     <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
-                    <td><?php echo htmlspecialchars($row['tutor_nombre']); ?></td>
+                    <td><?php echo mb_strtoupper($row['tutor_nombre']); ?></td>
                     <td>
                       <?php if (!empty($row['anteproyecto'])): ?>
                         <a href="<?php echo '../uploads/' . htmlspecialchars($row['anteproyecto']); ?>" target="_blank" download>Descargar</a>

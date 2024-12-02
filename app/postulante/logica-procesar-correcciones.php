@@ -9,90 +9,87 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = $_SESSION['usuario_id'];
-
-// Obtener los nombres y apellidos del usuario y su pareja (si existe)
-$sql_usuario = "SELECT u.nombres, u.apellidos, t.pareja_id 
-                FROM usuarios u 
-                INNER JOIN tema t ON u.id = t.usuario_id 
-                WHERE u.id = ?";
-$stmt_usuario = $conn->prepare($sql_usuario);
-$stmt_usuario->bind_param("i", $usuario_id);
-$stmt_usuario->execute();
-$result_usuario = $stmt_usuario->get_result();
-$usuario = $result_usuario->fetch_assoc();
-$stmt_usuario->close();
-
-$primer_nombre = explode(' ', $usuario['nombres'])[0];
-$primer_apellido = explode(' ', $usuario['apellidos'])[0];
-$nombre_pareja = '';
-
-if (!empty($usuario['pareja_id'])) {
-    // Obtener los datos de la pareja si existe
-    $sql_pareja = "SELECT nombres, apellidos FROM usuarios WHERE id = ?";
-    $stmt_pareja = $conn->prepare($sql_pareja);
-    $stmt_pareja->bind_param("i", $usuario['pareja_id']);
-    $stmt_pareja->execute();
-    $result_pareja = $stmt_pareja->get_result();
-    $pareja = $result_pareja->fetch_assoc();
-    $stmt_pareja->close();
-
-    if ($pareja) {
-        $nombre_pareja = "_" . explode(' ', $pareja['apellidos'])[0] . "_" . explode(' ', $pareja['nombres'])[0];
-    }
-}
+$usuario_nombre = $_SESSION['usuario_nombre'];
+$usuario_apellido = $_SESSION['usuario_apellido'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validar que el archivo fue cargado
     if (isset($_FILES['correcciones']) && $_FILES['correcciones']['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES['correcciones'];
-        $fileTmpPath = $file['tmp_name'];
-        $fileName = $file['name'];
-        $fileSize = $file['size'];
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        // Validar el archivo
+        $fileTmpPath = $_FILES['correcciones']['tmp_name'];
+        $fileName = $_FILES['correcciones']['name'];
+        $fileSize = $_FILES['correcciones']['size'];
+        $fileType = $_FILES['correcciones']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
 
-        // Validar la extensión del archivo (debe ser ZIP)
-        if ($fileExtension !== 'zip') {
-            header("Location: enviar-correcciones.php?status=invalid_extension");
-            exit();
-        }
+        // Permitir solo archivos ZIP
+        $allowedfileExtensions = array('zip');
+        if (in_array($fileExtension, $allowedfileExtensions)) {
+            // Verificar el tamaño del archivo (máximo 10 MB)
+            if ($fileSize < 10 * 1024 * 1024) {
+                // Directorio donde se guardarán las correcciones
+                $uploadFileDir = '../uploads/correcciones/';
 
-        // Validar el tamaño del archivo (10 MB máximo)
-        if ($fileSize > 10 * 1024 * 1024) {
-            header("Location: enviar-correcciones.php?status=too_large");
-            exit();
-        }
+                // Extraer el primer nombre y primer apellido del usuario
+                $primer_nombre = explode(' ', $usuario_nombre)[0];
+                $primer_apellido = explode(' ', $usuario_apellido)[0];
 
-        // Crear la nomenclatura del archivo con el primer apellido y primer nombre (y pareja si existe)
-        $nuevoNombreArchivo = "Correcciones_tesis_" . strtoupper($primer_apellido) . "_" . strtoupper($primer_nombre) . $nombre_pareja . ".zip";
+                // Formatear el nombre del archivo con la nomenclatura requerida
+                $newFileName = "Correcciones_tesis_" . strtoupper($primer_apellido) . "_" . strtoupper($primer_nombre) . '.' . $fileExtension; 
 
-        $uploadDir = "../uploads/correcciones/";
+                $dest_path = $uploadFileDir . $newFileName;
 
-        // Crear la carpeta si no existe
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
+                // Mover el archivo al directorio de destino
+                if(move_uploaded_file($fileTmpPath, $dest_path)) {
+                    // Actualizar la base de datos
+                    // Primero, obtener el nombre del archivo actual (si existe) para eliminarlo
+                    $sql_select = "SELECT correcciones_tesis FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
+                    $stmt_select = $conn->prepare($sql_select);
+                    $stmt_select->bind_param("i", $usuario_id);
+                    $stmt_select->execute();
+                    $result_select = $stmt_select->get_result();
+                    $tema = $result_select->fetch_assoc();
+                    $stmt_select->close();
 
-        $uploadPath = $uploadDir . $nuevoNombreArchivo;
+                    // Si hay un archivo existente, eliminarlo
+                    if ($tema && !empty($tema['correcciones_tesis'])) {
+                        $existingFile = $uploadFileDir . $tema['correcciones_tesis'];
+                        if (file_exists($existingFile)) {
+                            unlink($existingFile);
+                        }
+                    }
 
-        // Mover el archivo cargado a la carpeta de destino
-        if (move_uploaded_file($fileTmpPath, $uploadPath)) {
-            // Actualizar la base de datos con la ruta del archivo de correcciones
-            $sql_update = "UPDATE tema SET correcciones_tesis = ? WHERE usuario_id = ?";
-            $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bind_param("si", $nuevoNombreArchivo, $usuario_id);
-
-            if ($stmt_update->execute()) {
-                header("Location: enviar-documento-tesis.php?status=success");
+                    // Actualizar el campo 'correcciones_tesis' en la base de datos
+                    $sql_update = "UPDATE tema SET correcciones_tesis = ? WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
+                    $stmt_update = $conn->prepare($sql_update);
+                    $stmt_update->bind_param("si", $newFileName, $usuario_id);
+                    if ($stmt_update->execute()) {
+                        $stmt_update->close();
+                        header("Location: enviar-documento-tesis.php?status=success");
+                        exit();
+                    } else {
+                        $stmt_update->close();
+                        header("Location: enviar-documento-tesis.php?status=db_error");
+                        exit();
+                    }
+                } else {
+                    header("Location: enviar-documento-tesis.php?status=upload_error");
+                    exit();
+                }
             } else {
-                header("Location: enviar-documento-tesis.php?status=db_error");
+                header("Location: enviar-documento-tesis.php?status=too_large");
+                exit();
             }
-            $stmt_update->close();
         } else {
-            header("Location: enviar-documento-tesis.php?status=upload_error");
+            header("Location: enviar-documento-tesis.php?status=invalid_extension");
+            exit();
         }
     } else {
         header("Location: enviar-documento-tesis.php?status=no_file");
+        exit();
     }
 } else {
     header("Location: enviar-documento-tesis.php?status=form_error");
+    exit();
 }
+?>

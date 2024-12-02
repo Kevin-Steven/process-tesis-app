@@ -189,7 +189,7 @@ if ($result_revisores->num_rows > 0) {
                                 // Verificar si hay un revisor asignado
                                 $revisor_nombre = (!empty($tema['revisor_nombre']) && !empty($tema['revisor_apellido']))
                                     ? $tema['revisor_nombre'] . ' ' . $tema['revisor_apellido']
-                                    : 'No se ha asignado un nuevo revisor';
+                                    : 'No se ha asignado un revisor';
 
                                 echo "<tr>
                                         <td>{$tema['tema']}</td>

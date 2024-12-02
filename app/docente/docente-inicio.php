@@ -88,9 +88,11 @@ if (!$conn) {
         </div>
         <nav class="nav flex-column">
             <a class="nav-link active" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
             <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
+            <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
         </nav>
     </div>
 
@@ -104,17 +106,18 @@ if (!$conn) {
 
                     <!-- Cards con acciones rápidas -->
                     <div class="row justify-content-center">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="card card-principal h-100 shadow">
                                 <div class="card-body text-center">
                                     <i class='bx bx-book bx-lg mb-3'></i>
-                                    <h5 class="card-title">Revisar Anteproyectos</h5>
+                                    <h5 class="card-title">Anteproyectos</h5>
                                     <p class="card-text">Accede a los anteproyectos pendientes de revisión.</p>
                                     <a href="revisar-anteproyecto.php" class="btn">Acceder</a>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+
+                        <div class="col-md-4 mb-3">
                             <div class="card card-principal h-100 shadow">
                                 <div class="card-body text-center">
                                     <i class='bx bx-file bx-lg mb-3'></i>
@@ -124,6 +127,18 @@ if (!$conn) {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-4 mb-3">
+                            <div class="card card-principal h-100 shadow">
+                                <div class="card-body text-center">
+                                    <i class='bx bx-user bx-lg mb-3'></i>
+                                    <h5 class="card-title">Postulantes</h5>
+                                    <p class="card-text">Listado de postulantes asignados.</p>
+                                    <a href="listado-postulantes.php" class="btn">Acceder</a>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>

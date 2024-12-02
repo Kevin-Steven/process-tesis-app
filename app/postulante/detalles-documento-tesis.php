@@ -103,7 +103,7 @@ $observaciones_tesis = $tema['observaciones_tesis'] ?? 'Sin Observaciones';
                     <?php if (!empty($documento_tesis)): ?>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Documento Actual: </label>
-                            <a href="../uploads/documento-tesis/<?php echo htmlspecialchars($documento_tesis); ?>" target="_blank" class="text-decoration-none">
+                            <a href="../uploads/documento-tesis/<?php echo htmlspecialchars($documento_tesis); ?>" class="text-decoration-none">
                                 Descargar Documento Actual
                             </a>
                         </div>

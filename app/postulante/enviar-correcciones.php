@@ -174,30 +174,83 @@ $correcciones_tesis = $tema['correcciones_tesis'] ?? null;
                 </div>
             <?php endif; ?>
 
-            <!-- Enlace para descargar el archivo de correcciones actual -->
             <?php if (!empty($correcciones_tesis)): ?>
+                <!-- Si ya hay un archivo subido, mostrar opciones para descargar y editar -->
                 <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Archivo de Correcciones Subido</h5>
+                    </div>
                     <div class="card-body">
-                        <h5>Archivo de Correcciones Actual</h5>
-                        <a href="../uploads/correcciones/<?php echo htmlspecialchars($correcciones_tesis); ?>" target="_blank" class="btn btn-info">Descargar Correcciones</a>
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Eliminar Archivo</button>
+                        <!-- Enlace para descargar el archivo existente -->
+                        <p class="mb-3 d-flex align-items-center">
+                            <!-- Enlace para descargar el archivo existente -->
+                            <a href="../uploads/correcciones/<?php echo htmlspecialchars($correcciones_tesis); ?>" class="text-decoration-none">
+                                <i class='bx bx-download'></i> Descargar Correcciones
+                            </a>
+
+                            <span class="d-none d-md-inline mx-2"> - </span>
+
+                            <!-- Enlace para abrir el modal de eliminación -->
+                            <a href="#" class="text-danger text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalEliminarCorrecciones">
+                                <i class='bx bx-trash'></i> Eliminar Correcciones
+                            </a>
+                        </p>
+
+                        <!-- Formulario para reemplazar el archivo existente -->
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <form action="editar_correcciones.php" method="POST" class="enviar-tema" enctype="multipart/form-data">
+                                    <input type="hidden" name="correcciones_tesis_anterior" value="<?php echo htmlspecialchars($correcciones_tesis); ?>">
+                                    <div class="mb-3">
+                                        <label for="correcciones_nuevas" class="form-label fw-bold">Reemplazar Correcciones (ZIP MÁXIMO 2 MB)</label>
+                                        <input type="file" class="form-control" id="documentoCarpeta" name="correcciones_nuevas" accept=".zip" required onchange="validarTamanoArchivo()">
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn">Actualizar Correcciones</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <!-- Si no hay correcciones subidas, mostrar el formulario de subida -->
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <form action="logica-procesar-correcciones.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="correcciones" class="form-label fw-bold">Subir Archivo de Correcciones (ZIP MÁXIMO 2 MB)</label>
+                                <input type="file" class="form-control" id="documentoCarpeta" name="correcciones" accept=".zip" required onchange="validarTamanoArchivo()">
+                                <small class="form-text text-muted">El archivo debe ser un ZIP que contenga las correcciones.</small>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn">Enviar Correcciones</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             <?php endif; ?>
 
-            <!-- Formulario para subir correcciones -->
-            <div class="card shadow-lg">
-                <div class="card-body">
-                    <form action="logica-procesar-correcciones.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="correcciones" class="form-label fw-bold">Subir Archivo de Correcciones (ZIP MÁXIMO 2 MB)</label>
-                            <input type="file" class="form-control" id="documentoCarpeta" name="correcciones" accept=".zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">El archivo debe ser un ZIP que contenga las correcciones.</small>
+            <!-- Modal de Confirmación para eliminar -->
+            <div class="modal fade" id="modalEliminarCorrecciones" tabindex="-1" aria-labelledby="modalLabelEliminar" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabelEliminar">Confirmar Eliminación</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Enviar Correcciones</button>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de que deseas eliminar este archivo de correcciones? Esta acción no se puede deshacer.</p>
                         </div>
-                    </form>
+                        <div class="modal-footer">
+                            <!-- Formulario para eliminar el archivo -->
+                            <form action="eliminar_correcciones.php" method="POST">
+                                <input type="hidden" name="correcciones_tesis" value="<?php echo htmlspecialchars($correcciones_tesis); ?>">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

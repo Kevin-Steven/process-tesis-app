@@ -49,8 +49,6 @@ CREATE TABLE tutores (
     cedula VARCHAR(20) NOT NULL UNIQUE
 );
 
-
-
 -- Insertar datos en la tabla tutores
 INSERT INTO tutores (nombres, cedula)
 VALUES
@@ -88,6 +86,12 @@ CREATE TABLE tema (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (tutor_id) REFERENCES tutores(id) ON DELETE CASCADE
 );
+
+ALTER TABLE tema 
+ADD COLUMN estado_tesis VARCHAR(50) DEFAULT 'Pendiente';
+
+ALTER TABLE tema 
+ADD COLUMN correcciones_tesis VARCHAR(255) DEFAULT NULL;
 
 DELIMITER $$
 CREATE TRIGGER after_user_insert

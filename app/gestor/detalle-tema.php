@@ -197,7 +197,7 @@ if (isset($_GET['id'])) {
                 </tr>
                 <tr>
                   <th class="tabla-anchura-th"><i class="bx bx-book-reader"></i> Tutor</th>
-                  <td><?php echo $tema['tutor_nombres']; ?></td>
+                  <td><?php echo mb_strtoupper($tema['tutor_nombres']); ?></td>
                 </tr>
                 <tr>
                   <th class="tabla-anchura-th"><i class="bx bx-file"></i> Tema</th>

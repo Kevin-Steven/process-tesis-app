@@ -14,8 +14,20 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 $usuario_id = $_SESSION['usuario_id'];
 
-// Consulta para obtener el estado del tema y de la tesis
-$sql_tema = "SELECT estado_tema, estado_tesis, documento_tesis, observaciones_tesis, pareja_id FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
+/// Consulta para obtener el estado del tema, de la tesis, y el revisor de tesis
+$sql_tema = "SELECT t.estado_tema, 
+       t.estado_tesis, 
+       t.documento_tesis, 
+       t.observaciones_tesis, 
+       t.pareja_id, 
+       t.motivo_rechazo_correcciones, 
+       CONCAT(u.nombres, ' ', u.apellidos) AS revisor_tesis_nombre
+FROM tema t
+LEFT JOIN usuarios u ON t.revisor_tesis_id = u.id
+WHERE t.usuario_id = ? 
+ORDER BY t.id DESC 
+LIMIT 1
+";
 $stmt_tema = $conn->prepare($sql_tema);
 $stmt_tema->bind_param("i", $usuario_id);
 $stmt_tema->execute();
@@ -23,11 +35,17 @@ $result_tema = $stmt_tema->get_result();
 $tema = $result_tema->fetch_assoc();
 $stmt_tema->close();
 
+// Variables del tema y de la tesis
 $estado_tema = $tema['estado_tema'] ?? null;
 $estado_tesis = $tema['estado_tesis'] ?? null;
 $documento_tesis = $tema['documento_tesis'] ?? null;
 $observaciones_tesis = $tema['observaciones_tesis'] ?? 'Sin Observaciones';
 $pareja_id = $tema['pareja_id'] ?? null;
+$motivo_rechazo_correcciones = $tema['motivo_rechazo_correcciones'] ?? null;
+
+// Nombre del revisor de tesis
+$revisor_tesis_nombre = $tema['revisor_tesis_nombre'] ?? 'No asignado';
+
 
 // Obtener el nombre de la pareja si existe
 $nombre_pareja = '';
@@ -39,7 +57,7 @@ if ($pareja_id) {
   $result_pareja = $stmt_pareja->get_result();
   $pareja = $result_pareja->fetch_assoc();
   $stmt_pareja->close();
-  $nombre_pareja = $pareja ? $pareja['nombres'] . ' ' . $pareja['apellidos'] : 'N/A';
+  $nombre_pareja = $pareja ? $pareja['nombres'] . ' ' . $pareja['apellidos'] : 'No aplica';
 }
 ?>
 
@@ -197,31 +215,32 @@ if ($pareja_id) {
             </form>
           </div>
         </div>
-      <?php elseif ($estado_tesis === 'Pendiente'): ?>
-        <!-- Tabla con la información del documento enviado si el estado es Pendiente -->
-        <h3 class="text-center mt-4 mb-3">Documento de Tesis Enviado</h3>
+      <?php else: ?>
+        <!-- Tabla con la información del documento enviado -->
+        <h3 class="text-center mt-4 mb-3">Estado del Documento de Tesis</h3>
         <div class="table-responsive">
           <table class="table table-bordered shadow-lg">
             <thead class="table-light text-center">
               <tr>
-                <th>Documento Tesis</th>
+                <th>Editar Documento</th>
                 <th>Pareja Tesis</th>
+                <th>Revisor de Tesis</th>
                 <th>Observaciones</th>
                 <th>Enviar Correcciones</th>
+                <th>Motivo de Rechazo</th>
                 <th>Estado</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <!-- Columna: Documento Tesis -->
+                <!-- Columna: Editar Documento Tesis -->
                 <td class="text-center">
-                  <?php if (!empty($documento_tesis)): ?>
-                    <!-- Enlace para ver detalles en lugar de descargar -->
+                  <?php if (!empty($observaciones_tesis) && file_exists("../uploads/observaciones-tesis/" . $observaciones_tesis)): ?>
+                    <span class="text-muted">No disponible</span>
+                  <?php else: ?>
                     <a href="detalles-documento-tesis.php?usuario_id=<?php echo $usuario_id; ?>" class="btn btn-link text-decoration-none">
                       Ver detalles
                     </a>
-                  <?php else: ?>
-                    No disponible
                   <?php endif; ?>
                 </td>
 
@@ -231,6 +250,15 @@ if ($pareja_id) {
                     <?php echo htmlspecialchars($nombre_pareja); ?>
                   <?php else: ?>
                     No aplica
+                  <?php endif; ?>
+                </td>
+
+                <!-- Columna: Revisor de Tesis -->
+                <td class="text-center">
+                  <?php if ($revisor_tesis_nombre === 'No asignado'): ?>
+                    <span class="text-muted">No asignado</span>
+                  <?php else: ?>
+                    <?php echo htmlspecialchars($revisor_tesis_nombre); ?>
                   <?php endif; ?>
                 </td>
 
@@ -250,10 +278,26 @@ if ($pareja_id) {
                 <!-- Columna: Enviar Correcciones -->
                 <td class="text-center">
                   <?php
+                  // Verificar si el estado de la tesis es "Aprobado"
+                  if ($estado_tesis === 'Aprobado'): ?>
+                    <span class="text-muted">No disponible</span>
+                  <?php
                   // Verificar si existen observaciones para habilitar el enlace
-                  if (!empty($observaciones_tesis) && file_exists("../uploads/observaciones-tesis/" . $observaciones_tesis)): ?>
+                  elseif (!empty($observaciones_tesis) && file_exists("../uploads/observaciones-tesis/" . $observaciones_tesis)): ?>
                     <a href="enviar-correcciones.php?tesis_id=<?php echo $usuario_id; ?>" class="text-decoration-none">
-                      Enviar Correcciones
+                      Enviar
+                    </a>
+                  <?php else: ?>
+                    <span class="text-muted">No disponible</span>
+                  <?php endif; ?>
+                </td>
+
+                <!-- Columna: Motivo de Rechazo -->
+                <td class="text-center">
+                  <?php if ($estado_tesis === 'Rechazado' && !empty($motivo_rechazo_correcciones)): ?>
+                    <!-- Enlace para abrir la modal -->
+                    <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
+                      Detalles Rechazo
                     </a>
                   <?php else: ?>
                     <span class="text-muted">No disponible</span>
@@ -266,7 +310,7 @@ if ($pareja_id) {
                     <span class="badge bg-warning text-dark">Pendiente</span>
                   <?php elseif ($estado_tesis === 'Aprobado'): ?>
                     <span class="badge bg-success">Aprobado</span>
-                  <?php elseif ($estado_tesis === 'Rechazado'): ?>
+                  <?php elseif ($estado_tesis === 'Rechazado' || $estado_tesis === 'Correcciones Rechazadas'): ?>
                     <span class="badge bg-danger">Rechazado</span>
                   <?php else: ?>
                     <span class="badge bg-secondary">Desconocido</span>
@@ -279,6 +323,25 @@ if ($pareja_id) {
       <?php endif; ?>
     </div>
   </div>
+
+  <!-- Modal para mostrar el motivo del rechazo -->
+  <div class="modal fade" id="modalMotivoRechazo" tabindex="-1" aria-labelledby="modalMotivoRechazoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalMotivoRechazoLabel">Motivo de Rechazo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <?php echo nl2br(htmlspecialchars($motivo_rechazo_correcciones)); ?>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Toast para error de tamaño de archivo -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">

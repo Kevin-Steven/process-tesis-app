@@ -53,7 +53,13 @@ $stmt_pareja_seleccionado->close();
 $pareja_seleccionado_id = $pareja_seleccionado['seleccionador_id'] ?? null;
 
 // Consulta para obtener el tema aprobado del usuario
-$sql_tema_aprobado = "SELECT * FROM tema WHERE usuario_id = ? AND estado_tema = 'Aprobado' AND estado_registro = 0 LIMIT 1";
+$sql_tema_aprobado = "SELECT t.*, 
+           CONCAT(u.nombres, ' ', u.apellidos) AS revisor_nombre
+    FROM tema t
+    LEFT JOIN usuarios u ON t.revisor_anteproyecto_id = u.id
+    WHERE t.usuario_id = ? AND t.estado_tema = 'Aprobado' AND t.estado_registro = 0 
+    LIMIT 1
+";
 $stmt_tema_aprobado = $conn->prepare($sql_tema_aprobado);
 $stmt_tema_aprobado->bind_param("i", $usuario_id);
 $stmt_tema_aprobado->execute();
@@ -196,14 +202,16 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
       <h1 class="mb-4 text-center fw-bold">Enviar Tema</h1>
 
       <?php if ($tema_aprobado || $tema_pareja): ?>
+        <h3 class="text-center mt-4 mb-3">Estado del Tema de Tesis y Revisión de Anteproyecto</h3>
         <div class="table-responsive">
           <table class="table table-bordered shadow-lg">
             <thead class="table-light text-center">
               <tr>
                 <th>Tema</th>
                 <th>Pareja</th>
+                <th>Revisor</th>
+                <th>Observaciones</th>
                 <th>Estado</th>
-                <th>Observaciones Anteproyecto</th>
               </tr>
             </thead>
             <tbody>
@@ -226,13 +234,12 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
                   <?php endif; ?>
                 </td>
 
-                <!-- Columna: Estado -->
                 <td class="text-center">
-                  <span class="badge bg-success">Aprobado</span>
+                  <?php echo isset($tema_aprobado['revisor_nombre']) ? htmlspecialchars($tema_aprobado['revisor_nombre']) : 'No asignado'; ?>
                 </td>
 
                 <!-- Columna: Observaciones -->
-                <td>
+                <td class="text-center">
                   <?php
                   $observaciones = $tema_pareja ? $tema_pareja['observaciones_anteproyecto'] : $tema_aprobado['observaciones_anteproyecto'];
                   if (!empty($observaciones)): ?>
@@ -242,6 +249,11 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
                   <?php else: ?>
                     No hay observaciones
                   <?php endif; ?>
+                </td>
+
+                <!-- Columna: Estado -->
+                <td class="text-center">
+                  <span class="badge bg-success">Aprobado</span>
                 </td>
               </tr>
             </tbody>

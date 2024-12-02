@@ -134,7 +134,7 @@ if (isset($_GET['id'])) {
                                 </tr>
                                 <tr>
                                     <th>Tutor Seleccionado por el Postulante</th>
-                                    <td><?php echo strtoupper($tutor_nombre); ?></td>
+                                    <td><?php echo mb_strtoupper($tutor_nombre); ?></td>
                                 </tr>
                                 <tr>
                                     <th>Revisor Actual</th>

@@ -95,6 +95,7 @@ if (isset($_GET['id'])) {
             <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
+            <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
         </nav>
     </div>
 
@@ -164,17 +165,17 @@ if (isset($_GET['id'])) {
     <!-- Toast para error de tamaño de archivo -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="toast-header">
-            <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
-            <strong class="me-auto">Error de Tamaño</strong>
-            <small>Justo ahora</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-          </div>
-          <div class="toast-body">
-            El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
-          </div>
+            <div class="toast-header">
+                <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+                <strong class="me-auto">Error de Tamaño</strong>
+                <small>Justo ahora</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
+            </div>
         </div>
-      </div>
+    </div>
 
     <div class="modal fade" id="modalConfirmarEliminarSolicitud" tabindex="-1" aria-labelledby="modalConfirmarEliminarSolicitudLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -215,7 +216,7 @@ if (isset($_GET['id'])) {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/sidebar.js" ></script>
+    <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js" defer></script>
     <script src="../js/validarTamañoDocente.js" defer></script>
 </body>

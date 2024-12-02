@@ -136,7 +136,7 @@ $result = $conn->query($sql);
                     }
                     ?>
                   </td>
-                  <td><?php echo $row['tutor_nombres']; ?></td>
+                  <td><?php echo mb_strtoupper($row['tutor_nombres']); ?></td>
                   <td class="text-center">
                     <a href="detalle-tema.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
                       <i class='bx bx-search'></i> Ver detalles

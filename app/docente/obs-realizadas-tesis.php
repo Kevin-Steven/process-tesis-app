@@ -16,7 +16,7 @@ if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Obtener la cédula del docente actual desde la tabla usuarios
+// Verificar que el usuario es un docente
 $sql = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -25,9 +25,7 @@ $result = $stmt->get_result();
 $docente = $result->fetch_assoc();
 
 if ($docente) {
-    $cedula_docente = $docente['cedula'];
-
-    // Consulta actualizada para priorizar `revisor_tesis_id`
+    // Consulta para obtener las observaciones asignadas al revisor de tesis actual
     $sql = "SELECT 
                 t.id, 
                 t.tema, 
@@ -36,17 +34,12 @@ if ($docente) {
                 u.nombres AS postulante_nombres, 
                 u.apellidos AS postulante_apellidos, 
                 p.nombres AS pareja_nombres, 
-                p.apellidos AS pareja_apellidos, 
-                tu.nombres AS tutor_nombres,
-                rt.nombres AS revisor_tesis_nombres,
-                rt.apellidos AS revisor_tesis_apellidos
+                p.apellidos AS pareja_apellidos
             FROM tema t
             JOIN usuarios u ON t.usuario_id = u.id
             LEFT JOIN usuarios p ON t.pareja_id = p.id
-            LEFT JOIN tutores tu ON t.tutor_id = tu.id
-            LEFT JOIN usuarios rt ON t.revisor_tesis_id = rt.id
             WHERE 
-                (t.revisor_tesis_id = ? OR (t.revisor_tesis_id IS NULL AND tu.cedula = ?))
+                t.revisor_tesis_id = ?
                 AND t.estado_tema = 'Aprobado'
                 AND t.estado_registro = 0
                 AND t.observaciones_tesis IS NOT NULL
@@ -54,9 +47,12 @@ if ($docente) {
             ORDER BY t.fecha_subida DESC";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("is", $usuario_id, $cedula_docente);
+    $stmt->bind_param("i", $usuario_id);
     $stmt->execute();
     $result = $stmt->get_result();
+} else {
+    echo "No se encontró el docente.";
+    exit();
 }
 ?>
 
@@ -125,9 +121,11 @@ if ($docente) {
         </div>
         <nav class="nav flex-column">
             <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
             <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link active" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
+            <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
         </nav>
     </div>
 
