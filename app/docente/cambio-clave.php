@@ -63,13 +63,13 @@ if (isset($_SESSION['mensaje'])) {
         <ul class="dropdown-menu dropdown-menu-end mt-2">
           <li>
             <a class="dropdown-item d-flex align-items-center" href="perfil.php">
-              <i class='bx bx-user me-2'></i> <!-- Ícono para "Perfil" -->
+              <i class='bx bx-user me-2'></i> 
               Perfil
             </a>
           </li>
           <li>
-            <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
-              <i class='bx bx-lock me-2'></i> <!-- Ícono para "Cambio de Clave" -->
+            <a class="dropdown-item d-flex align-items-center" href="cambio-clave.php">
+              <i class='bx bx-lock me-2'></i> 
               Cambio de Clave
             </a>
           </li>
@@ -78,7 +78,7 @@ if (isset($_SESSION['mensaje'])) {
           </li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
-              <i class='bx bx-log-out me-2'></i> <!-- Ícono para "Cerrar Sesión" -->
+              <i class='bx bx-log-out me-2'></i> 
               Cerrar Sesión
             </a>
           </li>
@@ -101,6 +101,7 @@ if (isset($_SESSION['mensaje'])) {
       <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
       <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
       <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
+      <a class="nav-link" href="informe.php"><i class='bx bx-file'></i> Informe</a>
     </nav>
   </div>
 
@@ -112,7 +113,7 @@ if (isset($_SESSION['mensaje'])) {
           <form action="logica-cambio-clave.php" class="formularioCambioClave" method="post">
             <h2 class="title-crd text-center mb-4 fw-bold">Cambio de Contraseña</h2>
 
-            <!-- Mostrar el mensaje si existe -->
+            <!-- Mostrar el mensaje si es que existe -->
             <?php if (!empty($mensaje)): ?>
               <div class="alert alert-<?php echo $tipo_mensaje; ?>" role="alert">
                 <?php echo $mensaje; ?>

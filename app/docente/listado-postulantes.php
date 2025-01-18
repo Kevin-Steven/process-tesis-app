@@ -127,12 +127,14 @@ if ($docente) {
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
             <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
+            <a class="nav-link" href="informe.php"><i class='bx bx-file'></i> Informe</a>
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-3">
+            
             <h1 class="text-center mb-4 fw-bold">Listado de Postulantes Asignados</h1>
 
             <?php if ($result_temas && $result_temas->num_rows > 0): ?>
@@ -140,8 +142,9 @@ if ($docente) {
                     <table class="table table-striped">
                         <thead class="table-header-fixed">
                             <tr>
-                                <th>Postulante</th>
-                                <th>Pareja</th>
+                                <th>Tema</th>
+                                <th>Postulante 1</th>
+                                <th>Postulante 2</th>
                                 <th>Anteproyecto</th>
                                 <th>Documento Tesis</th>
                             </tr>
@@ -149,12 +152,14 @@ if ($docente) {
                         <tbody>
                             <?php while ($row = $result_temas->fetch_assoc()): ?>
                                 <tr>
+                                    <td><?php echo htmlspecialchars($row['tema']); ?></td>
+
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                                     <td>
                                         <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
                                             <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
                                         <?php else: ?>
-                                            No aplica
+                                            NO APLICA
                                         <?php endif; ?>
                                     </td>
                                     <td>

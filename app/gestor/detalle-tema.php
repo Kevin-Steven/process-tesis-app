@@ -110,7 +110,21 @@ if (isset($_GET['id'])) {
       <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-file'></i> Listado Postulantes</a>
       <a class="nav-link" href="ver-temas.php"><i class='bx bx-book-open'></i> Temas Postulados</a>
       <a class="nav-link" href="ver-temas-aprobados.php"><i class='bx bx-file'></i> Temas aprobados</a>
-      <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Generar Reportes</a>
+      <!-- Módulo Informes con submenú -->
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bx-file'></i> Informes</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse" id="submenuInformes">
+        <ul class="list-unstyled ps-4">
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active bg-secondary' : ''; ?>" href="informe-tutor.php">
+              <i class="bx bx-file"></i> Informe Tutor
+            </a>
+          </li>
+        </ul>
+      </div>
+      <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>
   </div>

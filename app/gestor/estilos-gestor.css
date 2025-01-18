@@ -22,11 +22,11 @@ body {
   cursor: pointer;
   color: #191919;
   transition: all .6s;
-  margin-left: 250px; 
+  margin-left: 250px;
 }
 
 .menu-toggle-small {
-  margin-left: 0px; 
+  margin-left: 0px;
 }
 
 .topbar-right {
@@ -40,11 +40,13 @@ body {
   margin-right: 20px;
 }
 
-.topbar i, span {
+.topbar i,
+span {
   transition: .3s ease;
 }
 
-.topbar i:hover, .topbar span:hover {
+.topbar i:hover,
+.topbar span:hover {
   color: #3a57e8;
 }
 
@@ -54,11 +56,11 @@ body {
   cursor: pointer;
 }
 
-.topbar .dropdown-item:focus, 
+.topbar .dropdown-item:focus,
 .topbar .dropdown-item:active {
-    background-color: transparent !important; 
-    color: inherit;
-    outline: none; 
+  background-color: transparent !important;
+  color: inherit;
+  outline: none;
 }
 
 .user-profile {
@@ -96,6 +98,10 @@ body {
   font-size: 17px;
   transition: .3s ease;
   box-shadow: inset 0 0 0 0 white;
+}
+
+.sidebar .nav-link:focus {
+  color: #d3d3d3;
 }
 
 .sidebar .nav-link:hover,
@@ -152,7 +158,8 @@ body {
 }
 
 /* Estilo de la tarjeta en la sección de contenido */
-.container-fluid .card, .container .documentos-aprobados {
+.container-fluid .card,
+.container .documentos-aprobados {
   border-radius: 0.4rem;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
 }
@@ -177,12 +184,12 @@ body {
 
 .container-fluid .card {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(135deg, #ffffff, #f1f3f6); 
-  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  background: linear-gradient(135deg, #ffffff, #f1f3f6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .container-fluid .card:hover {
-  transform: translateY(-5px); 
+  transform: translateY(-5px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
 
@@ -196,8 +203,9 @@ body {
 }
 
 /* Estilo general del formulario */
-.formulario-inscripcion, .formularioCambioClave {
-  border-radius: 1rem; 
+.formulario-inscripcion,
+.formularioCambioClave {
+  border-radius: 1rem;
   padding: 1.5rem;
 }
 
@@ -205,55 +213,71 @@ body {
   background: white;
 }
 
-.formulario-inscripcion label, .formularioCambioClave label {
+.formulario-inscripcion label,
+.formularioCambioClave label {
   font-weight: 500;
-  color: #333; 
+  color: #333;
 }
 
 .content .title-crd {
   color: #333;
 }
 
-.formulario-inscripcion .form-control, .formularioCambioClave {
-  border-radius: 0.5rem; 
+.formulario-inscripcion .form-control,
+.formularioCambioClave {
+  border-radius: 0.5rem;
   font-size: 1rem;
   border: 1px solid #ddd;
   transition: border-color 0.3s ease;
 }
 
-.formulario-inscripcion .form-select:focus, .form-control:focus, .formularioCambioClave .form-control:focus {
-  border-color: #04087c; 
-  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2); 
+.formulario-inscripcion .form-select:focus,
+.form-control:focus,
+.formularioCambioClave .form-control:focus {
+  border-color: #04087c;
+  box-shadow: 0 0 5px rgba(58, 87, 232, 0.2);
 }
 
-.anteproyecto .btns .btn, 
-.formulario-inscripcion .btn, .formularioCambioClave .btn, .boton-subir-perfil .btn-upload, 
-.formulario-perfil .btn, .botones-detalle-tema .btn, .generar-reporte .btn{
+.anteproyecto .btns .btn,
+.formulario-inscripcion .btn,
+.formularioCambioClave .btn,
+.boton-subir-perfil .btn-upload,
+.formulario-perfil .btn,
+.botones-detalle-tema .btn,
+.generar-reporte .btn,
+.inf .subir-informe {
   background-color: #04087c;
   color: white;
   padding: 12px 30px;
-  border-radius: 50px; 
+  border-radius: 50px;
   font-size: 1rem;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.formulario-inscripcion .btn:hover, .formularioCambioClave .btn:hover, 
-.boton-subir-perfil .btn-upload:hover, .formulario-perfil .btn:hover,
-.botones-detalle-tema .btn:hover, .generar-reporte .btn:hover, .anteproyecto .btns .btn:hover {
+.formulario-inscripcion .btn:hover,
+.formularioCambioClave .btn:hover,
+.boton-subir-perfil .btn-upload:hover,
+.formulario-perfil .btn:hover,
+.botones-detalle-tema .btn:hover,
+.generar-reporte .btn:hover,
+.anteproyecto .btns .btn:hover,
+.inf .subir-informe:hover {
   color: white;
   background-color: #04087c;
-  transform: translateY(-2px); 
-  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.3);
 }
 
-#cancelar-btn, .anteproyecto  .btns .cancelar-btn {
+#cancelar-btn,
+.anteproyecto .btns .cancelar-btn {
   background: #ccc;
   color: #373737;
   transition: .3s;
 }
 
-#cancelar-btn:hover, .anteproyecto .btns .cancelar-btn:hover {
+#cancelar-btn:hover,
+.anteproyecto .btns .cancelar-btn:hover {
   border-color: #ccc;
   background: #ccc;
   color: #373737;
@@ -272,21 +296,23 @@ body {
 }
 
 /* Botón principal de la tarjeta */
-.container-fluid .card .btn, .formulario-aceptar-rechazar .btn {
+.container-fluid .card .btn,
+.formulario-aceptar-rechazar .btn {
   padding: 10px 30px;
-  border-radius: 50px; 
-  background: #04087c; 
+  border-radius: 50px;
+  background: #04087c;
   color: white;
-  transition: background-color 0.3s ease, transform 0.3s ease; 
-  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4); 
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 10px rgba(58, 87, 232, 0.4);
 }
 
 
-.container-fluid .card .btn:hover, .formulario-aceptar-rechazar .btn:hover {
+.container-fluid .card .btn:hover,
+.formulario-aceptar-rechazar .btn:hover {
   color: white;
 }
 
-.card .formulario-aceptar-rechazar .btn:active, 
+.card .formulario-aceptar-rechazar .btn:active,
 .card .formulario-aceptar-rechazar .btn:focus,
 .card .botones-detalle-tema .btn:active,
 .card .botones-detalle-tema .btn:focus,
@@ -294,7 +320,7 @@ body {
 .card .generar-reporte .btn:focus,
 .card .anteproyecto .btns .btn:active,
 .card .anteproyecto .btns .btn:focus {
-  background: #04087c; 
+  background: #04087c;
   color: white;
   border-color: #04087c;
 }
@@ -306,7 +332,7 @@ body {
   color: #373737;
 }
 
-.card .formulario-aceptar-rechazar .color-rojo:active, 
+.card .formulario-aceptar-rechazar .color-rojo:active,
 .card .formulario-aceptar-rechazar .color-rojo:focus,
 .card .botones-detalle-tema .color-rojo:active,
 .card .botones-detalle-tema .color-rojo:focus {
@@ -315,7 +341,7 @@ body {
   border-color: rgb(212, 37, 37);
 }
 
-.card .formulario-aceptar-rechazar .color-naranja:active, 
+.card .formulario-aceptar-rechazar .color-naranja:active,
 .card .formulario-aceptar-rechazar .color-naranja:focus,
 .card .botones-detalle-tema .devolver-tema:active,
 .card .botones-detalle-tema .devolver-tema:focus {
@@ -326,24 +352,28 @@ body {
 
 
 .formulario-aceptar-rechazar .btn:hover {
-  background: #04087c; 
-  
+  background: #04087c;
+
 }
 
-.formulario-aceptar-rechazar .color-rojo, .botones-detalle-tema .color-rojo{
+.formulario-aceptar-rechazar .color-rojo,
+.botones-detalle-tema .color-rojo {
   background: rgb(212, 37, 37);
 }
 
-.formulario-aceptar-rechazar .color-rojo:hover, .botones-detalle-tema .color-rojo:hover {
+.formulario-aceptar-rechazar .color-rojo:hover,
+.botones-detalle-tema .color-rojo:hover {
   background: rgb(179, 32, 32);
 }
 
-.formulario-aceptar-rechazar .color-naranja, .botones-detalle-tema .devolver-tema{
+.formulario-aceptar-rechazar .color-naranja,
+.botones-detalle-tema .devolver-tema {
   padding-inline: 25px;
   background: rgb(207, 157, 39);
 }
 
-.formulario-aceptar-rechazar .color-naranja:hover, .botones-detalle-tema .devolver-tema:hover {
+.formulario-aceptar-rechazar .color-naranja:hover,
+.botones-detalle-tema .devolver-tema:hover {
   background: rgb(181, 138, 35);
 
 }
@@ -358,19 +388,20 @@ body {
   padding-inline: 50px;
 }
 
-.formulario-aceptar-rechazar .aprobar{
+.formulario-aceptar-rechazar .aprobar {
   padding-inline: 80px;
 }
 
 /* Estilo de las tarjetas */
-.container .card, .formularioCambioClave{
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+.container .card,
+.formularioCambioClave {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .card-header .card-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: #333; 
+  color: #333;
 }
 
 /* FORMULARIO PARA ACTUALIZAR EL PERFIL */
@@ -389,7 +420,8 @@ body {
   font-size: 18px;
 }
 
-.profile img, .formulario-perfil img {
+.profile img,
+.formulario-perfil img {
   width: 110px;
   height: 110px;
   object-fit: cover;
@@ -413,20 +445,20 @@ body {
   position: relative;
 }
 
-.table-responsive a{
+.table-responsive a {
   color: #04087c;
 }
 
 .table-header-fixed {
   position: sticky;
   top: 0;
-  background-color: #fff; 
+  background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 
 }
 
 .table-header-fixed th {
-  padding: 15px 10px; 
+  padding: 15px 10px;
   vertical-align: middle;
 }
 
@@ -437,7 +469,7 @@ table a i {
 }
 
 
-.tabla-descargar a{
+.tabla-descargar a {
   font-size: 16px;
   font-weight: bold;
   color: #04087c;
@@ -448,8 +480,9 @@ table a i {
   margin-right: 5px;
 }
 
-.tabla-descargar th, table td {
-  vertical-align: middle; 
+.tabla-descargar th,
+table td {
+  vertical-align: middle;
 }
 
 /* FOCUS Y ACTIVE DE LOS BUTTONS */
@@ -504,18 +537,18 @@ table a i {
   position: fixed;
   bottom: 50px;
   right: 20px;
-  z-index: 1000; 
+  z-index: 1000;
 }
 
 .regresar-enlace {
   font-size: 50px;
-  color: #04087c; 
+  color: #04087c;
   text-decoration: none;
   transition: .3s;
 }
 
 .regresar-enlace:hover {
-  color: #007bff; 
+  color: #007bff;
 }
 
 #color-verde {
@@ -536,6 +569,10 @@ table a i {
   transform: none;
 }
 
+.inf .subir-informe {
+  border-radius: 12px;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     top: 60px;
@@ -546,31 +583,69 @@ table a i {
     transform: translateX(-100%);
   }
 
+  .inf {
+    text-align: center;
+  }
+
+  .inf .subir-informe{
+    font-size: 16px;
+    padding: 10px;
+  }
+
   .sidebar-hidden {
     transform: translateX(0);
   }
 
-  .content, .footer {
-    margin-left: 0; 
-    transition: filter 0.6s; 
+  .content,
+  .footer {
+    margin-left: 0;
+    transition: filter 0.6s;
   }
 
   .blurred {
     filter: blur(2px);
   }
 
-   /* Desactivar animaciones en otros elementos */
-   .topbar, .menu-toggle, .topbar i, .topbar span, 
-   .container-fluid .card, .container-fluid .btn, 
-   .sidebar .nav-link, .formulario-inscripcion .form-control, 
-   .formularioCambioClave .form-control, 
-   .boton-subir-perfil .btn-upload, 
-   .container .card, .footer, 
-   .anteproyecto .btns .btn, 
-   .botones-detalle-tema .btn, 
-   .generar-reporte .btn {
-     transition: none !important; /* Desactiva todas las transiciones */
-   }
+  /* Hacer que la tabla sea desplazable horizontalmente */
+  .custom-scroll-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .custom-scroll-table table {
+    width: 100%;
+  }
+
+  .custom-scroll-table td,
+  .custom-scroll-table th {
+    text-align: center;
+  }
+
+  .custom-scroll-table button {
+    margin: 0 2px;
+  }
+
+
+  /* Desactivar animaciones en otros elementos */
+  .topbar,
+  .menu-toggle,
+  .topbar i,
+  .topbar span,
+  .container-fluid .card,
+  .container-fluid .btn,
+  .sidebar .nav-link,
+  .formulario-inscripcion .form-control,
+  .formularioCambioClave .form-control,
+  .boton-subir-perfil .btn-upload,
+  .container .card,
+  .footer,
+  .anteproyecto .btns .btn,
+  .botones-detalle-tema .btn,
+  .generar-reporte .btn {
+    transition: none !important;
+    /* Desactiva todas las transiciones */
+  }
 
   .content .container-fluid .lead {
     font-size: 16px;
@@ -585,7 +660,7 @@ table a i {
   }
 
   .menu-toggle {
-    margin-left: 0; 
+    margin-left: 0;
   }
 
   .topbar {
@@ -603,7 +678,7 @@ table a i {
   .formulario-aceptar-rechazar {
     display: block;
   }
-  
+
   .formulario-aceptar-rechazar .btn {
     margin-bottom: 1rem;
     font-size: 13px;
@@ -640,7 +715,7 @@ table a i {
     font-size: 13px;
   }
 
-  .botones-detalle-tema .btn{
+  .botones-detalle-tema .btn {
     margin-bottom: 10px;
   }
 
