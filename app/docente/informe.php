@@ -107,6 +107,8 @@ $result_informes = $stmt_informes->get_result();
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
             <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
+            <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
+            <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
             <a class="nav-link active" href="informe.php"><i class='bx bx-file'></i> Informe</a>
         </nav>
     </div>
@@ -127,6 +129,12 @@ $result_informes = $stmt_informes->get_result();
                             <?php elseif ($_GET['status'] === 'error_updated'): ?>
                                 <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
                                 <strong class="me-auto">Error de Actualización</strong>
+                            <?php elseif ($_GET['status'] === 'invalid_file'): ?>
+                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                                <strong class="me-auto">Error de Tamaño</strong>
+                            <?php elseif ($_GET['status'] === 'file_error'): ?>
+                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                                <strong class="me-auto">Error de Tamaño</strong>
                             <?php elseif ($_GET['status'] === 'success'): ?>
                                 <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
                                 <strong class="me-auto">Subida Exitosa</strong>
@@ -148,6 +156,12 @@ $result_informes = $stmt_informes->get_result();
                                     break;
                                 case 'error_updated':
                                     echo "Hubo un problema al intentar actualizar el informe. Por favor, intente de nuevo.";
+                                    break;
+                                case 'invalid_file':
+                                    echo "El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.";
+                                    break;
+                                case 'file_error':
+                                    echo "El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.";
                                     break;
                                 case 'success':
                                     echo "El informe se ha subido correctamente.";
@@ -178,7 +192,6 @@ $result_informes = $stmt_informes->get_result();
                 <table class="table table-striped custom-scroll-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Archivo</th>
                             <th>Fecha de Subida</th>
                             <th>Acciones</th>
@@ -188,7 +201,6 @@ $result_informes = $stmt_informes->get_result();
                         <?php if ($result_informes->num_rows > 0): ?>
                             <?php while ($informe = $result_informes->fetch_assoc()): ?>
                                 <tr>
-                                    <td><?php echo $informe['id']; ?></td>
                                     <td>
                                         <a href="<?php echo $informe['archivo']; ?>" download>
                                             <?php echo basename($informe['archivo']); ?>
@@ -225,8 +237,8 @@ $result_informes = $stmt_informes->get_result();
                                                     <input type="hidden" name="informe_id" value="<?php echo $informe['id']; ?>">
                                                     <div class="mb-3">
                                                         <label for="archivoEditar" class="form-label">Subir Nuevo Archivo</label>
-                                                        <input type="file" class="form-control" id="documentoCarpeta" name="archivo_informe" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                                                        <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 10 MB.</small>
+                                                        <input type="file" class="form-control documentoCarpeta" name="archivo_informe" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
+                                                        <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 20 MB.</small>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -271,21 +283,6 @@ $result_informes = $stmt_informes->get_result();
         </div>
     </div>
 
-    <!-- Toast para error de tamaño de archivo -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
-                <strong class="me-auto">Error de Tamaño</strong>
-                <small>Justo ahora</small>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
-            </div>
-        </div>
-    </div>
-
     <!-- Modal para subir informe -->
     <div class="modal fade" id="modalSubirInforme" tabindex="-1" aria-labelledby="modalSubirInformeLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -298,8 +295,8 @@ $result_informes = $stmt_informes->get_result();
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="archivo_informe" class="form-label">Archivo</label>
-                            <input type="file" class="form-control" id="documentoCarpeta" name="archivo_informe" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 10 MB.</small>
+                            <input type="file" class="form-control documentoCarpeta" name="archivo_informe" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
+                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 20 MB.</small>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -307,6 +304,21 @@ $result_informes = $stmt_informes->get_result();
                         <button type="submit" class="btn btn-primary">Subir</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast para error de tamaño de archivo -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="fileSizeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bx bx-error-circle fs-4 me-2 text-danger"></i>
+                <strong class="me-auto">Error de Tamaño</strong>
+                <small>Justo ahora</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
             </div>
         </div>
     </div>
@@ -321,7 +333,7 @@ $result_informes = $stmt_informes->get_result();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js" defer></script>
-    <script src="../js/validarTamañoDocente.js" defer></script>
+    <script src="../js/validadDobleInput.js" defer></script>
 
 </body>
 

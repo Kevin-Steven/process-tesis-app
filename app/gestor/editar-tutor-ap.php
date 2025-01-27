@@ -122,20 +122,17 @@ if (isset($_GET['id'])) {
     <div class="container mt-2">
       <h1 class="mb-4 text-center fw-bold">Editar Tutor</h1>
 
-      <!-- Formulario para cambiar el tutor -->
       <div class="card shadow-lg mx-auto">
         <div class="card-body">
           <h5 class="card-title text-center fw-bold mb-3">Editar Tutor del Tema: "<?php echo htmlspecialchars($tema['tema']); ?>"</h5>
           <form action="logica-actualizar-tutor-ap.php" class="actualizar-tutor" method="POST">
             <input type="hidden" name="tema_id" value="<?php echo $tema_id; ?>">
 
-            <!-- Tutor actual -->
             <div class="mb-3">
               <label for="tutor_actual" class="form-label fw-bold">Tutor Actual</label>
               <input type="text" class="form-control" id="tutor_actual" value="<?php echo htmlspecialchars($tema['tutor_nombres']); ?>" disabled>
             </div>
 
-            <!-- Selección de nuevo tutor -->
             <div class="mb-3">
               <label for="tutor_id" class="form-label fw-bold">Nuevo Tutor</label>
               <select class="form-select" id="tutor_id" name="tutor_id" required>
@@ -148,7 +145,6 @@ if (isset($_GET['id'])) {
               </select>
             </div>
 
-            <!-- Botones -->
             <div class="text-center botones-detalle-tema mt-4 d-flex justify-content-center gap-4">
               <button type="button" id="cancelar-btn" class="btn" onclick="history.back()">Cancelar</button>
               <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modalConfirmarActualizar">

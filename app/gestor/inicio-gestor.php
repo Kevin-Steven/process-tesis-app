@@ -118,9 +118,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
           <h1 class="display-5 fw-bold mb-2">Bienvenido a tu panel de administración</h1>
           <p class="lead mb-4">Desde este panel podrás revisar las inscripciones, verificar la documentación de los postulantes y generar reportes para el proceso de titulación.</p>
 
-          <!-- Cards con acciones rápidas -->
           <div class="row justify-content-center">
-            <!-- Card 1: Revisar Documentos -->
             <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
@@ -132,7 +130,6 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               </div>
             </div>
 
-            <!-- Card 2: Ver Inscripciones -->
             <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
@@ -144,7 +141,6 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               </div>
             </div>
 
-            <!-- Card 3: Generar Reportes -->
             <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
@@ -156,17 +152,28 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               </div>
             </div>
 
-            <!-- Card 4: Asignar revisores -->
-            <div class="col-md-12 mb-3">
+            <div class="col-md-8 mb-3">
+              <div class="card card-principal h-100">
+                <div class="card-body text-center">
+                  <i class='bx bx-group bx-lg mb-3'></i>
+                  <h5 class="card-title">Asignar Jurado</h5>
+                  <p class="card-text">Gestiona y asigna jurados para las sustentaciones de tesis de manera eficiente.</p>
+                  <a href="asignar-jurado.php" class="btn">Acceder</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
                   <i class='bx bx-user-check bx-lg mb-3'></i>
                   <h5 class="card-title">Asignar Revisores</h5>
-                  <p class="card-text">Asigna revisores para los anteproyectos y las tesis.</p>
+                  <p class="card-text">Asigna revisores para los anteproyectos, tesis y plagio.</p>
                   <a href="asignar-revisores.php" class="btn">Acceder</a>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>

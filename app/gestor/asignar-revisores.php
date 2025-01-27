@@ -147,6 +147,16 @@ if (!$result_revisores) {
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-5">
+                    <div class="card text-center mb-4 border border-secondary rounded-3 shadow-md">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-3">Asignar Revisor de Plagio</h5>
+                            <p class="card-text mb-4">Designa un revisor para verificar la originalidad del documento final y asegurar su calidad académica.</p>
+                            <a href="tabla-revisor-plagio.php" class="btn">Acceder</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

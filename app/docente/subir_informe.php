@@ -28,14 +28,14 @@ if (isset($_FILES['archivo_informe']) && $_FILES['archivo_informe']['error'] ===
 
     // Extensiones permitidas
     $allowedFileExtensions = ['zip', 'doc', 'docx', 'pdf'];
-    $maxFileSize = 10 * 1024 * 1024; // 10MB en bytes
+    $maxFileSize = 20 * 1024 * 1024; // 20MB en bytes
 
     // Validación del archivo
     $error = '';
     if (!in_array($fileExtension, $allowedFileExtensions)) {
         $error = 'invalid_extension';
     } elseif ($fileSize > $maxFileSize) {
-        $error = 'too_large';
+        $error = 'invalid_file';
     } else {
         $destPath = $uploadDir . $fileName; // Ruta final con el nombre original del archivo
 

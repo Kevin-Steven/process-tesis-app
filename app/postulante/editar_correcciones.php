@@ -32,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['correcciones_nuevas'
 
     $archivo_nuevo = $_FILES['correcciones_nuevas'];
 
-    // Validar el tamaño del archivo (máximo 10 MB)
-    if ($archivo_nuevo['size'] > 10 * 1024 * 1024) {
+    // Validar el tamaño del archivo (máximo 20 MB)
+    if ($archivo_nuevo['size'] > 20 * 1024 * 1024) {
         header("Location: enviar-correcciones.php?status=too_large");
         exit();
     }

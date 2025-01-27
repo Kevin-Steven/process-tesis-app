@@ -41,7 +41,6 @@ function enviarCorreoEliminacion($nombre_postulante, $apellido_postulante) {
     $mail = new PHPMailer(true);
 
     try {
-        // Configuración del servidor SMTP de Gmail
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
@@ -49,7 +48,6 @@ function enviarCorreoEliminacion($nombre_postulante, $apellido_postulante) {
         $mail->Password   = 'ecic zfih ifqj utgv'; 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
-
         // Configuración del charset
         $mail->CharSet    = 'UTF-8';
 
@@ -61,7 +59,6 @@ function enviarCorreoEliminacion($nombre_postulante, $apellido_postulante) {
 
         $mail->isHTML(true);
 
-        // Asunto y cuerpo del correo
         $mail->Subject = 'Inscripción Eliminada - Postulante';
         $mail->Body    = '<h2>Notificación de Eliminación de Inscripción</h2>
                           <p>El postulante <strong>' . $nombre_postulante . ' ' . $apellido_postulante . '</strong> ha eliminado su inscripción del sistema.</p>

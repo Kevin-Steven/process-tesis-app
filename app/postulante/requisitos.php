@@ -36,7 +36,7 @@ $stmt->close();
 $estado_inscripcion = $inscripcion['estado_inscripcion'] ?? null;
 
 // Consulta para obtener el estado del tema y de la tesis
-$sql_tema = "SELECT estado_tema FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
+$sql_tema = "SELECT estado_tema, estado_tesis FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
 $stmt_tema = $conn->prepare($sql_tema);
 $stmt_tema->bind_param("i", $usuario_id);
 $stmt_tema->execute();
@@ -45,6 +45,7 @@ $tema = $result_tema->fetch_assoc();
 $stmt_tema->close();
 
 $estado_tema = $tema['estado_tema'] ?? null;
+$estado_tesis = $tema['estado_tesis'] ?? null;
 ?>
 
 <!doctype html>
@@ -127,6 +128,10 @@ $estado_tema = $tema['estado_tema'] ?? null;
       <?php endif; ?>
       <?php if ($estado_tema === 'Aprobado'): ?>
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
+      <?php endif; ?>
+      <?php if ($estado_tesis === 'Aprobado'): ?>
+        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+        <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>
     </nav>
   </div>

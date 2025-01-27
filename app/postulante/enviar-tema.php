@@ -127,6 +127,16 @@ $parejaId = $tema_pendiente['pareja_id'] ?? null;
 $estadoTema = $tema_pendiente['estado_tema'] ?? null;
 $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 'Rechazado') ? $tema_pendiente['motivo_rechazo'] : null;
 
+$sql_temass = "SELECT estado_tesis FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
+$stmt_tema = $conn->prepare($sql_temass);
+$stmt_tema->bind_param("i", $usuario_id);
+$stmt_tema->execute();
+$result_tema = $stmt_tema->get_result();
+$tema = $result_tema->fetch_assoc();
+$stmt_tema->close();
+
+$estado_tesis = $tema['estado_tesis'] ?? null;
+
 ?>
 
 <!doctype html>
@@ -192,6 +202,10 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
       <?php endif; ?>
       <?php if ($tema_aprobado): ?>
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
+      <?php endif; ?>
+      <?php if ($estado_tesis === 'Aprobado'): ?>
+        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+        <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>
     </nav>
   </div>
@@ -444,7 +458,7 @@ $motivo_rechazo = (isset($tema_pendiente) && $tema_pendiente['estado_tema'] === 
 
                   <!-- Subir Anteproyecto -->
                   <div class="mb-3">
-                    <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP MÁXIMO 2 MB)</label>
+                    <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP MÁXIMO 20 MB)</label>
                     <input type="file" class="form-control" id="documentoCarpeta" name="anteproyecto" accept=".zip" required onchange="validarTamanoArchivo()">
                   </div>
                 </div>

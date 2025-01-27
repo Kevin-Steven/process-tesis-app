@@ -64,11 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_update_anteproyecto->bind_param("si", $anteproyectoFileName, $tema_id);
                 $stmt_update_anteproyecto->execute();
             } else {
-                echo "Error al subir el archivo.";
+                header("Location: enviar-tema.php?status=error-subir-archivo");
                 exit();
             }
         } else {
-            echo "Solo se permiten archivos ZIP o RAR.";
+            header("Location: enviar-tema.php?status=error-solo-zip-rar");
             exit();
         }
     }
@@ -130,7 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: enviar-tema.php?mensaje=Tema actualizado con éxito");
         exit();
     } else {
-        echo "Error al actualizar el tema: " . $stmt_update->error;
+        header("Location: enviar-tema.php?mensaje=Error al actualizar el tema");
+        //echo "Error al actualizar el tema: " . $stmt_update->error;
     }
 
     $stmt_update->close();

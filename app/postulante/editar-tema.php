@@ -175,7 +175,7 @@ $result_parejas = $stmt_parejas->get_result();
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
           <div class="toast-body">
-            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+            El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
           </div>
         </div>
       </div>
@@ -261,7 +261,7 @@ $result_parejas = $stmt_parejas->get_result();
 
                 <!-- Subir Anteproyecto -->
                 <div class="mb-3">
-                  <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 2 MB)</label>
+                  <label for="anteproyecto" class="form-label fw-bold">Subir Anteproyecto (ZIP o RAR MÁXIMO 20 MB)</label>
 
                   <!-- Campo para subir un nuevo archivo -->
                   <input type="file" class="form-control" id="documentoCarpeta" name="anteproyecto" accept=".zip,.rar" onchange="validarTamanoArchivo()">

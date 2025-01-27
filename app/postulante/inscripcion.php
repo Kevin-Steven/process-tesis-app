@@ -30,7 +30,7 @@ $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 
 // Consulta para obtener el estado del tema y de la tesis
-$sql_tema = "SELECT estado_tema FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
+$sql_tema = "SELECT estado_tema, estado_tesis FROM tema WHERE usuario_id = ? ORDER BY id DESC LIMIT 1";
 $stmt_tema = $conn->prepare($sql_tema);
 $stmt_tema->bind_param("i", $usuario_id);
 $stmt_tema->execute();
@@ -39,6 +39,7 @@ $tema = $result_tema->fetch_assoc();
 $stmt_tema->close();
 
 $estado_tema = $tema['estado_tema'] ?? null;
+$estado_tesis = $tema['estado_tesis'] ?? null;
 ?>
 
 <!doctype html>
@@ -123,6 +124,10 @@ $estado_tema = $tema['estado_tema'] ?? null;
       <?php if ($estado_tema === 'Aprobado'): ?>
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
       <?php endif; ?>
+      <?php if ($estado_tesis === 'Aprobado'): ?>
+        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+        <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
+      <?php endif; ?>
     </nav>
   </div>
 
@@ -167,7 +172,7 @@ $estado_tema = $tema['estado_tema'] ?? null;
                   echo "Hubo un error en el envío del formulario.";
                   break;
                 case 'file_error':
-                  echo "El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.";
+                  echo "El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.";
                   break;
                 case 'deleted':
                   echo "La inscripción ha sido eliminada correctamente.";
@@ -192,7 +197,7 @@ $estado_tema = $tema['estado_tema'] ?? null;
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
           <div class="toast-body">
-            El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+            El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
           </div>
         </div>
       </div>
@@ -244,7 +249,7 @@ $estado_tema = $tema['estado_tema'] ?? null;
               <div class="row">
                 <!-- Cargar carpeta ZIP/RAR -->
                 <div class="col-md-12 mb-12 text-center">
-                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP MÁXIMO 2 MB)</label>
+                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP MÁXIMO 20 MB)</label>
                   <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip" required onchange="validarTamanoArchivo()">
                 </div>
               </div>

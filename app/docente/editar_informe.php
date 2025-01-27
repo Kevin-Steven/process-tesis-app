@@ -24,7 +24,7 @@ if (isset($_FILES['archivo_informe']) && $_FILES['archivo_informe']['error'] ===
 
     // Validar extensiones y tamaño
     $allowedFileExtensions = ['zip', 'doc', 'docx', 'pdf'];
-    $maxFileSize = 10 * 1024 * 1024; // 10MB
+    $maxFileSize = 20 * 1024 * 1024; // 20MB
 
     if (!in_array($fileExtension, $allowedFileExtensions) || $fileSize > $maxFileSize) {
         header("Location: informe.php?status=invalid_file");

@@ -116,7 +116,7 @@ $observaciones_tesis = $tema['observaciones_tesis'] ?? 'Sin Observaciones';
                         <input type="hidden" name="id_postulante" value="<?php echo $usuario_id; ?>">
 
                         <div class="mb-3">
-                            <label for="documentoTesis" class="form-label fw-bold">Subir Nuevo Documento (ZIP MÁXIMO 2 MB)</label>
+                            <label for="documentoTesis" class="form-label fw-bold">Subir Nuevo Documento (ZIP MÁXIMO 20 MB)</label>
                             <input type="file" class="form-control" id="documentoCarpeta" name="documentoTesis" accept=".zip" required onchange="validarTamanoArchivo()">
                             <small class="form-text text-muted">El archivo ZIP debe contener: Documento de Tesis en Word, PDF e Informe de Antiplagio.</small>
                         </div>
@@ -171,7 +171,7 @@ $observaciones_tesis = $tema['observaciones_tesis'] ?? 'Sin Observaciones';
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+                El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
             </div>
         </div>
     </div>

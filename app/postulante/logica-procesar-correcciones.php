@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Permitir solo archivos ZIP
         $allowedfileExtensions = array('zip');
         if (in_array($fileExtension, $allowedfileExtensions)) {
-            // Verificar el tamaño del archivo (máximo 10 MB)
-            if ($fileSize < 10 * 1024 * 1024) {
+            // Verificar el tamaño del archivo (máximo 20 MB)
+            if ($fileSize < 20 * 1024 * 1024) {
                 // Directorio donde se guardarán las correcciones
                 $uploadFileDir = '../uploads/correcciones/';
 

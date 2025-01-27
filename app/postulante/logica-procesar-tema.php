@@ -71,11 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
                 $anteproyectoFileName = $newFileName; // Guardar el nombre del archivo para la base de datos
             } else {
-                echo "Hubo un error al subir el archivo.";
+                header("Location: enviar-tema.php?status=error-subir-archivo");
                 exit();
             }
         } else {
-            echo "Solo se permiten archivos ZIP.";
+            header("Location: enviar-tema.php?status=error-solo-zip");
             exit();
         }
     }
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: enviar-tema.php?status=success");
         exit();
     } else {
-        echo "Error al enviar el tema: " . $conn->error;
+        header("Location: enviar-tema.php?status=error-enviar-tema");
     }
 
     // Cerrar conexiones

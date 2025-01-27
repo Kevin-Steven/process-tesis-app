@@ -46,8 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Validar el tamaño del archivo (10 MB máximo)
-        if ($fileSize > 10 * 1024 * 1024) {
+        // Validar el tamaño del archivo (20 MB máximo)
+        if ($fileSize > 20 * 1024 * 1024) {
             header("Location: enviar-documento-tesis.php?status=too_large");
             exit();
         }

@@ -141,10 +141,10 @@ $correcciones_tesis = $tema['correcciones_tesis'] ?? null;
                                     echo "Solo se permiten archivos ZIP.";
                                     break;
                                 case 'too_large':
-                                    echo "El archivo supera el tamaño máximo de 2 MB.";
+                                    echo "El archivo supera el tamaño máximo de 20 MB.";
                                     break;
                                 case 'file_error':
-                                    echo "El archivo supera el tamaño máximo de 2 MB.";
+                                    echo "El archivo supera el tamaño máximo de 20 MB.";
                                     break;
                                 case 'upload_error':
                                     echo "Hubo un error al mover el archivo.";
@@ -202,7 +202,7 @@ $correcciones_tesis = $tema['correcciones_tesis'] ?? null;
                                 <form action="editar_correcciones.php" method="POST" class="enviar-tema" enctype="multipart/form-data">
                                     <input type="hidden" name="correcciones_tesis_anterior" value="<?php echo htmlspecialchars($correcciones_tesis); ?>">
                                     <div class="mb-3">
-                                        <label for="correcciones_nuevas" class="form-label fw-bold">Reemplazar Correcciones (ZIP MÁXIMO 2 MB)</label>
+                                        <label for="correcciones_nuevas" class="form-label fw-bold">Reemplazar Correcciones (ZIP MÁXIMO 20 MB)</label>
                                         <input type="file" class="form-control" id="documentoCarpeta" name="correcciones_nuevas" accept=".zip" required onchange="validarTamanoArchivo()">
                                     </div>
                                     <div class="text-center">

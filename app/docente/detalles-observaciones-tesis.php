@@ -96,6 +96,8 @@ if (isset($_GET['id'])) {
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link active" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
             <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
+            <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
+            <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
             <a class="nav-link" href="informe.php"><i class='bx bx-file'></i> Informe</a>
         </nav>
     </div>
@@ -173,7 +175,7 @@ if (isset($_GET['id'])) {
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
+                El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
             </div>
         </div>
     </div>
@@ -197,7 +199,7 @@ if (isset($_GET['id'])) {
                         <div class="mb-3">
                             <label for="archivoObservaciones" class="form-label fw-bold">Subir archivo con las observaciones</label>
                             <input type="file" class="form-control" id="documentoCarpeta" name="archivo_observaciones" accept=".zip,.doc,.docx" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 10 MB.</small>
+                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 20 MB.</small>
                         </div>
                     </form>
                 </div>

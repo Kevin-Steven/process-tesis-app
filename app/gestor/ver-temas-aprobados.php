@@ -183,8 +183,8 @@ $result = $conn->query($sql);
             <thead class="table-header-fixed">
               <tr>
                 <th>Tema</th>
-                <th>Postulante 1</th>
-                <th>Postulante 2</th>
+                <th>Estudiante 1</th>
+                <th>Estudiante 2</th>
                 <th>Tutor</th>
                 <th>Anteproyecto</th>
                 <th>Observaciones Anteproyecto</th>

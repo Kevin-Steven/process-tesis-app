@@ -55,7 +55,7 @@ if (isset($_FILES['archivo_observaciones']) && $_FILES['archivo_observaciones'][
     $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
     // Extensiones permitidas
-    $allowedfileExtensions = ['zip', 'doc', 'docx'];
+    $allowedfileExtensions = ['zip', 'doc', 'docx', 'pdf'];
     $maxFileSize = 20 * 1024 * 1024; // 20MB en bytes
 
     // Validación del archivo
