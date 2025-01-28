@@ -111,6 +111,16 @@ if (!$result_revisores) {
                             <i class="bx bx-file"></i> Informe Tutor
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-tesis.php">
+                            <i class="bx bx-file"></i> Informe Tesis
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+                            <i class="bx bx-file"></i> Jurado tesis
+                        </a>
+                    </li>
                 </ul>
             </div>
             <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Reportes</a>

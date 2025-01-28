@@ -18,10 +18,11 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 $sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id,
            u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
            p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 
-           p.apellidos AS pareja_apellidos, 
-           tutores.nombres AS tutor_nombre, p.id AS pareja_id
+           p.apellidos AS pareja_apellidos, up.nombres as nombres_plagio, up.apellidos as apellidos_plagio,
+           tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis 
     FROM tema t
     JOIN usuarios u ON t.usuario_id = u.id
+    JOIN usuarios up ON t.id_revisor_plagio = up.id
     LEFT JOIN usuarios p ON t.pareja_id = p.id
     JOIN tutores ON t.tutor_id = tutores.id
     WHERE t.estado_tema = 'Aprobado' 
@@ -112,6 +113,16 @@ $result = $conn->query($sql);
               <i class="bx bx-file"></i> Informe Tutor
             </a>
           </li>
+          <li>
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-tesis.php">
+              <i class="bx bx-file"></i> Informe Tesis
+            </a>
+          </li>
+          <li>
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+              <i class="bx bx-file"></i> Jurado tesis
+            </a>
+          </li>
         </ul>
       </div>
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Reportes</a>
@@ -188,7 +199,9 @@ $result = $conn->query($sql);
                 <th>Tutor</th>
                 <th>Anteproyecto</th>
                 <th>Observaciones Anteproyecto</th>
+                <th>Documento Tesis</th>
                 <th>Observaciones Tesis</th>
+                <th>Revisor Plagio</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -215,12 +228,20 @@ $result = $conn->query($sql);
                       <?php endif; ?>
                     </td>
                     <td>
-                      <?php if (!empty($row['observaciones_tesis'])): ?>
-                        <a href="<?php echo '../uploads/observaciones-tesis/' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php if (!empty($row['tesis'])): ?>
+                        <a href="<?php echo '../uploads/correcciones/' . htmlspecialchars($row['tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
                         No disponible
                       <?php endif; ?>
                     </td>
+                    <td>
+                      <?php if (!empty($row['observaciones_tesis'])): ?>
+                        <a href="<?php echo '../uploads/observaciones-tesis /' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        No disponible
+                      <?php endif; ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($row['nombres_plagio'] . ' ' . $row['apellidos_plagio']); ?></td>
                     <td class="text-center">
                       <a href="editar-tutor-ap.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
                         <i class='bx bx-search'></i> Ver detalles

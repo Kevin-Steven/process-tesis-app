@@ -102,9 +102,18 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               <i class="bx bx-file"></i> Informe Tutor
             </a>
           </li>
+          <li>
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-tesis.php">
+              <i class="bx bx-file"></i> Informe Tesis
+            </a>
+          </li>
+          <li>
+            <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+              <i class="bx bx-file"></i> Jurado tesis
+            </a>
+          </li>
         </ul>
       </div>
-
       <a class="nav-link" href="generar-reportes.php"><i class='bx bx-line-chart'></i> Reportes</a>
       <a class="nav-link" href="comunicados.php"><i class='bx bx-message'></i> Comunicados</a>
     </nav>
@@ -152,12 +161,12 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               </div>
             </div>
 
-            <div class="col-md-8 mb-3">
+            <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
                   <i class='bx bx-group bx-lg mb-3'></i>
                   <h5 class="card-title">Asignar Jurado</h5>
-                  <p class="card-text">Gestiona y asigna jurados para las sustentaciones de tesis de manera eficiente.</p>
+                  <p class="card-text">Asigna jurados para las sustentaciones de tesis.</p>
                   <a href="asignar-jurado.php" class="btn">Acceder</a>
                 </div>
               </div>
@@ -170,6 +179,17 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                   <h5 class="card-title">Asignar Revisores</h5>
                   <p class="card-text">Asigna revisores para los anteproyectos, tesis y plagio.</p>
                   <a href="asignar-revisores.php" class="btn">Acceder</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <div class="card card-principal h-100">
+                <div class="card-body text-center">
+                  <i class='bx bx-user-plus bx-lg mb-3'></i>
+                  <h5 class="card-title">Agregar Tutores</h5>
+                  <p class="card-text">Agrega tutores según sea necesario.</p>
+                  <a href="agg-del-tutores.php" class="btn">Acceder</a>
                 </div>
               </div>
             </div>

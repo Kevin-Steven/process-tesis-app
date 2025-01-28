@@ -30,9 +30,10 @@
 
             <form action="/app/registrar/logica-login.php" class="login" method="POST">
                 <div class="p-n4 mb-3">
-                    <label for="cedula" class="form-label fw-bold">Cédula</label>
-                    <input type="text" class="form-control" maxlength="10" id="cedula" name="cedula" placeholder="Ingrese su Cédula" required oninput="validateInput(this)">
+                    <label for="cedula" class="form-label fw-bold">Cédula / Usuario</label>
+                    <input type="text" class="form-control" id="cedula" name="cedula" placeholder="Ingrese su Cédula / Usuario" required >
                 </div>
+
                 <div class="mb-5">
                     <label for="inputPassword5" class="form-label fw-bold">Contraseña</label>
                     <div class="input-group">

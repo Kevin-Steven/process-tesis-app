@@ -95,8 +95,18 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
             <div class="collapse show" id="submenuInformes">
                 <ul class="list-unstyled ps-4">
                     <li>
-                        <a class="nav-link  active <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active bg-secondary' : ''; ?>" href="informe-tutor.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tutor.php' ? 'active bg-secondary' : ''; ?>" href="informe-tutor.php">
                             <i class="bx bx-file"></i> Informe Tutor
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-tesis.php">
+                            <i class="bx bx-file"></i> Informe Tesis
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link  <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+                            <i class="bx bx-file"></i> Jurado tesis
                         </a>
                     </li>
                 </ul>

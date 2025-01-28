@@ -127,16 +127,33 @@ if ($docente) {
             <a class="nav-link" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
             <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
             <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-file'></i> Informes</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuInformes">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe.php' ? 'active bg-secondary' : ''; ?>" href="informe.php">
+                            <i class="bx bx-file"></i> Informe Tutor
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'informe-revisor-tesis.php' ? 'active bg-secondary' : ''; ?>" href="informe-revisor-tesis.php">
+                            <i class="bx bx-file"></i> Informe tesis
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
             <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
-            <a class="nav-link" href="informe.php"><i class='bx bx-file'></i> Informe</a>
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content" id="content">
         <div class="container mt-3">
-            
+
             <h1 class="text-center mb-4 fw-bold">Listado de Postulantes Asignados</h1>
 
             <?php if ($result_temas && $result_temas->num_rows > 0): ?>

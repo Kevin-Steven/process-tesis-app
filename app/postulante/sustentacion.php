@@ -61,8 +61,7 @@ if ($pareja_id) {
 }
 
 // Consulta para obtener los nombres de los jurados y sus observaciones
-$sql_jurados = "
-    SELECT 
+$sql_jurados = "SELECT 
         u1.nombres AS jurado1_nombre, 
         u2.nombres AS jurado2_nombre, 
         u3.nombres AS jurado3_nombre,
@@ -94,7 +93,6 @@ $jurado3_nombre = $jurados['jurado3_nombre'] ?? 'No asignado';
 $observacion_jurado1 = $jurados['obs_jurado_uno'] ?? 'Sin observación';
 $observacion_jurado2 = $jurados['obs_jurado_dos'] ?? 'Sin observación';
 $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
-
 ?>
 
 <!doctype html>
@@ -211,7 +209,6 @@ $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
                                 <?php endif; ?>
                             </td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
