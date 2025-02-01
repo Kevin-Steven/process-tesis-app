@@ -143,6 +143,13 @@ if ($result_revisores->num_rows > 0) {
     <div class="content" id="content">
         <div class="container mt-2">
             <h1 class="mb-4 text-center fw-bold">Asignar Revisor de Plagio</h1>
+
+            <!-- Campo de búsqueda -->
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class='bx bx-search'></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o tutor">
+            </div>
+
             <?php if (isset($_GET['status'])): ?>
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                     <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -178,10 +185,11 @@ if ($result_revisores->num_rows > 0) {
             <?php endif; ?>
 
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped" id="temas">
                     <thead class="table-header-fixed">
                         <tr>
                             <th>Tema</th>
+                            <th>Tutor</th>
                             <th>Revisor Plagio</th>
                             <th class="text-center">Acciones</th>
                         </tr>
@@ -206,6 +214,7 @@ if ($result_revisores->num_rows > 0) {
 
                         if ($result_temas_aprobados->num_rows > 0) {
                             while ($tema = $result_temas_aprobados->fetch_assoc()) {
+
                                 $tutor_nombre = !empty($tema['tutor_nombre']) ? mb_strtoupper($tema['tutor_nombre']) : 'Tutor no asignado';
 
                                 // Verificar si hay un revisor asignado
@@ -215,6 +224,7 @@ if ($result_revisores->num_rows > 0) {
 
                                 echo "<tr>
                                         <td>{$tema['tema']}</td>
+                                        <td>{$tutor_nombre}</td>
                                         <td>{$revisor_nombre}</td>
                                         <td class='text-center'>
                                             <a href='detalle-revisor-plagio.php?id={$tema['id']}' class='text-decoration-none d-flex align-items-center justify-content-center'>
@@ -250,6 +260,8 @@ if ($result_revisores->num_rows > 0) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js" defer></script>
+    <script src="../js/buscarTema.js" defer></script>
+
 </body>
 
 </html>

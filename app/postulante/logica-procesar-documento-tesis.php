@@ -52,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Crear la nomenclatura del archivo
         $nuevoNombreArchivo = "Documento_tesis_" . $primer_apellido . "_" . $primer_nombre . $nombre_pareja . ".zip";
         $uploadDir = "../uploads/documento-tesis/";
         $uploadPath = $uploadDir . $nuevoNombreArchivo;

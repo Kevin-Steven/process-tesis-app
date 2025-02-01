@@ -15,18 +15,19 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id,
-           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-           p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 
-           p.apellidos AS pareja_apellidos, up.nombres as nombres_plagio, up.apellidos as apellidos_plagio,
-           tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis 
-    FROM tema t
-    JOIN usuarios u ON t.usuario_id = u.id
-    JOIN usuarios up ON t.id_revisor_plagio = up.id
-    LEFT JOIN usuarios p ON t.pareja_id = p.id
-    JOIN tutores ON t.tutor_id = tutores.id
-    WHERE t.estado_tema = 'Aprobado' 
-    AND t.estado_registro = 0";
+$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id, t.documento_tesis,
+       u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
+       p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 
+       p.apellidos AS pareja_apellidos, up.nombres as nombres_plagio, up.apellidos as apellidos_plagio,
+       tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis 
+FROM tema t
+LEFT JOIN usuarios u ON t.usuario_id = u.id
+LEFT JOIN usuarios up ON t.id_revisor_plagio = up.id
+LEFT JOIN usuarios p ON t.pareja_id = p.id
+LEFT JOIN tutores ON t.tutor_id = tutores.id
+WHERE t.estado_tema = 'Aprobado' 
+AND t.estado_registro = 0;
+";
 
 $result = $conn->query($sql);
 ?>
@@ -201,6 +202,7 @@ $result = $conn->query($sql);
                 <th>Observaciones Anteproyecto</th>
                 <th>Documento Tesis</th>
                 <th>Observaciones Tesis</th>
+                <th>Tesis Corregida</th>
                 <th>Revisor Plagio</th>
                 <th>Acciones</th>
               </tr>
@@ -228,8 +230,8 @@ $result = $conn->query($sql);
                       <?php endif; ?>
                     </td>
                     <td>
-                      <?php if (!empty($row['tesis'])): ?>
-                        <a href="<?php echo '../uploads/correcciones/' . htmlspecialchars($row['tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php if (!empty($row['documento_tesis'])): ?>
+                        <a href="<?php echo '../uploads/documento-tesis/' . htmlspecialchars($row['documento_tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
                         No disponible
                       <?php endif; ?>
@@ -237,6 +239,13 @@ $result = $conn->query($sql);
                     <td>
                       <?php if (!empty($row['observaciones_tesis'])): ?>
                         <a href="<?php echo '../uploads/observaciones-tesis /' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        No disponible
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <?php if (!empty($row['tesis'])): ?>
+                        <a href="<?php echo '../uploads/correcciones/' . htmlspecialchars($row['tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
                         No disponible
                       <?php endif; ?>

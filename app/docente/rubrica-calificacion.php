@@ -32,40 +32,27 @@ if (!$docente) {
 
 $cedula_docente = $docente['cedula'];
 
-// Consulta para obtener los temas y las observaciones de los jurados
 $sql_temas = "SELECT 
-    t.id, 
-    t.tema, 
-    t.correcciones_tesis, 
-    t.estado_tesis,
-    u.nombres AS postulante_nombres, 
-    u.apellidos AS postulante_apellidos, 
-    p.nombres AS pareja_nombres, 
-    p.apellidos AS pareja_apellidos,
-    tu1.cedula AS cedula_jurado_1, 
-    tu2.cedula AS cedula_jurado_2, 
-    tu3.cedula AS cedula_jurado_3,
-    t.obs_jurado_uno, 
-    t.obs_jurado_dos, 
-    t.obs_jurado_tres,
-    t.id_jurado_uno,
-    t.id_jurado_dos,
-    t.id_jurado_tres
-FROM tema t
-JOIN usuarios u ON t.usuario_id = u.id
-LEFT JOIN usuarios p ON t.pareja_id = p.id
-LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
-LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id
-LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
-WHERE 
-    (tu1.cedula = ? OR tu2.cedula = ? OR tu3.cedula = ?) -- Compara cédula del docente con los 3 jurados
-    AND t.estado_tema = 'Aprobado'  -- Estado del tema aprobado
-    AND t.estado_registro = 0 -- Estado de registro
-ORDER BY t.fecha_subida DESC";
+            t.id, 
+            t.tema, 
+            t.documento_tesis, 
+            t.rubrica_calificacion, 
+            u.nombres AS postulante_nombres, 
+            u.apellidos AS postulante_apellidos, 
+            p.nombres AS pareja_nombres, 
+            p.apellidos AS pareja_apellidos
+        FROM tema t
+        JOIN usuarios u ON t.usuario_id = u.id
+        LEFT JOIN usuarios p ON t.pareja_id = p.id
+        WHERE 
+            t.revisor_tesis_id = ?
+            AND t.estado_tema = 'Aprobado'
+            AND t.estado_registro = 0
+            AND t.documento_tesis IS NOT NULL 
+        ORDER BY t.fecha_subida DESC";
 
-// Preparamos la consulta y vinculamos la cédula del docente actual a los 3 jurados
 $stmt_temas = $conn->prepare($sql_temas);
-$stmt_temas->bind_param("sss", $cedula_docente, $cedula_docente, $cedula_docente);
+$stmt_temas->bind_param("i", $usuario_id);
 $stmt_temas->execute();
 $result_temas = $stmt_temas->get_result();
 
@@ -77,7 +64,7 @@ $result_temas = $stmt_temas->get_result();
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Revisar sustentación</title>
+  <title>Rúbrica de calificación</title>
   <link href="../gestor/estilos-gestor.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -142,7 +129,7 @@ $result_temas = $stmt_temas->get_result();
         <span><i class='bx bx-file'></i> Tesis</span>
         <i class="bx bx-chevron-down"></i>
       </a>
-      <div class="collapse" id="RevisarTesis">
+      <div class="collapse show" id="RevisarTesis">
         <ul class="list-unstyled ps-4">
           <li>
             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-tesis.php">
@@ -166,6 +153,7 @@ $result_temas = $stmt_temas->get_result();
           </li>
         </ul>
       </div>
+      
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Informes</span>
         <i class="bx bx-chevron-down"></i>
@@ -185,83 +173,80 @@ $result_temas = $stmt_temas->get_result();
         </ul>
       </div>
       <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
-      <a class="nav-link active" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
+      <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
     </nav>
   </div>
 
   <!-- Contenido -->
   <div class="content" id="content">
     <div class="container mt-3">
-      <h1 class="text-center mb-4 fw-bold">Revisar Sustentación</h1>
+      <h1 class="text-center mb-4 fw-bold">Rúbrica de Calificación</h1>
 
       <!-- Toast -->
-      <?php if (isset($_GET['status'])): ?>
+      <?php if (isset($_GET['estado'])): ?>
         <div class="toast-container position-fixed bottom-0 end-0 p-3">
           <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-              <?php if ($_GET['status'] === 'success'): ?>
+              <?php if ($_GET['estado'] === 'exito'): ?>
                 <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
                 <strong class="me-auto">Operación Exitosa</strong>
-              <?php elseif ($_GET['status'] === 'too_large'): ?>
-                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                <strong class="me-auto">Archivo Demasiado Grande</strong>
-              <?php elseif ($_GET['status'] === 'invalid_extension'): ?>
-                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                <strong class="me-auto">Extensión de Archivo Inválida</strong>
-              <?php elseif ($_GET['status'] === 'upload_error'): ?>
-                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                <strong class="me-auto">Error al Subir el Archivo</strong>
-              <?php elseif ($_GET['status'] === 'no_file'): ?>
-                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                <strong class="me-auto">No se ha Seleccionado Ningún Archivo</strong>
-              <?php elseif ($_GET['status'] === 'deleted'): ?>
+              <?php elseif ($_GET['estado'] === 'exito_eliminar'): ?>
                 <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
                 <strong class="me-auto">Archivo Eliminado</strong>
-              <?php elseif ($_GET['status'] === 'file_not_found'): ?>
-                <i class='bx bx-error-circle fs-4 me-2 text-warning'></i>
-                <strong class="me-auto">Archivo No Encontrado</strong>
-              <?php elseif ($_GET['status'] === 'error'): ?>
+              <?php elseif ($_GET['estado'] === 'error_conexion'): ?>
                 <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                <strong class="me-auto">Error al Procesar la Solicitud</strong>
-              <?php elseif ($_GET['status'] === 'invalid_action'): ?>
+                <strong class="me-auto">Error de Conexión</strong>
+              <?php elseif ($_GET['estado'] === 'error_archivo'): ?>
+                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                <strong class="me-auto">Archivo no Seleccionado</strong>
+              <?php elseif ($_GET['estado'] === 'error_tamano_archivo'): ?>
+                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                <strong class="me-auto">Archivo Demasiado Grande</strong>
+              <?php elseif ($_GET['estado'] === 'error_tipo_archivo'): ?>
+                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                <strong class="me-auto">Extensión Inválida</strong>
+              <?php elseif ($_GET['estado'] === 'error_subida'): ?>
+                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                <strong class="me-auto">Error al Subir el Archivo</strong>
+              <?php elseif ($_GET['estado'] === 'error_bd'): ?>
+                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                <strong class="me-auto">Error en la Base de Datos</strong>
+              <?php else: ?>
                 <i class='bx bx-error-circle fs-4 me-2 text-warning'></i>
-                <strong class="me-auto">Acción Inválida</strong>
+                <strong class="me-auto">Error Desconocido</strong>
               <?php endif; ?>
               <small>Justo ahora</small>
               <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
               <?php
-              switch ($_GET['status']) {
-                case 'success':
-                  echo "La operación se realizó con éxito.";
+              switch ($_GET['estado']) {
+                case 'exito':
+                  echo "El archivo se subió correctamente.";
                   break;
-                case 'too_large':
-                  echo "El archivo que intentas subir es demasiado grande. Asegúrate de que no exceda los 20 MB.";
-                  break;
-                case 'invalid_extension':
-                  echo "La extensión del archivo no es válida. Solo se permiten archivos .zip, .pdf, .doc, .docx.";
-                  break;
-                case 'upload_error':
-                  echo "Ocurrió un error al subir el archivo. Inténtalo nuevamente.";
-                  break;
-                case 'no_file':
-                  echo "No se ha seleccionado ningún archivo. Por favor, selecciona un archivo antes de proceder.";
-                  break;
-                case 'deleted':
+                case 'exito_eliminar':
                   echo "El archivo ha sido eliminado exitosamente.";
                   break;
-                case 'file_not_found':
-                  echo "El archivo no se encuentra en el servidor.";
+                case 'error_conexion':
+                  echo "No se pudo conectar a la base de datos. Por favor, inténtalo más tarde.";
                   break;
-                case 'error':
-                  echo "Ocurrió un error inesperado. Intenta nuevamente.";
+                case 'error_archivo':
+                  echo "No se seleccionó ningún archivo. Por favor, selecciona un archivo antes de continuar.";
                   break;
-                case 'invalid_action':
-                  echo "La acción solicitada no es válida.";
+                case 'error_tamano_archivo':
+                  echo "El archivo que intentas subir es demasiado grande. Asegúrate de que no exceda los 20 MB.";
+                  break;
+                case 'error_tipo_archivo':
+                  echo "La extensión del archivo no es válida. Solo se permiten archivos .zip, .pdf, .doc, .docx.";
+                  break;
+                case 'error_subida':
+                  echo "Ocurrió un error al mover el archivo. Por favor, inténtalo nuevamente.";
+                  break;
+                case 'error_bd':
+                  echo "Ocurrió un error al actualizar la base de datos. Por favor, contacta al administrador.";
                   break;
                 default:
-                  echo "Ha ocurrido un error desconocido.";
+                  echo "Ha ocurrido un error desconocido. Por favor, intenta nuevamente.";
                   break;
               }
               ?>
@@ -276,100 +261,43 @@ $result_temas = $stmt_temas->get_result();
           <table class="table table-striped">
             <thead class="table-header-fixed">
               <tr>
+                <th>Estudiante 1</th>
+                <th>Estudiante 2</th>
                 <th>Tema</th>
-                <th>Documento Tesis</th>
-                <th>Observaciones</th>
+                <th>Calificación</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
               <?php while ($row = $result_temas->fetch_assoc()): ?>
                 <tr>
+                  <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
+                  <td>
+                    <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
+                      <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
+                    <?php else: ?>
+                      No aplica
+                    <?php endif; ?>
+                  </td>
                   <td><?php echo htmlspecialchars($row['tema']); ?></td>
-
                   <td>
                     <?php
                     // Verifica el contenido de correcciones_tesis
-                    if (!empty($row['correcciones_tesis'])):
+                    if (!empty($row['rubrica_calificacion'])):
                     ?>
-                      <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/correcciones/<?php echo urlencode($row['correcciones_tesis']); ?>" download>
-                        Descargar Tesis
+                      <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/calificaciones-tesis/<?php echo basename($row['rubrica_calificacion']); ?>" download>
+                        Descargar
                       </a>
                     <?php else: ?>
-                      <span class="text-muted">No disponible</span>
+                      <span class="text-muted">No hay documentos</span>
                     <?php endif; ?>
                   </td>
-
-
-                  <td>
-                    <?php
-                    // Cédula del docente actual
-                    $cedula_docente = $docente['cedula'];
-
-                    // Obtener el ID del tema y los jurados del tema actual
-                    $tema_id = $row['id']; // Asegúrate de que $row contenga el ID del tema
-
-                    // Consulta para obtener las cédulas de los tres jurados basados en los IDs de los jurados
-                    $sql_jurados = "SELECT 
-                                    tu1.cedula AS cedula_jurado_1,
-                                    tu2.cedula AS cedula_jurado_2,
-                                    tu3.cedula AS cedula_jurado_3,
-                                    t.obs_jurado_uno,
-                                    t.obs_jurado_dos,
-                                    t.obs_jurado_tres
-                                  FROM tema t
-                                  LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
-                                  LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id
-                                  LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
-                                  WHERE t.id = ?";
-
-                    // Preparamos la consulta y vinculamos el ID del tema
-                    $stmt_jurados = $conn->prepare($sql_jurados);
-                    $stmt_jurados->bind_param("i", $tema_id); // Asumimos que $tema_id es un entero
-                    $stmt_jurados->execute();
-                    $result_jurados = $stmt_jurados->get_result();
-
-                    // Verificamos si obtenemos datos
-                    if ($result_jurados->num_rows > 0) {
-                      $row_jurados = $result_jurados->fetch_assoc();
-
-                      // Extraemos las cédulas de los jurados
-                      $cedula_jurado_1 = $row_jurados['cedula_jurado_1'];
-                      $cedula_jurado_2 = $row_jurados['cedula_jurado_2'];
-                      $cedula_jurado_3 = $row_jurados['cedula_jurado_3'];
-
-                      // Comprobamos qué observación mostrar dependiendo de la cédula del docente
-                      $file_path = "";
-                      if ($cedula_docente == $cedula_jurado_1 && !empty($row_jurados['obs_jurado_uno'])) {
-                        $file_path = "../uploads/observaciones-sustentacion/" . basename($row_jurados['obs_jurado_uno']);
-                      } elseif ($cedula_docente == $cedula_jurado_2 && !empty($row_jurados['obs_jurado_dos'])) {
-                        $file_path = "../uploads/observaciones-sustentacion/" . basename($row_jurados['obs_jurado_dos']);
-                      } elseif ($cedula_docente == $cedula_jurado_3 && !empty($row_jurados['obs_jurado_tres'])) {
-                        $file_path = "../uploads/observaciones-sustentacion/" . basename($row_jurados['obs_jurado_tres']);
-                      }
-
-                      // Si el archivo está especificado y existe, mostrar el enlace de descarga
-                      if ($file_path && file_exists($file_path)):
-                    ?>
-                        <a class="text-decoration-none d-inline-flex align-items-center" href="<?php echo $file_path; ?>" download>
-                          Descargar Observaciones
-                        </a>
-                    <?php
-                      else:
-                        // Si no hay archivo o no existe, mostramos un mensaje
-                        echo '<span class="text-muted">No hay observaciones</span>';
-                      endif;
-                    } else {
-                      echo '<span class="text-muted">Datos de jurados no encontrados</span>';
-                    }
-                    ?>
                   </td>
-
 
                   <td class="text-center">
                     <div class="d-flex justify-content-center gap-2">
                       <!-- Botón Subir Observaciones -->
-                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSubirObservaciones<?php echo $row['id']; ?>">
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSubirCalificaciones<?php echo $row['id']; ?>">
                         <i class='bx bx-upload'></i>
                       </button>
 
@@ -387,24 +315,22 @@ $result_temas = $stmt_temas->get_result();
                 </tr>
 
                 <!-- Modal Subir -->
-                <div class="modal fade" id="modalSubirObservaciones<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalSubirObservacionesLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                <div class="modal fade" id="modalSubirCalificaciones<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalSubirObservacionesLabel<?php echo $row['id']; ?>" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
-                      <form action="subir-observaciones-sust.php" method="POST" enctype="multipart/form-data">
+                      <form action="subir-doc-calificacion.php" method="POST" enctype="multipart/form-data">
                         <div class="modal-header">
                           <input type="hidden" name="tesis_id" value="<?php echo $row['id']; ?>">
-                          <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
                           <input type="hidden" name="accion" value="subir">
 
-                          <h5 class="modal-title" id="modalEditarLabel">Subir Observaciones</h5>
+                          <h5 class="modal-title" id="modalEditarLabel">Subir documento</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          <input type="hidden" name="informe_id" value="<?php echo $informe['id']; ?>">
                           <div class="mb-3">
                             <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
                             <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 20 MB.</small>
+                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 10 MB.</small>
                           </div>
                         </div>
                         <div class="modal-footer">
@@ -419,21 +345,19 @@ $result_temas = $stmt_temas->get_result();
                 <div class="modal fade" id="modalEditar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEditarLabel<?php echo $row['id']; ?>" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
-                      <form action="subir-observaciones-sust.php" method="POST" enctype="multipart/form-data">
+                      <form action="subir-doc-calificacion.php" method="POST" enctype="multipart/form-data">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="modalEditarLabel<?php echo $row['id']; ?>">Editar Observaciones</h5>
+                          <h5 class="modal-title" id="modalEditarLabel<?php echo $row['id']; ?>">Editar documento</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                           <input type="hidden" name="tesis_id" value="<?php echo $row['id']; ?>">
-                          <input type="hidden" name="campo_obs" value="<?php echo $campo_obs; ?>"> <!-- Aseguramos que el campo correspondiente se pase -->
-                          <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
                           <input type="hidden" name="accion" value="editar">
 
                           <div class="mb-3">
                             <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
-                            <input type="file" class="form-control documentoCarpeta" name="observaciones-tesis-sust" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 20 MB.</small>
+                            <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
+                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 10 MB.</small>
                           </div>
                         </div>
                         <div class="modal-footer">
@@ -448,18 +372,16 @@ $result_temas = $stmt_temas->get_result();
                 <div class="modal fade" id="modalEliminar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEliminarLabel<?php echo $row['id']; ?>" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
-                      <form action="subir-observaciones-sust.php" method="POST">
+                      <form action="subir-doc-calificacion.php" method="POST">
                         <div class="modal-header">
                           <h5 class="modal-title" id="modalEliminarLabel<?php echo $row['id']; ?>">Eliminar Observaciones</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                           <input type="hidden" name="tesis_id" value="<?php echo $row['id']; ?>">
-                          <input type="hidden" name="campo_obs" value="<?php echo $campo_obs; ?>">
-                          <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
                           <input type="hidden" name="accion" value="eliminar">
 
-                          <p>¿Está seguro de que desea eliminar las observaciones de este tema?</p>
+                          <p>¿Está seguro de que desea eliminar la calificación de este tema?</p>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -474,7 +396,7 @@ $result_temas = $stmt_temas->get_result();
           </table>
         </div>
       <?php else: ?>
-        <p class="text-center">No hay sustentaciones de tesis asignadas.</p>
+        <p class="text-center">No hay documentos de tesis asignadas.</p>
       <?php endif; ?>
 
     </div>
@@ -490,7 +412,7 @@ $result_temas = $stmt_temas->get_result();
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
-        El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
+        El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
       </div>
     </div>
   </div>
@@ -506,7 +428,6 @@ $result_temas = $stmt_temas->get_result();
   <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js"></script>
   <script src="../js/validadDobleInput.js" defer></script>
-
 </body>
 
 </html>

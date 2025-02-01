@@ -116,6 +116,13 @@ $result_temas_aprobados = $conn->query($sql_temas_aprobados);
     <div class="content" id="content">
         <div class="container mt-2">
             <h1 class="mb-4 text-center fw-bold">Asignar Revisor de Tesis</h1>
+
+            <!-- Campo de búsqueda -->
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class='bx bx-search'></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o tutor">
+            </div>
+
             <?php if (isset($_GET['status'])): ?>
                 <div class="toast-container position-fixed bottom-0 end-0 p-3">
                     <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -151,7 +158,7 @@ $result_temas_aprobados = $conn->query($sql_temas_aprobados);
             <?php endif; ?>
 
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped" id="temas">
                     <thead class="table-header-fixed">
                         <tr>
                             <th>Tema</th>
@@ -206,6 +213,8 @@ $result_temas_aprobados = $conn->query($sql_temas_aprobados);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js" defer></script>
+    <script src="../js/buscarTema.js" defer></script>
+
 </body>
 
 </html>

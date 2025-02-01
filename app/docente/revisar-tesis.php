@@ -124,9 +124,34 @@ if ($docente) {
       <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
       <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
       <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
-      <a class="nav-link active" href="revisar-tesis.php"><i class='bx bx-book-reader'></i> Revisar Tesis</a>
-      <a class="nav-link" href="ver-observaciones.php"><i class='bx bx-file'></i> Ver Observaciones</a>
-      <a class="nav-link" href="revisar-correcciones-tesis.php"><i class='bx bx-file'></i> Ver Correcciones</a>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#RevisarTesis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bx-file'></i> Tesis</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse show" id="RevisarTesis">
+        <ul class="list-unstyled ps-4">
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-tesis.php">
+              <i class="bx bx-book-reader"></i> Revisar Tesis
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones.php">
+              <i class="bx bx-file"></i> Observaciones
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-correcciones-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-correcciones-tesis.php">
+              <i class="bx bx-file"></i> Correcciones
+            </a>
+          </li>
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'rubrica-calificacion.php' ? 'active bg-secondary' : ''; ?>" href="rubrica-calificacion.php">
+              <i class="bx bx-file"></i> Calificación
+            </a>
+          </li>
+        </ul>
+      </div>
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Informes</span>
         <i class="bx bx-chevron-down"></i>
@@ -160,8 +185,8 @@ if ($docente) {
           <table class="table table-striped">
             <thead class="table-header-fixed">
               <tr>
-                <th>Postulante</th>
-                <th>Pareja</th>
+                <th>Estudiante 1</th>
+                <th>Estudiante 2</th>
                 <th>Tema</th>
                 <th class="text-center">Acciones</th>
               </tr>
@@ -194,7 +219,7 @@ if ($docente) {
           </table>
         </div>
       <?php else: ?>
-        <p class="text-center">No hay tesis asignadas para revisión.</p>
+        <p class="text-center">No hay tesis para revisión.</p>
       <?php endif; ?>
     </div>
   </div>
