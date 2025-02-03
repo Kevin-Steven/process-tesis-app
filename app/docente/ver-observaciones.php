@@ -86,7 +86,24 @@ if (!$conn) {
         <nav class="nav flex-column">
             <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
-            <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-file'></i> Anteproyecto</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuAnteproyecto">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="revisar-anteproyecto.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+                            <i class="bx bx-file"></i> Observaciones
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#RevisarTesis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bx-file'></i> Tesis</span>
                 <i class="bx bx-chevron-down"></i>
@@ -95,7 +112,7 @@ if (!$conn) {
                 <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-tesis.php">
-                            <i class="bx bx-book-reader"></i> Revisar Tesis
+                            <i class="bx bx-book-reader"></i> Revisar
                         </a>
                     </li>
                     <li>
@@ -110,7 +127,12 @@ if (!$conn) {
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'rubrica-calificacion.php' ? 'active bg-secondary' : ''; ?>" href="rubrica-calificacion.php">
-                            <i class="bx bx-file"></i> Calificación
+                            <i class="bx bx-file"></i> Rubrica Calificación
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'certificados.php' ? 'active bg-secondary' : ''; ?>" href="certificados.php">
+                            <i class='bx bx-certification'></i> Certificado revisor
                         </a>
                     </li>
                 </ul>
@@ -144,21 +166,11 @@ if (!$conn) {
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
                     <h1 class="mb-3 fw-bold">Revisa las Observaciones Realizadas</h1>
-                    <p class="lead mb-5">Desde este panel, podrás revisar las observaciones que ya has realizado a los anteproyectos y tesis. Además, tendrás la opción de actualizar o corregir cualquier observación en caso de haber cometido un error al enviarla.</p>
+                    <p class="lead mb-5">Desde este panel, podrás revisar las observaciones que ya has realizado a las tesis. Además, tendrás la opción de actualizar o corregir cualquier observación en caso de haber cometido un error al enviarla.</p>
 
 
                     <!-- Cards con acciones rápidas -->
                     <div class="row justify-content-center">
-                        <div class="col-md-6 mb-3">
-                            <div class="card card-principal h-100 shadow">
-                                <div class="card-body text-center">
-                                    <i class='bx bx-book bx-lg mb-3'></i>
-                                    <h5 class="card-title fw-bold mb-3">Ver Observaciones del Anteproyecto</h5>
-                                    <p class="card-text mb-4">Revisa las observaciones realizadas sobre el anteproyecto.</p>
-                                    <a href="obs-realizadas-anteproyecto.php" class="btn">Acceder</a>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-md-6 mb-3">
                             <div class="card card-principal h-100 shadow">
                                 <div class="card-body text-center">

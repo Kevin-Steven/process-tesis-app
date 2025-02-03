@@ -124,7 +124,24 @@ $result_temas = $stmt_temas->get_result();
         <nav class="nav flex-column">
             <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
-            <a class="nav-link" href="revisar-anteproyecto.php"><i class='bx bx-file'></i> Revisar Anteproyecto</a>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-file'></i> Anteproyecto</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuAnteproyecto">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="revisar-anteproyecto.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+                            <i class="bx bx-file"></i> Observaciones
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#RevisarTesis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bx-file'></i> Tesis</span>
                 <i class="bx bx-chevron-down"></i>
@@ -133,7 +150,7 @@ $result_temas = $stmt_temas->get_result();
                 <ul class="list-unstyled ps-4">
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-tesis.php' ? 'active bg-secondary' : ''; ?>" href="revisar-tesis.php">
-                            <i class="bx bx-book-reader"></i> Revisar Tesis
+                            <i class="bx bx-book-reader"></i> Revisar
                         </a>
                     </li>
                     <li>
@@ -148,7 +165,12 @@ $result_temas = $stmt_temas->get_result();
                     </li>
                     <li>
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'rubrica-calificacion.php' ? 'active bg-secondary' : ''; ?>" href="rubrica-calificacion.php">
-                            <i class="bx bx-file"></i> Calificación
+                            <i class="bx bx-file"></i> Rubrica Calificación
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'certificados.php' ? 'active bg-secondary' : ''; ?>" href="certificados.php">
+                            <i class='bx bx-certification'></i> Certificado revisor
                         </a>
                     </li>
                 </ul>

@@ -18,44 +18,6 @@ if (!$conn) {
     die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
-// Verificar que el usuario es un docente
-$sql = "SELECT cedula FROM usuarios WHERE id = ? AND rol = 'docente'";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $usuario_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$docente = $result->fetch_assoc();
-
-if ($docente) {
-    // Consulta para obtener las observaciones asignadas al revisor actual
-    $sql = "SELECT 
-            t.id, 
-            t.tema, 
-            t.anteproyecto, 
-            t.observaciones_anteproyecto, 
-            u.nombres AS postulante_nombres, 
-            u.apellidos AS postulante_apellidos, 
-            p.nombres AS pareja_nombres, 
-            p.apellidos AS pareja_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios p ON t.pareja_id = p.id
-        WHERE 
-            t.revisor_anteproyecto_id = ?
-            AND t.estado_tema = 'Aprobado'
-            AND t.estado_registro = 0
-            AND t.observaciones_anteproyecto IS NOT NULL
-            AND t.observaciones_anteproyecto != ''
-        ORDER BY t.fecha_subida DESC";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $usuario_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-} else {
-    echo "No se encontró el docente.";
-    exit();
-}
 ?>
 
 <!doctype html>
@@ -64,7 +26,7 @@ if ($docente) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tus Observaciones</title>
+    <title>Ver Observaciones</title>
     <link href="../gestor/estilos-gestor.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -72,7 +34,7 @@ if ($docente) {
 </head>
 
 <body>
-    <!-- Topbar con ícono de menú hamburguesa -->
+    <!-- Topbar con ícono de menú hamburguesa (fuera del menú) -->
     <div class="topbar z-1">
         <div class="menu-toggle">
             <i class='bx bx-menu'></i>
@@ -80,7 +42,7 @@ if ($docente) {
         <div class="topbar-right">
             <div class="input-group search-bar">
                 <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
-                <input type="text" id="search" class="form-control" placeholder="Buscar...">
+                <input type="text" id="search" class="form-control" placeholder="Search">
             </div>
             <i class='bx bx-envelope'></i>
             <i class='bx bx-bell'></i>
@@ -136,7 +98,7 @@ if ($docente) {
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link active <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
                             <i class="bx bx-file"></i> Observaciones
                         </a>
                     </li>
@@ -200,95 +162,31 @@ if ($docente) {
 
     <!-- Content -->
     <div class="content" id="content">
-        <div class="container mt-3">
-            <h1 class="text-center mb-4 fw-bold">Revisar Observaciones de Anteproyectos</h1>
-            <?php if (isset($_GET['status'])): ?>
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header">
-                            <i class='bx bx-send fs-4 me-2'></i>
-                            <strong class="me-auto">Estado de Actualización</strong>
-                            <small>Justo ahora</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            <?php
-                            switch ($_GET['status']) {
-                                case 'success':
-                                    echo "Observaciones enviadas con éxito.";
-                                    break;
-                                case 'not_found':
-                                    echo "No se encontraron detalles para el postulante.";
-                                    break;
-                                case 'invalid_extension':
-                                    echo "Tipo de archivo no permitido. Solo se aceptan archivos ZIP, DOC y DOCX.";
-                                    break;
-                                case 'too_large':
-                                    echo "El archivo excede el tamaño máximo permitido de 20MB.";
-                                    break;
-                                case 'db_error':
-                                    echo "Error al actualizar la base de datos.";
-                                    break;
-                                case 'upload_error':
-                                    echo "Hubo un error al subir el archivo.";
-                                    break;
-                                case 'no_file':
-                                    echo "Por favor, selecciona un archivo para subir.";
-                                    break;
-                                case 'form_error':
-                                    echo "No se ha enviado el formulario correctamente.";
-                                    break;
-                                default:
-                                    echo "Ocurrió un error desconocido.";
-                                    break;
-                            }
-                            ?>
+        <div class="container-fluid py-3">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h1 class="mb-3 fw-bold">Revisa las Observaciones Realizadas</h1>
+                    <p class="lead mb-5">Desde este panel, podrás revisar las observaciones que ya has realizado a los anteproyectos. Además, tendrás la opción de actualizar o corregir cualquier observación en caso de haber cometido un error al enviarla.</p>
+
+                    <!-- Cards con acciones rápidas -->
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <div class="card card-principal h-100 shadow">
+                                <div class="card-body text-center">
+                                    <i class='bx bx-book bx-lg mb-3'></i>
+                                    <h5 class="card-title fw-bold mb-3">Ver Observaciones del Anteproyecto</h5>
+                                    <p class="card-text mb-4">Revisa las observaciones realizadas sobre el anteproyecto.</p>
+                                    <a href="obs-realizadas-anteproyecto.php" class="btn">Acceder</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <?php endif; ?>
 
-            <?php if ($result->num_rows > 0): ?>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead class="table-header-fixed">
-                            <tr>
-                                <th>Postulante</th>
-                                <th>Pareja</th>
-                                <th>Tema</th>
-                                <th>Observaciones</th>
-                                <th class="text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                                    <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
-                                    <td><?php echo htmlspecialchars($row['tema']); ?></td>
-                                    <td>
-                                        <?php if (!empty($row['observaciones_anteproyecto'])): ?>
-                                            <a href="../uploads/observaciones/<?php echo $row['observaciones_anteproyecto']; ?>" download class="text-decoration-none">Descargar</a>
-                                        <?php else: ?>
-                                            No disponible
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="detalles-observaciones.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
-                                            <i class='bx bx-search'></i> Ver detalles
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
                 </div>
-            <?php else: ?>
-                <p class="text-center">No hay observaciones realizadas.</p>
-            <?php endif; ?>
-
+            </div>
         </div>
     </div>
+
 
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-light text-center">
@@ -299,6 +197,7 @@ if ($docente) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
+    <script src="../js/toast.js" defer></script>
 </body>
 
 </html>
