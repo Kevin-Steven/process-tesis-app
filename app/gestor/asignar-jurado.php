@@ -187,7 +187,7 @@ $result = $conn->query($sql);
             <!-- Campo de búsqueda -->
             <div class="input-group mb-3">
                 <span class="input-group-text"><i class='bx bx-search'></i></span>
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema, postulante o tutor">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o postulante">
             </div>
 
             <!-- Tabla de temas aprobados -->

@@ -136,7 +136,7 @@ $result_temas = $stmt_temas->get_result();
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-anteproyecto.php">
               <i class="bx bx-file"></i> Observaciones
             </a>
           </li>
@@ -154,7 +154,7 @@ $result_temas = $stmt_temas->get_result();
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-tesis.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-tesis.php">
               <i class="bx bx-file"></i> Observaciones
             </a>
           </li>
@@ -276,10 +276,16 @@ $result_temas = $stmt_temas->get_result();
         </div>
       <?php endif; ?>
 
+      <!-- Campo de búsqueda -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class='bx bx-search'></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o postulante">
+      </div>
+
       <?php if ($result_temas && $result_temas->num_rows > 0): ?>
 
         <div class="table-responsive">
-          <table class="table table-striped">
+          <table class="table table-striped" id="temas">
             <thead class="table-header-fixed">
               <tr>
                 <th>Estudiante 1</th>
@@ -449,6 +455,7 @@ $result_temas = $stmt_temas->get_result();
   <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js"></script>
   <script src="../js/validadDobleInput.js" defer></script>
+  <script src="../js/buscarTema.js" defer></script>
 </body>
 
 </html>

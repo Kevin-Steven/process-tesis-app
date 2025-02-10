@@ -18,18 +18,26 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 $sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id, t.documento_tesis,
        u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
        p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 
+       t.rubrica_calificacion as doc_calificacion, t.certificados as tesis_certificado, t.doc_plagio as cert_plagio, 
        p.apellidos AS pareja_apellidos, up.nombres as nombres_plagio, up.apellidos as apellidos_plagio,
-       tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis 
+       tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis,
+       urt.nombres as nombres_rev_tesis, urt.apellidos as apellidos_rev_tesis, t.nota_revisor_tesis as nota_documento, u1.nombres AS jurado1_nombre, 
+        u2.nombres AS jurado2_nombre, u3.nombres AS jurado3_nombre
 FROM tema t
 LEFT JOIN usuarios u ON t.usuario_id = u.id
 LEFT JOIN usuarios up ON t.id_revisor_plagio = up.id
+LEFT JOIN usuarios urt ON t.revisor_tesis_id = urt.id
 LEFT JOIN usuarios p ON t.pareja_id = p.id
 LEFT JOIN tutores ON t.tutor_id = tutores.id
+LEFT JOIN tutores u1 ON t.id_jurado_uno = u1.id
+LEFT JOIN tutores u2 ON t.id_jurado_dos = u2.id
+LEFT JOIN tutores u3 ON t.id_jurado_tres = u3.id
 WHERE t.estado_tema = 'Aprobado' 
 AND t.estado_registro = 0;
 ";
 
 $result = $conn->query($sql);
+
 ?>
 
 <!doctype html>
@@ -203,7 +211,15 @@ $result = $conn->query($sql);
                 <th>Documento Tesis</th>
                 <th>Observaciones Tesis</th>
                 <th>Tesis Corregida</th>
-                <th>Revisor Plagio</th>
+                <th>Revisor Tesis</th>
+                <th>Certificado AntiPlagio</th>
+                <th>Fiscal Plagio</th>
+                <th>Jurado 1</th>
+                <th>Jurado 2</th>
+                <th>Jurado 3</th>
+                <th>Nota Documento</th>
+                <th>Nota Exposición</th>
+                <th>Nota Final Titulación</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -213,44 +229,107 @@ $result = $conn->query($sql);
                   <tr>
                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                    <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
+                    <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : '<span class="text-muted">No aplica</span>'; ?></td>
                     <td><?php echo mb_strtoupper($row['tutor_nombre']); ?></td>
                     <td>
                       <?php if (!empty($row['anteproyecto'])): ?>
                         <a href="<?php echo '../uploads/' . htmlspecialchars($row['anteproyecto']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
-                        No disponible
+                        <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
                     </td>
                     <td>
                       <?php if (!empty($row['observaciones_anteproyecto'])): ?>
                         <a href="<?php echo '../uploads/observaciones/' . htmlspecialchars($row['observaciones_anteproyecto']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
-                        No disponible
+                        <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
                     </td>
                     <td>
                       <?php if (!empty($row['documento_tesis'])): ?>
                         <a href="<?php echo '../uploads/documento-tesis/' . htmlspecialchars($row['documento_tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
-                        No disponible
+                        <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
                     </td>
                     <td>
                       <?php if (!empty($row['observaciones_tesis'])): ?>
-                        <a href="<?php echo '../uploads/observaciones-tesis /' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                        <a href="<?php echo '../uploads/' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
-                        No disponible
+                        <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
                     </td>
                     <td>
                       <?php if (!empty($row['tesis'])): ?>
                         <a href="<?php echo '../uploads/correcciones/' . htmlspecialchars($row['tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
-                        No disponible
+                        <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
                     </td>
-                    <td><?php echo htmlspecialchars($row['nombres_plagio'] . ' ' . $row['apellidos_plagio']); ?></td>
+                    <td>
+                      <?php
+                      if (!empty($row['nombres_rev_tesis']) && !empty($row['apellidos_rev_tesis'])) {
+                        echo htmlspecialchars($row['nombres_rev_tesis'] . ' ' . $row['apellidos_rev_tesis']);
+                      } else {
+                        echo '<span class="text-muted">No asignado</span>';
+                      }
+                      ?>
+                    </td>
+
+                    <td>
+                      <?php if (!empty($row['cert_plagio'])): ?>
+                        <a href="<?php echo htmlspecialchars($row['cert_plagio']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        <span class="text-muted">No hay documentos</span>
+                      <?php endif; ?>
+                    </td>
+                    <td> <!--Revisor de plagio-->
+                      <?php
+                      if (!empty($row['nombres_plagio']) && !empty($row['apellidos_plagio'])) {
+                        echo htmlspecialchars($row['nombres_plagio'] . ' ' . $row['apellidos_plagio']);
+                      } else {
+                        echo '<span class="text-muted">No asignado</span>';
+                      }
+                      ?>
+                    </td>
+                    <td>
+                      <?php
+                      if (!empty($row['jurado1_nombre'])) {
+                        echo mb_strtoupper($row['jurado1_nombre']);
+                      } else {
+                        echo '<span class="text-muted">No asignado</span>';
+                      }
+                      ?>
+                    </td>
+                    <td>
+                      <?php
+                      if (!empty($row['jurado2_nombre'])) {
+                        echo mb_strtoupper($row['jurado2_nombre']);
+                      } else {
+                        echo '<span class="text-muted">No asignado</span>';
+                      }
+                      ?>
+                    </td>
+                    <td>
+                      <?php
+                      if (!empty($row['jurado3_nombre'])) {
+                        echo mb_strtoupper($row['jurado3_nombre']);
+                      } else {
+                        echo '<span class="text-muted">No asignado</span>';
+                      }
+                      ?>
+                    </td>
+                    <td>
+                      <?php
+                      if (!empty($row['nota_documento'])) {
+                        echo htmlspecialchars($row['nota_documento']);
+                      } else {
+                        echo '<span class="text-muted">Sin nota</span>';
+                      }
+                      ?>
+                    </td>
+                    <td>En proceso</td>
+                    <td>En proceso</td>
                     <td class="text-center">
                       <a href="editar-tutor-ap.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
                         <i class='bx bx-search'></i> Ver detalles
@@ -260,12 +339,12 @@ $result = $conn->query($sql);
                 <?php endwhile; ?>
               <?php else: ?>
                 <tr>
-                  <td colspan="8" class="text-center">No se encontraron temas aprobados.</td>
+                  <td colspan="19" class="text-center">No se encontraron temas aprobados.</td>
                 </tr>
               <?php endif; ?>
               <!-- Fila para "No se encontraron resultados" -->
               <tr id="noResultsRow" style="display: none;">
-                <td colspan="8" class="text-center">No se encontraron resultados.</td>
+                <td colspan="19" class="text-center">No se encontraron resultados.</td>
               </tr>
             </tbody>
           </table>

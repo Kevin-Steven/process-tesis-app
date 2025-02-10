@@ -115,7 +115,7 @@ $result_informes = $stmt_informes->get_result();
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-anteproyecto.php">
                             <i class="bx bx-file"></i> Observaciones
                         </a>
                     </li>
@@ -133,7 +133,7 @@ $result_informes = $stmt_informes->get_result();
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-tesis.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-tesis.php">
                             <i class="bx bx-file"></i> Observaciones
                         </a>
                     </li>

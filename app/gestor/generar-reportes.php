@@ -155,6 +155,22 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                         </div>
                     </div>
                 </div>
+
+                <!-- Tarjeta para generar PDF de notas -->
+                <div class="col-md-5 mb-4">
+                    <div class="card temas-aprobados ">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Notas de Documentos de Tesis</h5>
+                            <p class="card-text">Genera un reporte en PDF con las notas de los documentos de tesis de los temas aprobados.</p>
+                            <form action="generar-pdf-notas-doc-tesis.php" class="generar-reporte" method="post" target="_blank">
+                                <button type="submit" class="btn" id="color-verde">
+                                    <i class="bx bxs-file-pdf"></i> Generar PDF
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

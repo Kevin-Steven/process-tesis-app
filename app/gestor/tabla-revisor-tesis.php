@@ -166,10 +166,10 @@ $result_temas_aprobados = $conn->query($sql_temas_aprobados);
                     <thead class="table-header-fixed">
                         <tr>
                             <th>Tema</th>
-                            <th>Tutor</th>
-                            <th>Revisor</th>
                             <th>Estudiante 1</th>
                             <th>Estudiante 2</th>
+                            <th>Tutor</th>
+                            <th>Revisor</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -185,10 +185,10 @@ $result_temas_aprobados = $conn->query($sql_temas_aprobados);
 
                                 echo "<tr>
                     <td>" . htmlspecialchars($tema['tema']) . "</td>
-                    <td>{$tutor_nombre}</td>
-                    <td>{$revisor}</td>
                     <td>{$postulante}</td>
                     <td>{$pareja}</td>
+                    <td>{$tutor_nombre}</td>
+                    <td>{$revisor}</td>
                     <td class='text-center'>
                         <a href='detalle-revisor-tesis.php?id={$tema['id']}' class='text-decoration-none d-flex align-items-center justify-content-center'>
                             <i class='bx bx-search'></i> Ver detalles

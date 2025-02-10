@@ -134,7 +134,7 @@ if ($docente) {
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-anteproyecto.php">
                             <i class="bx bx-file"></i> Observaciones
                         </a>
                     </li>
@@ -152,7 +152,7 @@ if ($docente) {
                         </a>
                     </li>
                     <li>
-                        <a class="nav-link active<?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones.php">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-tesis.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-tesis.php">
                             <i class="bx bx-file"></i> Observaciones
                         </a>
                     </li>
@@ -246,14 +246,20 @@ if ($docente) {
                 </div>
             <?php endif; ?>
 
+            <!-- Campo de búsqueda -->
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class='bx bx-search'></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o postulante">
+            </div>
+
             <?php if ($result && $result->num_rows > 0): ?>
                 <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="temas">
                         <thead class="table-header-fixed">
                             <tr>
-                                <th>Postulante</th>
-                                <th>Pareja</th>
                                 <th>Tema</th>
+                                <th>Estudiante 1</th>
+                                <th>Estudiante 2</th>
                                 <th>Observaciones</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
@@ -261,9 +267,9 @@ if ($docente) {
                         <tbody>
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
+                                    <td><?php echo htmlspecialchars($row['tema']); ?></td>
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                                     <td><?php echo (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
-                                    <td><?php echo htmlspecialchars($row['tema']); ?></td>
                                     <td>
                                         <?php if (!empty($row['observaciones_tesis'])): ?>
                                             <a href="../uploads/observaciones-tesis/<?php echo $row['observaciones_tesis']; ?>" download class="text-decoration-none">Descargar</a>
@@ -297,6 +303,8 @@ if ($docente) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sidebar.js"></script>
+  <script src="../js/buscarTema.js" defer></script>
+
 </body>
 
 </html>

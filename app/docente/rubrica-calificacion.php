@@ -37,6 +37,7 @@ $sql_temas = "SELECT
             t.tema, 
             t.documento_tesis, 
             t.rubrica_calificacion, 
+            t.nota_revisor_tesis AS nota,
             u.nombres AS postulante_nombres, 
             u.apellidos AS postulante_apellidos, 
             p.nombres AS pareja_nombres, 
@@ -136,7 +137,7 @@ $result_temas = $stmt_temas->get_result();
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones-anteproyecto.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-anteproyecto.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-anteproyecto.php">
               <i class="bx bx-file"></i> Observaciones
             </a>
           </li>
@@ -154,7 +155,7 @@ $result_temas = $stmt_temas->get_result();
             </a>
           </li>
           <li>
-            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'ver-observaciones.php' ? 'active bg-secondary' : ''; ?>" href="ver-observaciones.php">
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'obs-realizadas-tesis.php' ? 'active bg-secondary' : ''; ?>" href="obs-realizadas-tesis.php">
               <i class="bx bx-file"></i> Observaciones
             </a>
           </li>
@@ -277,22 +278,30 @@ $result_temas = $stmt_temas->get_result();
         </div>
       <?php endif; ?>
 
+      <!-- Campo de búsqueda -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class='bx bx-search'></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o postulante">
+      </div>
+
       <?php if ($result_temas && $result_temas->num_rows > 0): ?>
 
         <div class="table-responsive">
-          <table class="table table-striped">
+          <table class="table table-striped" id="temas">
             <thead class="table-header-fixed">
               <tr>
+                <th>Tema</th>
                 <th>Estudiante 1</th>
                 <th>Estudiante 2</th>
-                <th>Tema</th>
                 <th>Calificación</th>
+                <th>Nota revisor</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
               <?php while ($row = $result_temas->fetch_assoc()): ?>
                 <tr>
+                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                   <td>
                     <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
@@ -301,7 +310,6 @@ $result_temas = $stmt_temas->get_result();
                       No aplica
                     <?php endif; ?>
                   </td>
-                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td>
                     <?php
                     // Verifica el contenido de correcciones_tesis
@@ -312,6 +320,16 @@ $result_temas = $stmt_temas->get_result();
                       </a>
                     <?php else: ?>
                       <span class="text-muted">No hay documentos</span>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <?php
+                    // Verifica el contenido de correcciones_tesis
+                    if (!empty($row['nota'])):
+                    ?>
+                      <?php echo htmlspecialchars($row['nota']); ?>
+                    <?php else: ?>
+                      <span class="text-muted">Sin nota</span>
                     <?php endif; ?>
                   </td>
                   </td>
@@ -352,7 +370,11 @@ $result_temas = $stmt_temas->get_result();
                           <div class="mb-3">
                             <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
                             <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 10 MB.</small>
+                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 5 MB.</small>
+                          </div>
+                          <div class="mb-3">
+                            <label for="archivoEditar" class="form-label">Subir Nota</label>
+                            <input type="number" class="form-control" name="nota-tesis" id="nota-tesis-<?php echo $row['id']; ?>" required min="0" max="10" step="0.01" placeholder="Ingrese la nota del documento">
                           </div>
                         </div>
                         <div class="modal-footer">
@@ -378,8 +400,12 @@ $result_temas = $stmt_temas->get_result();
 
                           <div class="mb-3">
                             <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
-                            <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 10 MB.</small>
+                            <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" onchange="validarTamanoArchivo()">
+                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 5 MB.</small>
+                          </div>
+                          <div class="mb-3">
+                            <label for="archivoEditar" class="form-label">Subir nueva Nota</label>
+                            <input type="number" class="form-control" name="nota-tesis" id="nota-tesis-<?php echo $row['id']; ?>" value="<?php echo htmlspecialchars($row['nota']); ?>" min="0" max="10" step="0.01" placeholder="Ingrese la nueva nota del documento">
                           </div>
                         </div>
                         <div class="modal-footer">
@@ -390,6 +416,7 @@ $result_temas = $stmt_temas->get_result();
                     </div>
                   </div>
                 </div>
+
                 <!-- Modal Eliminar -->
                 <div class="modal fade" id="modalEliminar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEliminarLabel<?php echo $row['id']; ?>" aria-hidden="true">
                   <div class="modal-dialog">
@@ -434,7 +461,7 @@ $result_temas = $stmt_temas->get_result();
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
-        El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
+        El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
       </div>
     </div>
   </div>
@@ -450,6 +477,8 @@ $result_temas = $stmt_temas->get_result();
   <script src="../js/sidebar.js"></script>
   <script src="../js/toast.js"></script>
   <script src="../js/validadDobleInput.js" defer></script>
+  <script src="../js/buscarTema.js" defer></script>
+
 </body>
 
 </html>
