@@ -168,6 +168,32 @@ $result_temas = $stmt_temas->get_result();
           </li>
         </ul>
       </div>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bx-certification'></i> Plagio</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse" id="submenuPlagio">
+        <ul class="list-unstyled ps-4">
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-plagio.php' ? 'active bg-secondary' : ''; ?>" href="revisar-plagio.php">
+              <i class="bx bx-file"></i> Revisar
+            </a>
+          </li>
+        </ul>
+      </div>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuSustentacion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bx-book-open'></i> Sustentación</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse" id="submenuSustentacion">
+        <ul class="list-unstyled ps-4">
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-sustentacion.php' ? 'active bg-secondary' : ''; ?>" href="revisar-sustentacion.php">
+              <i class="bx bx-file"></i> Revisar
+            </a>
+          </li>
+        </ul>
+      </div>
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Informes</span>
         <i class="bx bx-chevron-down"></i>
@@ -186,8 +212,6 @@ $result_temas = $stmt_temas->get_result();
           </li>
         </ul>
       </div>
-      <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
-      <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
     </nav>
   </div>
 
@@ -196,29 +220,35 @@ $result_temas = $stmt_temas->get_result();
     <div class="container mt-3">
       <h1 class="text-center mb-4 fw-bold">Revisar Anteproyectos Asignados</h1>
 
+      <!-- Campo de búsqueda -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class='bx bx-search'></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o postulante">
+      </div>
+
       <?php if ($result_temas && $result_temas->num_rows > 0): ?>
         <div class="table-responsive">
-          <table class="table table-striped">
+          <table class="table table-striped" id="temas">
             <thead class="table-header-fixed">
               <tr>
-                <th>Postulante</th>
-                <th>Pareja</th>
                 <th>Tema</th>
+                <th>Estudiante 1</th>
+                <th>Estudiante 2</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
               <?php while ($row = $result_temas->fetch_assoc()): ?>
                 <tr>
+                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                   <td>
                     <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
                       <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
                     <?php else: ?>
-                      No aplica
+                      <span class="text-muted">No aplica</span>
                     <?php endif; ?>
                   </td>
-                  <td><?php echo htmlspecialchars($row['tema']); ?></td>
                   <td class="text-center">
                     <?php if (!empty($row['anteproyecto'])): ?>
                       <a href="detalles-anteproyecto.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
@@ -248,6 +278,7 @@ $result_temas = $stmt_temas->get_result();
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/sidebar.js"></script>
+  <script src="../js/buscarTema.js" defer></script>
 </body>
 
 </html>

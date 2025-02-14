@@ -125,7 +125,7 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
       <?php endif; ?>
       <?php if ($estado_tesis === 'Aprobado'): ?>
-        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
         <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>
     </nav>
@@ -172,7 +172,7 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
                   echo "Hubo un error en el envío del formulario.";
                   break;
                 case 'file_error':
-                  echo "El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.";
+                  echo "El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.";
                   break;
                 case 'deleted':
                   echo "La inscripción ha sido eliminada correctamente.";
@@ -197,7 +197,7 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
           <div class="toast-body">
-            El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
+            El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
           </div>
         </div>
       </div>
@@ -249,7 +249,7 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
               <div class="row">
                 <!-- Cargar carpeta ZIP/RAR -->
                 <div class="col-md-12 mb-12 text-center">
-                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP MÁXIMO 20 MB)</label>
+                  <label for="documentoCarpeta" class="form-label">Subir Carpeta de Documentos (ZIP MÁXIMO 5 MB)</label>
                   <input type="file" class="form-control" id="documentoCarpeta" name="documentoCarpeta" accept=".zip" required onchange="validarTamanoArchivo()">
                 </div>
               </div>

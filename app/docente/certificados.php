@@ -175,6 +175,32 @@ $result_temas = $stmt_temas->get_result();
           </li>
         </ul>
       </div>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bx-certification'></i> Plagio</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse" id="submenuPlagio">
+        <ul class="list-unstyled ps-4">
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-plagio.php' ? 'active bg-secondary' : ''; ?>" href="revisar-plagio.php">
+              <i class="bx bx-file"></i> Revisar
+            </a>
+          </li>
+        </ul>
+      </div>
+      <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuSustentacion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+        <span><i class='bx bx-book-open'></i> Sustentación</span>
+        <i class="bx bx-chevron-down"></i>
+      </a>
+      <div class="collapse" id="submenuSustentacion">
+        <ul class="list-unstyled ps-4">
+          <li>
+            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-sustentacion.php' ? 'active bg-secondary' : ''; ?>" href="revisar-sustentacion.php">
+              <i class="bx bx-file"></i> Revisar
+            </a>
+          </li>
+        </ul>
+      </div>
       <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
         <span><i class='bx bx-file'></i> Informes</span>
         <i class="bx bx-chevron-down"></i>
@@ -193,8 +219,6 @@ $result_temas = $stmt_temas->get_result();
           </li>
         </ul>
       </div>
-      <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
-      <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
     </nav>
   </div>
 
@@ -255,7 +279,7 @@ $result_temas = $stmt_temas->get_result();
                   echo "No se seleccionó ningún archivo. Por favor, selecciona un archivo antes de continuar.";
                   break;
                 case 'error_tamano_archivo':
-                  echo "El archivo que intentas subir es demasiado grande. Asegúrate de que no exceda los 20 MB.";
+                  echo "El archivo que intentas subir es demasiado grande. Asegúrate de que no exceda los 5 MB.";
                   break;
                 case 'error_tipo_archivo':
                   echo "La extensión del archivo no es válida. Solo se permiten archivos .zip, .pdf, .doc, .docx.";
@@ -439,7 +463,7 @@ $result_temas = $stmt_temas->get_result();
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
-        El archivo supera el límite de 10 MB. Por favor, sube un archivo más pequeño.
+        El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
       </div>
     </div>
   </div>

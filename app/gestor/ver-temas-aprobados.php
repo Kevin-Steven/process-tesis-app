@@ -220,7 +220,7 @@ $result = $conn->query($sql);
                 <th>Nota Documento</th>
                 <th>Nota Exposición</th>
                 <th>Nota Final Titulación</th>
-                <th>Acciones</th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -254,7 +254,7 @@ $result = $conn->query($sql);
                     </td>
                     <td>
                       <?php if (!empty($row['observaciones_tesis'])): ?>
-                        <a href="<?php echo '../uploads/' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                        <a href="<?php echo '../uploads/observaciones-tesis/' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
                         <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
@@ -330,11 +330,73 @@ $result = $conn->query($sql);
                     </td>
                     <td>En proceso</td>
                     <td>En proceso</td>
+
                     <td class="text-center">
-                      <a href="editar-tutor-ap.php?id=<?php echo $row['id']; ?>" class="text-decoration-none d-flex align-items-center justify-content-center">
-                        <i class='bx bx-search'></i> Ver detalles
-                      </a>
+                      <div class="d-flex justify-content-center gap-2">
+                        <!-- Botón Ver detalles -->
+                        <button type="button" class="btn btn-primary" onclick="window.location.href='editar-tutor-ap.php?id=<?php echo $row['id']; ?>'">
+                          <i class='bx bx-search-alt-2'></i>
+                        </button>
+
+                        <!-- Botón Imprimir -->
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalImprimir<?php echo $row['id']; ?>">
+                          <i class='bx bx-printer'></i>
+                        </button>
+
+                        <!-- Botón para ajustar el tema -->
+                        <button type="button" class="btn btn-warning" onclick="window.location.href='editar-tema.php?id=<?php echo $row['id']; ?>'">
+                          <i class='bx bx-edit-alt'></i>
+                        </button>
+
+                        <!-- Botón para generar word -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalWord<?php echo $row['id']; ?>">
+                          <i class='bx bx-file'></i>
+                        </button>
+                      </div>
                     </td>
+
+                    <div class="modal fade" id="modalImprimir<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalImprimirLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <form action="generar-acta-titulacion.php" method="GET" target="_blank">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="modalImprimirLabel<?php echo $row['id']; ?>">Desea imprimir la acta?</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <p>Se generará un documento en formato PDF con la información del acta de titulación.</p>
+                              <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="submit" class="btn btn-primary">Imprimir</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="modalWord<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalWordLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <form action="generar-acta-titulacion-word.php" method="GET" target="_blank">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="modalImprimirLabel<?php echo $row['id']; ?>">Desea generar la acta?</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <p>Se generará un documento en formato Word con la información del acta de titulación.</p>
+                              <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="submit" class="btn btn-primary">Generar</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
                   </tr>
                 <?php endwhile; ?>
               <?php else: ?>
@@ -353,6 +415,8 @@ $result = $conn->query($sql);
       </div>
     </div>
   </div>
+
+
 
   <!-- Footer -->
   <footer class="footer mt-auto py-3 bg-light text-center">

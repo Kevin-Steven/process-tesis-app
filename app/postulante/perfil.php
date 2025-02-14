@@ -10,7 +10,7 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 
 // Obtener los datos del usuario y la inscripción
-$sql = "SELECT u.nombres, u.apellidos, u.email, u.cedula, u.telefono, u.whatsapp, u.carrera, u.fecha_subida, 
+$sql = "SELECT u.nombres,u.orcid , u.apellidos, u.email, u.cedula, u.telefono, u.whatsapp, u.carrera, u.fecha_subida, 
                 d.estado_inscripcion, d.fecha_subida AS fecha_envio_formulario, u.foto_perfil, d.estado_registro
           FROM usuarios u 
           LEFT JOIN documentos_postulante d ON u.id = d.usuario_id 
@@ -164,7 +164,7 @@ $conn->close();
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
       <?php endif; ?>
       <?php if ($estado_tesis === 'Aprobado'): ?>
-        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
         <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>
     </nav>
@@ -198,7 +198,9 @@ $conn->close();
                         <?php if ($_GET['status'] == 'success'): ?>
                           Perfil actualizado correctamente.
                         <?php elseif ($_GET['status'] == 'invalid_phone'): ?>
-                          El número de teléfono o WhatsApp debe tener 10 dígitos.
+                          El número de teléfono, WhatsApp o cédula debe tener 10 dígitos.
+                        <?php elseif ($_GET['status'] == 'duplicated'): ?>
+                          El correo o cédula ya están en uso.
                         <?php elseif ($_GET['status'] == 'no_changes'): ?>
                           No se realizaron cambios.
                         <?php else: ?>
@@ -244,8 +246,12 @@ $conn->close();
                     <input type="text" name="whatsapp" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['whatsapp']; ?>" required>
                   </li>
                   <li class="list-group-item">
+                    <strong>ORCID:</strong>
+                    <input type="text" name="orcid" class="form-control" value="<?php echo $usuario['orcid']; ?>" required>
+                  </li>
+                  <li class="list-group-item">
                     <strong>Cédula:</strong>
-                    <input type="text" name="cedula" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['cedula']; ?>" readonly>
+                    <input type="text" name="cedula" class="form-control" maxlength="10" oninput="validateInput(this)" value="<?php echo $usuario['cedula']; ?>" required>
                   </li>
                 </ul>
                 <div class="text-center mt-3">

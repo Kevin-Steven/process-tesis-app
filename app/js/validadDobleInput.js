@@ -1,10 +1,10 @@
 function validarTamanoArchivo(input) {
     const archivo = input.files[0];
-    const tamanoMaximo = 10 * 1024 * 1024; // 10 MB en bytes
+    const tamanoMaximo = 5 * 1024 * 1024; // 5 MB en bytes
 
     if (archivo && archivo.size > tamanoMaximo) {
         // Limpiar el campo del archivo
-        input.value = ''; 
+        // input.value = ''; 
 
         // Actualizar el parámetro en la URL para mostrar el toast
         const url = new URL(window.location);

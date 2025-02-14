@@ -116,7 +116,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
                         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                     <div class="toast-body">
-                        El archivo supera el límite de 2 MB. Por favor, sube un archivo más pequeño.
+                        El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
                     </div>
                 </div>
             </div>

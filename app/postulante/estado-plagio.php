@@ -15,13 +15,30 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 $usuario_id = $_SESSION['usuario_id'];
 
 // Consulta para verificar el estado de la tesis
-$sql_estado_tesis = "SELECT estado_tesis FROM tema WHERE usuario_id = ? LIMIT 1";
+$sql_estado_tesis = "SELECT estado_tesis, enlace_plagio, motivo_rechazo_enlace, estado_enlace FROM tema WHERE usuario_id = ? LIMIT 1";
 $stmt_estado_tesis = $conn->prepare($sql_estado_tesis);
 $stmt_estado_tesis->bind_param("i", $usuario_id);
 $stmt_estado_tesis->execute();
 $result_estado_tesis = $stmt_estado_tesis->get_result();
-$estado_tesis = $result_estado_tesis->fetch_assoc()['estado_tesis'] ?? null;
+
+// Obtener ambos valores (estado_tesis y enlace_plagio)
+$estado_tesis_data = $result_estado_tesis->fetch_assoc();
+
+// Verificar si se obtuvieron datos
+if ($estado_tesis_data) {
+    $estado_tesis = $estado_tesis_data['estado_tesis'] ?? null;
+    $enlace_plagio = $estado_tesis_data['enlace_plagio'] ?? null;
+    $motivo_rechazo_enlace = $estado_tesis_data['motivo_rechazo_enlace'] ?? null;
+    $estado_enlace = $estado_tesis_data['estado_enlace'] ?? null;
+} else {
+    $estado_tesis = null;
+    $enlace_plagio = null;
+    $motivo_rechazo_enlace = null;
+    $estado_enlace = null;
+}
+
 $stmt_estado_tesis->close();
+
 
 // Consulta para obtener los datos del revisor (nombre y foto)
 $sql_revisor = "SELECT u.nombres, u.apellidos, t.doc_plagio FROM usuarios u
@@ -94,7 +111,7 @@ $stmt_revisor->close();
             <a class="nav-link" href="enviar-tema.php"><i class='bx bx-file'></i> Enviar Tema</a>
             <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
             <?php if ($estado_tesis === 'Aprobado'): ?>
-                <a class="nav-link active" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+                <a class="nav-link active" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
                 <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
             <?php endif; ?>
         </nav>
@@ -111,7 +128,10 @@ $stmt_revisor->close();
                     <thead class="table-light text-center">
                         <tr>
                             <th>Revisor de Plagio</th>
-                            <th>Documentos</th>
+                            <th>Enviar Link Plagio</th>
+                            <th>Motivo de Rechazo</th>
+                            <th>Certificado del fiscal de plagio</th>
+                            <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,6 +144,25 @@ $stmt_revisor->close();
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">
+                                <?php if (!empty($revisor)): ?>
+                                    <a data-bs-toggle="modal" data-bs-target="#modalEnviarEnlace" class="btn btn-link text-decoration-none">
+                                        Subir
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">No disponible</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
+                                <?php if ($estado_enlace === 'Rechazado' && !empty($motivo_rechazo_enlace)): ?>
+                                    <!-- Enlace para abrir la modal -->
+                                    <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalMotivoRechazo">
+                                        Detalles Rechazo
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">No disponible</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
                                 <?php if (!empty($revisor['doc_plagio'])): ?>
                                     <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/documento-plagio/<?php echo basename($revisor['doc_plagio']); ?>" download>
                                         Descargar
@@ -132,7 +171,76 @@ $stmt_revisor->close();
                                     <span class="text-muted">No hay documentos</span>
                                 <?php endif; ?>
                             </td>
+
+                            <!-- Columna: Estado -->
+                            <td class="text-center">
+                                <?php if ($estado_enlace === 'Pendiente'): ?>
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                <?php elseif ($estado_enlace === 'Aprobado'): ?>
+                                    <span class="badge bg-success">Aprobado</span>
+                                <?php elseif ($estado_enlace === 'Rechazado' || $estado_enlace === 'Correcciones Rechazadas'): ?>
+                                    <span class="badge bg-danger">Rechazado</span>
+                                <?php else: ?>
+                                    <span class="badge bg-secondary">Desconocido</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
+
+                        <div class="modal fade" id="modalEnviarEnlace" tabindex="-1" aria-labelledby="modalConfirmarEliminarSolicitudLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalConfirmarEliminarSolicitudLabel">Enviar enlace</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="formLinkPlagio" action="procesar-link-plagio.php" method="POST">
+
+
+                                            <input type="hidden" name="postulante" value="<?php echo $usuario_id; ?>">
+
+                                            <div class="mb-3">
+                                                <label for="enviar-enlace" class="form-label fw-bold">Enviar enlace del informe de plagio</label>
+                                                <input type="text" id="enviar-enlace" class="form-control" name="link-plagio" required placeholder="Introduce el enlace del informe de plagio">
+                                            </div>
+
+                                            <label>
+                                                <?php
+                                                if (!empty($enlace_plagio)) {
+                                                    echo "Enlace del informe de plagio: <a href='" . $enlace_plagio . "' target='_blank'>" . $enlace_plagio . "</a>";
+                                                } else {
+                                                    echo "No se ha enviado un enlace de plagio.";
+                                                }
+                                                ?>
+                                            </label>
+
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" form="formLinkPlagio" name="enviar_enlace" class="btn btn-primary">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal para mostrar el motivo del rechazo -->
+                        <div class="modal fade" id="modalMotivoRechazo" tabindex="-1" aria-labelledby="modalMotivoRechazoLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalMotivoRechazoLabel">Motivo de Rechazo</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <?php echo nl2br(htmlspecialchars($motivo_rechazo_enlace)); ?>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </tbody>
 
                 </table>

@@ -1,7 +1,7 @@
 function validarTamanoArchivo() {
     const archivoInput = document.getElementById('documentoCarpeta');
     const archivo = archivoInput.files[0];
-    const tamanoMaximo = 20 * 1024 * 1024; // 20 MB en bytes
+    const tamanoMaximo = 5 * 1024 * 1024; // 5 MB en bytes
 
     if (archivo && archivo.size > tamanoMaximo) {
         //archivoInput.value = ''; // Limpiar el campo de archivo

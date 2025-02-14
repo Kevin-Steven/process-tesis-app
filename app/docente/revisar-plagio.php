@@ -37,6 +37,10 @@ $sql_temas = "SELECT
             t.tema, 
             t.anteproyecto, 
             t.correcciones_tesis,
+            t.estado_enlace,
+            t.estado_tesis,
+            t.enlace_plagio,
+            tu.nombres AS tutor_nombre,
             t.doc_plagio AS observaciones,
             u.nombres AS postulante_nombres, 
             u.apellidos AS postulante_apellidos, 
@@ -45,6 +49,7 @@ $sql_temas = "SELECT
         FROM tema t
         JOIN usuarios u ON t.usuario_id = u.id
         LEFT JOIN usuarios p ON t.pareja_id = p.id
+        LEFT JOIN tutores tu ON t.tutor_id = tu.id
         WHERE 
             t.id_revisor_plagio = ?
             AND t.estado_tema = 'Aprobado'
@@ -175,6 +180,34 @@ $result_temas = $stmt_temas->get_result();
                     </li>
                 </ul>
             </div>
+
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-certification'></i> Plagio</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse show" id="submenuPlagio">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-plagio.php' ? 'active bg-secondary' : ''; ?>" href="revisar-plagio.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuSustentacion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-book-open'></i> Sustentación</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuSustentacion">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-sustentacion.php' ? 'active bg-secondary' : ''; ?>" href="revisar-sustentacion.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bx-file'></i> Informes</span>
                 <i class="bx bx-chevron-down"></i>
@@ -193,8 +226,6 @@ $result_temas = $stmt_temas->get_result();
                     </li>
                 </ul>
             </div>
-            <a class="nav-link active" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
-            <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
         </nav>
     </div>
 
@@ -255,7 +286,7 @@ $result_temas = $stmt_temas->get_result();
                                     echo "No se seleccionó ningún archivo. Por favor, selecciona un archivo antes de continuar.";
                                     break;
                                 case 'error_tamano_archivo':
-                                    echo "El archivo que intentas subir es demasiado grande. Asegúrate de que no exceda los 20 MB.";
+                                    echo "El archivo que intentas subir es demasiado grande. Asegúrate de que no exceda los 5 MB.";
                                     break;
                                 case 'error_tipo_archivo':
                                     echo "La extensión del archivo no es válida. Solo se permiten archivos .zip, .pdf, .doc, .docx.";
@@ -276,15 +307,26 @@ $result_temas = $stmt_temas->get_result();
                 </div>
             <?php endif; ?>
 
+            <!-- Campo de búsqueda -->
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class='bx bx-search'></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o postulante">
+            </div>
+
             <?php if ($result_temas && $result_temas->num_rows > 0): ?>
 
                 <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="temas">
                         <thead class="table-header-fixed">
                             <tr>
                                 <th>Tema</th>
+                                <th>Estudiante 1</th>
+                                <th>Estudiante 2</th>
+                                <th>Tutor</th>
                                 <th>Documento Tesis</th>
-                                <th>Documento Plagio</th>
+                                <th>Link informe de plagio</th>
+                                <th>Certificado Fiscal de Plagio</th>
+                                <th>Estado</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -293,13 +335,46 @@ $result_temas = $stmt_temas->get_result();
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
 
+                                    <td><?php echo $row['postulante_nombres'] . ' ' . $row['postulante_apellidos']; ?></td>
                                     <td>
                                         <?php
-                                        // Verifica el contenido de correcciones_tesis
-                                        if (!empty($row['correcciones_tesis'])):
+                                        if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) {
+                                            echo $row['pareja_nombres'] . ' ' . $row['pareja_apellidos'];
+                                        } else {
+                                            echo '<span class="text-muted">No aplica</span>';
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        $tutor_nombre = !empty($tema['tutor_nombre']) ? mb_strtoupper($tema['tutor_nombre'], 'UTF-8') : '<span class="text-muted">Tutor no asignado</span>';
+                                        ?>
+                                        <?php
+                                        if (!empty($row['tutor_nombre'])) {
+                                            echo mb_strtoupper($row['tutor_nombre']);
+                                        } else {
+                                            echo '<span class="text-muted">No asignado</span>';
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if (!empty($row['correcciones_tesis']) && $row['estado_tesis'] == 'Aprobado'):
                                         ?>
                                             <a class="text-decoration-none d-inline-flex align-items-center" href="../uploads/correcciones/<?php echo urlencode($row['correcciones_tesis']); ?>" download>
                                                 Descargar Tesis
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted">No disponible</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        // Verifica el contenido de correcciones_tesis
+                                        if (!empty($row['enlace_plagio'])):
+                                        ?>
+                                            <a class="text-decoration-none d-inline-flex align-items-center" href="../docente/detalles-enlace.php?id=<?php echo $row['id']; ?>">
+                                                Detalles
                                             </a>
                                         <?php else: ?>
                                             <span class="text-muted">No disponible</span>
@@ -319,6 +394,19 @@ $result_temas = $stmt_temas->get_result();
                                         <?php endif; ?>
                                     </td>
 
+                                    <!-- Columna: Estado -->
+                                    <td class="text-center">
+                                        <?php if ($row['estado_enlace'] === 'Pendiente'): ?>
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                        <?php elseif ($row['estado_enlace'] === 'Aprobado'): ?>
+                                            <span class="badge bg-success">Aprobado</span>
+                                        <?php elseif ($row['estado_enlace'] === 'Rechazado' || $row['estado_enlace'] === 'Enlace Rechazado'): ?>
+                                            <span class="badge bg-danger">Rechazado</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Desconocido</span>
+                                        <?php endif; ?>
+                                    </td>
+
 
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
@@ -332,10 +420,10 @@ $result_temas = $stmt_temas->get_result();
                                                 <i class='bx bx-edit-alt'></i>
                                             </button>
 
-                                            <!-- Botón Eliminar -->
+                                            <!-- Botón Eliminar 
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar<?php echo $row['id']; ?>">
                                                 <i class='bx bx-trash'></i>
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -354,9 +442,9 @@ $result_temas = $stmt_temas->get_result();
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="mb-3">
-                                                        <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
+                                                        <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir certificado de fiscal de plagio</label>
                                                         <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                                                        <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 20 MB.</small>
+                                                        <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 5 MB.</small>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -367,6 +455,7 @@ $result_temas = $stmt_temas->get_result();
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- Modal Editar -->
                                 <div class="modal fade" id="modalEditar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEditarLabel<?php echo $row['id']; ?>" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -383,7 +472,7 @@ $result_temas = $stmt_temas->get_result();
                                                     <div class="mb-3">
                                                         <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
                                                         <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                                                        <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 20 MB.</small>
+                                                        <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 5 MB.</small>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -438,7 +527,7 @@ $result_temas = $stmt_temas->get_result();
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
+                El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
             </div>
         </div>
     </div>
@@ -454,6 +543,7 @@ $result_temas = $stmt_temas->get_result();
     <script src="../js/sidebar.js"></script>
     <script src="../js/toast.js"></script>
     <script src="../js/validadDobleInput.js" defer></script>
+    <script src="../js/buscarTema.js" defer></script>
 </body>
 
 </html>

@@ -34,21 +34,32 @@ if ($docente) {
     t.anteproyecto,
     t.revisor_anteproyecto_id,
     t.revisor_tesis_id,
+    t.id_revisor_plagio,
     u.nombres AS postulante_nombres, 
     u.apellidos AS postulante_apellidos, 
     p.nombres AS pareja_nombres, 
-    p.apellidos AS pareja_apellidos
-    FROM tema t
-    JOIN usuarios u ON t.usuario_id = u.id
-    LEFT JOIN usuarios p ON t.pareja_id = p.id
-    WHERE 
-        (t.revisor_anteproyecto_id = ? OR t.revisor_tesis_id = ?)
-        AND t.estado_tema = 'Aprobado'
-        AND t.estado_registro = 0
-    ORDER BY t.fecha_subida DESC";
+    p.apellidos AS pareja_apellidos,
+    tu1.cedula AS cedula_jurado_1, 
+    tu2.cedula AS cedula_jurado_2, 
+    tu3.cedula AS cedula_jurado_3,
+    t.id_jurado_uno AS j1,
+    t.id_jurado_dos AS j2,
+    t.id_jurado_tres AS j3
+FROM tema t
+JOIN usuarios u ON t.usuario_id = u.id
+LEFT JOIN usuarios p ON t.pareja_id = p.id
+LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
+LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id
+LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
+WHERE 
+    (t.revisor_anteproyecto_id = ? OR t.revisor_tesis_id = ? OR t.id_revisor_plagio = ? OR tu1.cedula = ? OR tu2.cedula = ? OR tu3.cedula = ?)
+    AND t.estado_tema = 'Aprobado'
+    AND t.estado_registro = 0
+ORDER BY t.fecha_subida DESC";
+
 
     $stmt_temas = $conn->prepare($sql_temas);
-    $stmt_temas->bind_param("ii", $usuario_id, $usuario_id);
+    $stmt_temas->bind_param("iiiiii", $usuario_id, $usuario_id, $usuario_id, $docente, $docente, $docente);
     $stmt_temas->execute();
     $result_temas = $stmt_temas->get_result();
 } else {
@@ -174,6 +185,32 @@ if ($docente) {
                     </li>
                 </ul>
             </div>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-certification'></i> Plagio</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuPlagio">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-plagio.php' ? 'active bg-secondary' : ''; ?>" href="revisar-plagio.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuSustentacion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-book-open'></i> Sustentación</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuSustentacion">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-sustentacion.php' ? 'active bg-secondary' : ''; ?>" href="revisar-sustentacion.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bx-file'></i> Informes</span>
                 <i class="bx bx-chevron-down"></i>
@@ -192,8 +229,6 @@ if ($docente) {
                     </li>
                 </ul>
             </div>
-            <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
-            <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
         </nav>
     </div>
 
@@ -209,10 +244,12 @@ if ($docente) {
                         <thead class="table-header-fixed">
                             <tr>
                                 <th>Tema</th>
-                                <th>Postulante 1</th>
-                                <th>Postulante 2</th>
+                                <th>Estudiante 1</th>
+                                <th>Estudiante 2</th>
                                 <th>Anteproyecto</th>
                                 <th>Documento Tesis</th>
+                                <th>Revisor Antiplagio</th>
+                                <th>Jurado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -225,7 +262,7 @@ if ($docente) {
                                         <?php if (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])): ?>
                                             <?php echo htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']); ?>
                                         <?php else: ?>
-                                            NO APLICA
+                                            <span class="text-muted">No aplica</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -246,6 +283,78 @@ if ($docente) {
                                         }
                                         ?>
                                     </td>
+                                    <td>
+                                        <?php
+                                        if ($row['id_revisor_plagio'] == $usuario_id) {
+                                            echo '<span class="badge bg-success"><i class="bx bx-check"></i> Asignado</span>';
+                                        } else {
+                                            echo '<span class="badge bg-secondary"><i class="bx bx-x"></i> No asignado</span>';
+                                        }
+                                        ?>
+                                    </td>
+
+                                    <td>
+                                        <?php
+                                        // Cédula del docente actual
+                                        $cedula_docente = $docente['cedula'];
+
+                                        // Obtener el ID del tema y los jurados del tema actual
+                                        $tema_id = $row['id']; // Asegúrate de que $row contenga el ID del tema
+
+                                        // Consulta para obtener las cédulas de los tres jurados basados en los IDs de los jurados
+                                        $sql_jurados = "SELECT 
+                                    tu1.cedula AS cedula_jurado_1,
+                                    tu2.cedula AS cedula_jurado_2,
+                                    tu3.cedula AS cedula_jurado_3,
+                                    t.obs_jurado_uno,
+                                    t.obs_jurado_dos,
+                                    t.obs_jurado_tres
+                                  FROM tema t
+                                  LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
+                                  LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id
+                                  LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
+                                  WHERE t.id = ?";
+
+                                        // Preparamos la consulta y vinculamos el ID del tema
+                                        $stmt_jurados = $conn->prepare($sql_jurados);
+                                        $stmt_jurados->bind_param("i", $tema_id); // Asumimos que $tema_id es un entero
+                                        $stmt_jurados->execute();
+                                        $result_jurados = $stmt_jurados->get_result();
+
+                                        // Verificamos si obtenemos datos
+                                        if ($result_jurados->num_rows > 0) {
+                                            $row_jurados = $result_jurados->fetch_assoc();
+
+                                            // Extraemos las cédulas de los jurados
+                                            $cedula_jurado_1 = $row_jurados['cedula_jurado_1'];
+                                            $cedula_jurado_2 = $row_jurados['cedula_jurado_2'];
+                                            $cedula_jurado_3 = $row_jurados['cedula_jurado_3'];
+
+                                            // Comprobamos qué observación mostrar dependiendo de la cédula del docente
+                                            $asignad = "";
+                                            if ($cedula_docente == $cedula_jurado_1) {
+                                                $asignad = True;
+                                            } elseif ($cedula_docente == $cedula_jurado_2) {
+                                                $asignad = True;
+                                            } elseif ($cedula_docente == $cedula_jurado_3) {
+                                                $asignad = True;
+                                            }
+
+                                            // Si el archivo está especificado y existe, mostrar el enlace de descarga
+                                            if ($asignad):
+                                        ?>
+                                                <span class="badge bg-success"><i class="bx bx-check"></i> Asignado</span>
+                                        <?php
+                                            else:
+                                                // Si no hay archivo o no existe, mostramos un mensaje
+                                                echo '<span class="badge bg-secondary"><i class="bx bx-x"></i> No asignado</span>';
+                                            endif;
+                                        } else {
+                                            echo '<span class="text-muted">Datos de jurados no encontrados</span>';
+                                        }
+                                        ?>
+                                    </td>
+
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>

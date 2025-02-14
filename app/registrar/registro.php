@@ -64,9 +64,15 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="orcid" class="form-label fw-bold">ORCID</label>
+                        <input type="text" class="form-control" id="orcid" name="orcid" placeholder="Ingrese su orcid" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label for="correo" class="form-label fw-bold">Correo electrónico</label>
                         <input type="email" class="form-control" id="correo" name="correo" placeholder="name@gmail.com" required>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Carrera a la que pertenece</label>
                         <select class="form-select" name="carrera" id="carrera" required>
@@ -74,8 +80,6 @@
                             <option value="TDS">TDS</option>
                         </select>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6 mb-5">
                         <label for="password" class="form-label fw-bold">Contraseña</label>
                         <div class="input-group">
@@ -83,6 +87,8 @@
                         </div>
                     </div>
                 </div>
+                
+
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn w-50">Registrarse</button>
                 </div>

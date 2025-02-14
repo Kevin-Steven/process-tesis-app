@@ -18,6 +18,7 @@ $usuario_id = $_SESSION['usuario_id'];
 $sql_tema = "SELECT t.estado_tema, 
        t.estado_tesis, 
        t.documento_tesis, 
+       t.certificados,
        t.observaciones_tesis, 
        t.pareja_id, 
        t.motivo_rechazo_correcciones, 
@@ -45,7 +46,7 @@ $motivo_rechazo_correcciones = $tema['motivo_rechazo_correcciones'] ?? null;
 
 // Nombre del revisor de tesis
 $revisor_tesis_nombre = $tema['revisor_tesis_nombre'] ?? 'No asignado';
-
+$certificados = $tema['certificados'] ?? null;
 
 // Obtener el nombre de la pareja si existe
 $nombre_pareja = '';
@@ -124,7 +125,7 @@ if ($pareja_id) {
         <a class="nav-link active" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
       <?php endif; ?>
       <?php if ($estado_tesis === 'Aprobado'): ?>
-        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+        <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
         <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>
     </nav>
@@ -209,7 +210,7 @@ if ($pareja_id) {
             <form action="logica-procesar-documento-tesis.php" class="enviar-tema" method="POST" enctype="multipart/form-data">
               <input type="hidden" name="id_postulante" value="<?php echo $usuario_id; ?>">
               <div class="mb-3">
-                <label for="documentoTesis" class="form-label fw-bold">Subir Documento (ZIP MÁXIMO 20 MB)</label>
+                <label for="documentoTesis" class="form-label fw-bold">Subir Documento (ZIP MÁXIMO 5 MB)</label>
                 <input type="file" class="form-control" id="documentoCarpeta" name="documentoTesis" accept=".zip" required onchange="validarTamanoArchivo()">
                 <small class="form-text text-muted">El archivo ZIP debe contener: Documento de Tesis en Word, PDF e Informe de Antiplagio</small>
               </div>
@@ -232,6 +233,7 @@ if ($pareja_id) {
                 <th>Observaciones</th>
                 <th>Enviar Correcciones</th>
                 <th>Motivo de Rechazo</th>
+                <th>Descargar Certificado</th>
                 <th>Estado</th>
               </tr>
             </thead>
@@ -308,6 +310,15 @@ if ($pareja_id) {
                   <?php endif; ?>
                 </td>
 
+                <td>
+                  <?php if (!empty($certificados)): ?>
+                    <a href="<?php echo htmlspecialchars($certificados); ?>" target="_blank" download>Descargar</a>
+                  <?php else: ?>
+                    <span class="text-muted">No hay documentos</span>
+                  <?php endif; ?>
+                </td>
+
+
                 <!-- Columna: Estado -->
                 <td class="text-center">
                   <?php if ($estado_tesis === 'Pendiente'): ?>
@@ -357,7 +368,7 @@ if ($pareja_id) {
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
-        El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
+        El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
       </div>
     </div>
   </div>

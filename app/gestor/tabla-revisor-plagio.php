@@ -20,42 +20,24 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// Consulta para obtener los tutores seleccionados por los postulantes
-$sql_tutores = "SELECT 
-    t.id AS tema_id, 
-    t.tema,
-    tu.nombres AS tutor_nombres,
-    tu.cedula AS tutor_cedula
+// Consulta para obtener los temas aprobados junto con el tutor y revisor de tesis
+$sql_temas_aprobados = $sql_temas_aprobados = "SELECT 
+    t.id, 
+    t.tema, 
+    tu.nombres AS tutor_nombre,
+    CONCAT(r.nombres, ' ', r.apellidos) AS revisor,
+    CONCAT(u.nombres, ' ', u.apellidos) AS postulante,
+    CONCAT(p.nombres, ' ', p.apellidos) AS pareja
 FROM tema t
-JOIN tutores tu ON t.tutor_id = tu.id";
-
-// Ejecutar la consulta para tutores
-$result_tutores = $conn->query($sql_tutores);
-
-// Consulta para obtener los revisores asignados a los temas
-$sql_revisores = "SELECT t.id AS tema_id, r.nombres AS revisor_nombres, r.apellidos AS revisor_apellidos
-FROM tema t
+LEFT JOIN tutores tu ON t.tutor_id = tu.id
 LEFT JOIN usuarios r ON t.id_revisor_plagio = r.id
-";
+JOIN usuarios u ON t.usuario_id = u.id
+LEFT JOIN usuarios p ON t.pareja_id = p.id
+WHERE t.estado_tema = 'Aprobado' 
+AND t.estado_registro = 0";
 
-// Ejecutar la consulta para revisores
-$result_revisores = $conn->query($sql_revisores);
 
-// Almacenar los resultados en arrays para utilizarlos más adelante
-$tutores = [];
-$revisores = [];
-
-if ($result_tutores->num_rows > 0) {
-    while ($row = $result_tutores->fetch_assoc()) {
-        $tutores[$row['tema_id']] = $row;
-    }
-}
-
-if ($result_revisores->num_rows > 0) {
-    while ($row = $result_revisores->fetch_assoc()) {
-        $revisores[$row['tema_id']] = $row;
-    }
-}
+$result_temas_aprobados = $conn->query($sql_temas_aprobados);
 ?>
 
 <!doctype html>
@@ -147,7 +129,7 @@ if ($result_revisores->num_rows > 0) {
             <!-- Campo de búsqueda -->
             <div class="input-group mb-3">
                 <span class="input-group-text"><i class='bx bx-search'></i></span>
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema o tutor">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por tema, postulante o tutor">
             </div>
 
             <?php if (isset($_GET['status'])): ?>
@@ -189,60 +171,47 @@ if ($result_revisores->num_rows > 0) {
                     <thead class="table-header-fixed">
                         <tr>
                             <th>Tema</th>
+                            <th>Estudiante 1</th>
+                            <th>Estudiante 2</th>
                             <th>Tutor</th>
-                            <th>Revisor Plagio</th>
+                            <th>Revisor</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // Consulta para obtener los temas aprobados con tutores y revisores
-                        $sql_temas_aprobados = "SELECT 
-                                                t.id, 
-                                                t.tema, 
-                                                t.tutor_id,
-                                                t.id_revisor_plagio,
-                                                tu.nombres AS tutor_nombre,
-                                                r.nombres AS revisor_nombre,
-                                                r.apellidos AS revisor_apellido
-                                            FROM tema t
-                                            LEFT JOIN tutores tu ON t.tutor_id = tu.id
-                                            LEFT JOIN usuarios r ON t.id_revisor_plagio = r.id
-                                            WHERE t.estado_tema = 'Aprobado' AND t.estado_registro = 0";
-
-                        $result_temas_aprobados = $conn->query($sql_temas_aprobados);
-
                         if ($result_temas_aprobados->num_rows > 0) {
-                            while ($tema = $result_temas_aprobados->fetch_assoc()) {
-
-                                $tutor_nombre = !empty($tema['tutor_nombre']) ? mb_strtoupper($tema['tutor_nombre']) : 'Tutor no asignado';
-
-                                // Verificar si hay un revisor asignado
-                                $revisor_nombre = (!empty($tema['revisor_nombre']) && !empty($tema['revisor_apellido']))
-                                    ? $tema['revisor_nombre'] . ' ' . $tema['revisor_apellido']
-                                    : 'No se ha asignado un revisor';
+                        while ($tema = $result_temas_aprobados->fetch_assoc()) {
+                                $tema2 = !empty($tema['tema']);
+                                $tutor_nombre = !empty($tema['tutor_nombre']) ? mb_strtoupper($tema['tutor_nombre'], 'UTF-8') : '<span class="text-muted">Tutor no asignado</span>';
+                                $revisor = !empty($tema['revisor']) ? htmlspecialchars($tema['revisor']) : '<span class="text-muted">Revisor no asignado</span>';
+                                $postulante = !empty($tema['postulante']) ? htmlspecialchars($tema['postulante']) : '<span class="text-muted">Sin postulante</span>';
+                                $pareja = !empty($tema['pareja']) ? htmlspecialchars($tema['pareja']) : '<span class="text-muted">Sin pareja</span>';
 
                                 echo "<tr>
-                                        <td>{$tema['tema']}</td>
-                                        <td>{$tutor_nombre}</td>
-                                        <td>{$revisor_nombre}</td>
-                                        <td class='text-center'>
-                                            <a href='detalle-revisor-plagio.php?id={$tema['id']}' class='text-decoration-none d-flex align-items-center justify-content-center'>
-                                                <i class='bx bx-search'></i> Ver detalles
-                                            </a>
-                                        </td>
-                                    </tr>";
+                    <td>" . htmlspecialchars($tema['tema']) . "</td>
+                    <td>{$postulante}</td>
+                    <td>{$pareja}</td>
+                    <td>{$tutor_nombre}</td>
+                    <td>{$revisor}</td>
+                    <td class='text-center'>
+                        <a href='detalle-revisor-plagio.php?id={$tema['id']}' class='text-decoration-none d-flex align-items-center justify-content-center'>
+                            <i class='bx bx-search'></i> Ver detalles
+                        </a>
+                    </td>
+                </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='4' class='text-center'>No hay temas aprobados</td></tr>";
+                            echo "<tr><td colspan='6' class='text-center'>No hay temas aprobados</td></tr>";
                         }
                         ?>
                     </tbody>
 
                 </table>
             </div>
-
         </div>
+
+    </div>
     </div>
 
     <div class="btn-regresarA">

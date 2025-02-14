@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $whatsapp = $_POST['whatsapp'];
     $carrera = mysqli_real_escape_string($conn, $_POST['carrera']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $orcid = mysqli_real_escape_string($conn, $_POST['orcid']);
 
     if (strlen($cedula) != 10 || !ctype_digit($cedula)) {
         $_SESSION['mensaje'] = "La cédula debe tener exactamente 10 dígitos.";
@@ -59,10 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password_hashed = password_hash($password, PASSWORD_DEFAULT);
 
         // Insertar el nuevo usuario en la base de datos
-        $sql = "INSERT INTO usuarios (nombres, apellidos, email, cedula, direccion, telefono, whatsapp, carrera, password) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO usuarios (nombres, apellidos, email, cedula, direccion, telefono, whatsapp, carrera, password, orcid) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssssss", $nombres, $apellidos, $correo, $cedula, $direccion, $telefono, $whatsapp, $carrera, $password_hashed);
+        $stmt->bind_param("ssssssssss", $nombres, $apellidos, $correo, $cedula, $direccion, $telefono, $whatsapp, $carrera, $password_hashed, $orcid);
 
         if ($stmt->execute()) {
             $_SESSION['tipo'] = "success";

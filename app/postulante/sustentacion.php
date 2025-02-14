@@ -158,7 +158,7 @@ $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
                 <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
             <?php endif; ?>
             <?php if ($estado_tesis === 'Aprobado'): ?>
-                <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Documento Plagio</a>
+                <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
                 <a class="nav-link active" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
             <?php endif; ?>
         </nav>

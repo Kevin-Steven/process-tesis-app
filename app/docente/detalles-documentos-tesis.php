@@ -144,6 +144,32 @@ if (isset($_GET['id'])) {
                     </li>
                 </ul>
             </div>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-certification'></i> Plagio</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuPlagio">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-plagio.php' ? 'active bg-secondary' : ''; ?>" href="revisar-plagio.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuSustentacion" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
+                <span><i class='bx bx-book-open'></i> Sustentación</span>
+                <i class="bx bx-chevron-down"></i>
+            </a>
+            <div class="collapse" id="submenuSustentacion">
+                <ul class="list-unstyled ps-4">
+                    <li>
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'revisar-sustentacion.php' ? 'active bg-secondary' : ''; ?>" href="revisar-sustentacion.php">
+                            <i class="bx bx-file"></i> Revisar
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuInformes" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bx-file'></i> Informes</span>
                 <i class="bx bx-chevron-down"></i>
@@ -162,8 +188,6 @@ if (isset($_GET['id'])) {
                     </li>
                 </ul>
             </div>
-            <a class="nav-link" href="revisar-plagio.php"><i class='bx bx-certification'></i> Revisar Plagio</a>
-            <a class="nav-link" href="revisar-sustentacion.php"><i class='bx bx-file'></i> Revisar Sustentación</a>
         </nav>
     </div>
 
@@ -236,7 +260,7 @@ if (isset($_GET['id'])) {
                         <div class="mb-3">
                             <label for="archivoObservaciones" class="form-label fw-bold">Subir archivo con las observaciones</label>
                             <input type="file" class="form-control" id="documentoCarpeta" name="archivo_observaciones-tesis" accept=".zip,.doc,.docx" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 20 MB.</small>
+                            <small class="form-text text-muted">Se permiten archivos .zip, .doc, .docx con un tamaño máximo de 5 MB.</small>
                         </div>
                     </form>
                 </div>
@@ -258,7 +282,7 @@ if (isset($_GET['id'])) {
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                El archivo supera el límite de 20 MB. Por favor, sube un archivo más pequeño.
+                El archivo supera el límite de 5 MB. Por favor, sube un archivo más pequeño.
             </div>
         </div>
     </div>
