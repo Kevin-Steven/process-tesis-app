@@ -41,7 +41,7 @@ $stmt_estado_tesis->close();
 
 
 // Consulta para obtener los datos del revisor (nombre y foto)
-$sql_revisor = "SELECT u.nombres, u.apellidos, t.doc_plagio FROM usuarios u
+$sql_revisor = "SELECT u.nombres, u.apellidos, t.doc_plagio, t.enlace_plagio FROM usuarios u
                 INNER JOIN tema t ON t.id_revisor_plagio = u.id
                 WHERE t.usuario_id = ? LIMIT 1";
 $stmt_revisor = $conn->prepare($sql_revisor);
@@ -110,10 +110,10 @@ $stmt_revisor->close();
             <a class="nav-link" href="inscripcion.php"><i class='bx bx-file'></i> Inscribirse</a>
             <a class="nav-link" href="enviar-tema.php"><i class='bx bx-file'></i> Enviar Tema</a>
             <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
-            <?php if ($estado_tesis === 'Aprobado'): ?>
-                <a class="nav-link active" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
-                <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
-            <?php endif; ?>
+            <!--   if ($estado_tesis === 'Aprobado'): ?> -->
+            <a class="nav-link active" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
+            <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
+
         </nav>
     </div>
 
@@ -144,7 +144,7 @@ $stmt_revisor->close();
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">
-                                <?php if (!empty($revisor)): ?>
+                                <?php if (!empty($revisor) && $estado_enlace === 'Pendiente' or $estado_enlace === 'Rechazado'): ?>
                                     <a data-bs-toggle="modal" data-bs-target="#modalEnviarEnlace" class="btn btn-link text-decoration-none">
                                         Subir
                                     </a>

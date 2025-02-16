@@ -123,58 +123,61 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
         <div class="container mt-2">
             <h1 class="mb-5 text-center fw-bold">Generar Reportes</h1>
 
-            <!-- Filas de Tarjetas de Reportes -->
+            <!-- Selección de reporte -->
             <div class="row justify-content-center">
-
-                <!-- Tarjeta para generar PDF de postulantes aprobados -->
-                <div class="col-md-5 mb-4">
-                    <div class="card documentos-aprobados">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
                         <div class="card-body text-center">
-                            <h5 class="card-title">Postulantes Aprobados</h5>
-                            <p class="card-text">Genera un listado en PDF de todos los postulantes con la documentación aprobada.</p>
-                            <form action="generar-pdf-postulantes.php" class="generar-reporte" method="post" target="_blank">
-                                <button type="submit" class="btn">
+                            <h5 class="card-title">Selecciona un Reporte</h5>
+                            <select class="form-select mb-3" id="reportSelect">
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="generar-pdf-postulantes.php">Postulantes Aprobados</option>
+                                <option value="generar-pdf-temas.php">Temas Aprobados</option>
+                                <option value="generar-pdf-notas-doc-tesis.php">Notas de Documentos de Tesis</option>
+                                <option value="generar-pdf-fechas-postulantes.php">Fecha Sustentación</option>
+                                <option value="generar-pdf-jurado.php">Jurados</option>
+                            </select>
+                            <div class="generar-reporte">
+                                <button class="btn" onclick="generarPDF()">
                                     <i class="bx bxs-file-pdf"></i> Generar PDF
                                 </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Tarjeta para generar PDF de temas aprobados -->
-                <div class="col-md-5 mb-4">
-                    <div class="card temas-aprobados ">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Temas Aprobados</h5>
-                            <p class="card-text">Genera un listado en PDF de todos los temas aprobados registrados en la base de datos.</p>
-                            <form action="generar-pdf-temas.php" class="generar-reporte" method="post" target="_blank">
-                                <button type="submit" class="btn" id="color-verde">
-                                    <i class="bx bxs-file-pdf"></i> Generar PDF
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta para generar PDF de notas -->
-                <div class="col-md-5 mb-4">
-                    <div class="card temas-aprobados ">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Notas de Documentos de Tesis</h5>
-                            <p class="card-text">Genera un reporte en PDF con las notas de los documentos de tesis de los temas aprobados.</p>
-                            <form action="generar-pdf-notas-doc-tesis.php" class="generar-reporte" method="post" target="_blank">
-                                <button type="submit" class="btn" id="color-verde">
-                                    <i class="bx bxs-file-pdf"></i> Generar PDF
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
 
+    <div class="modal fade" id="noSelectionModal" tabindex="-1" aria-labelledby="noSelectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="noSelectionModalLabel">Aviso</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    Por favor, selecciona un tipo de reporte antes de continuar.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generarPDF() {
+            var selectedOption = document.getElementById("reportSelect").value;
+            if (selectedOption) {
+                window.open(selectedOption, '_blank');
+            } else {
+                // Mostrar el modal si no hay selección
+                var myModal = new bootstrap.Modal(document.getElementById('noSelectionModal'));
+                myModal.show();
+            }
+        }
+    </script>
 
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-light text-center">

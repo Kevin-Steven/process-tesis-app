@@ -33,6 +33,7 @@ $result_tema = $stmt_tema->get_result();
 $tema = $result_tema->fetch_assoc();
 $stmt_tema->close();
 
+$estado_tema = $tema['estado_tema'] ?? null;
 $estado_tesis = $tema['estado_tesis'] ?? null;
 $correcciones_tesis = $tema['correcciones_tesis'] ?? null;
 ?>
@@ -97,6 +98,10 @@ $correcciones_tesis = $tema['correcciones_tesis'] ?? null;
             <a class="nav-link" href="inscripcion.php"><i class='bx bx-file'></i> Inscribirse</a>
             <a class="nav-link" href="enviar-tema.php"><i class='bx bx-file'></i> Enviar Tema</a>
             <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
+            <?php if ($estado_tema === 'Aprobado'): ?>
+                <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
+                <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
+            <?php endif; ?>
         </nav>
     </div>
 

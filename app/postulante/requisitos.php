@@ -4,8 +4,8 @@ require '../config/config.php'; // Asegúrate de que esta línea está correctam
 
 // Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['usuario_id'])) {
-    header("Location: ../../index.php");
-    exit();
+  header("Location: ../../index.php");
+  exit();
 }
 
 // Obtener el primer nombre y el primer apellido
@@ -20,7 +20,7 @@ $usuario_id = $_SESSION['usuario_id'];
 
 // Verificar que la conexión a la base de datos ($conn) esté disponible
 if (!$conn) {
-    die("Error al conectar con la base de datos: " . mysqli_connect_error());
+  die("Error al conectar con la base de datos: " . mysqli_connect_error());
 }
 
 // Consulta para obtener el estado de la inscripción
@@ -82,8 +82,8 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
       <div class="user-profile dropdown">
         <div class="d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
           <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
-          <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span> 
-          <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i> 
+          <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span>
+          <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i>
         </div>
         <ul class="dropdown-menu dropdown-menu-end mt-2">
           <li>
@@ -94,11 +94,13 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
           </li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="cambioClave.php">
-              <i class='bx bx-lock me-2'></i> 
+              <i class='bx bx-lock me-2'></i>
               Cambio de Clave
             </a>
           </li>
-          <li><hr class="dropdown-divider"></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
               <i class='bx bx-log-out me-2'></i>
@@ -115,7 +117,7 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
     <div class="profile">
       <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
       <h5><?php echo $primer_nombre . ' ' . $primer_apellido; ?></h5>
-      <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p> 
+      <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
     </div>
     <nav class="nav flex-column">
       <a class="nav-link" href="inicio-postulante.php"><i class='bx bx-home-alt'></i> Inicio</a>
@@ -129,7 +131,8 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
       <?php if ($estado_tema === 'Aprobado'): ?>
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
       <?php endif; ?>
-      <?php if ($estado_tesis === 'Aprobado'): ?>
+      <!-- if ($estado_tesis === 'Aprobado'): ?> agregar la etiqueta php antes del if -->
+      <?php if ($estado_tema === 'Aprobado'): ?>
         <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
         <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>
@@ -203,13 +206,13 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
           </div>
         </div>
       </div>
-      
+
       <!--CARD FINAL -->
       <div class="row justify-content-center">
         <div class="col-md-4 mb-4">
           <div class="card h-100">
             <div class="card-body text-center">
-            <i class='bx bx-news bx-lg mb-3'></i>
+              <i class='bx bx-news bx-lg mb-3'></i>
               <h5 class="card-title">Solicitud de matrícula</h5>
               <p class="card-text">Solicita tu matrícula directamente a través del sistema SIGA Institutos.</p>
             </div>
@@ -233,8 +236,8 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
             </div>
           </div>
         </div>
-      </div>  
-      
+      </div>
+
     </div>
   </div>
 
@@ -249,4 +252,5 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
   <script src="../js/sidebar.js"></script>
 
 </body>
+
 </html>

@@ -63,6 +63,8 @@ VALUES
 ('Plaza Quizhpi Jorge', '0920521465'),
 ('Tamayo Miranda Marco', '0920371887');
 
+
+
 -- Crear tabla tema
 CREATE TABLE tema (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -92,9 +94,6 @@ CREATE TABLE tema (
 	id_jurado_uno INT, 
 	id_jurado_dos INT, 
 	id_jurado_tres INT, 
-	obs_jurado_uno VARCHAR(255), 
-	obs_jurado_dos VARCHAR(255), 
-	obs_jurado_tres VARCHAR(255), 
 	ult_correcc_doc_tesis VARCHAR(255), 
 	estado_ultimas_obs VARCHAR(100) DEFAULT 'Pendiente',
 	rubrica_calificacion VARCHAR(255) DEFAULT NULL,

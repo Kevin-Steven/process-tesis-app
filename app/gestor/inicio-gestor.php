@@ -164,10 +164,10 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
             <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
-                  <i class='bx bx-group bx-lg mb-3'></i>
-                  <h5 class="card-title">Asignar Jurado</h5>
-                  <p class="card-text">Asigna jurados para las sustentaciones de tesis.</p>
-                  <a href="asignar-jurado.php" class="btn">Acceder</a>
+                  <i class='bx bx-user-plus bx-lg mb-3'></i>
+                  <h5 class="card-title">Agregar Tutores</h5>
+                  <p class="card-text">Agrega tutores según sea necesario.</p>
+                  <a href="agg-del-tutores.php" class="btn">Acceder</a>
                 </div>
               </div>
             </div>
@@ -186,10 +186,10 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
             <div class="col-md-4 mb-3">
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
-                  <i class='bx bx-user-plus bx-lg mb-3'></i>
-                  <h5 class="card-title">Agregar Tutores</h5>
-                  <p class="card-text">Agrega tutores según sea necesario.</p>
-                  <a href="agg-del-tutores.php" class="btn">Acceder</a>
+                  <i class='bx bx-group bx-lg mb-3'></i>
+                  <h5 class="card-title">Asignar Jurado</h5>
+                  <p class="card-text">Asigna jurados para las sustentaciones de tesis.</p>
+                  <a href="asignar-jurado.php" class="btn">Acceder</a>
                 </div>
               </div>
             </div>
@@ -198,7 +198,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               <div class="card card-principal h-100">
                 <div class="card-body text-center">
                   <i class='bx bx-time bx-lg mb-3'></i>
-                  <h5 class="card-title">Asignar Horario</h5>
+                  <h5 class="card-title">Horario Sustentación</h5>
                   <p class="card-text">Asignar horario de sustentación.</p>
                   <a href="#" class="btn">Acceder</a>
                 </div>

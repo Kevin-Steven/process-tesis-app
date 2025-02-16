@@ -203,7 +203,8 @@ $estado_tesis = $tema['estado_tesis'] ?? null;
       <?php if ($tema_aprobado): ?>
         <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
       <?php endif; ?>
-      <?php if ($estado_tesis === 'Aprobado'): ?>
+      <!-- if ($estado_tesis === 'Aprobado'): ?> agregar la etiqueta php antes del if -->
+      <?php if ($tema_aprobado): ?>
         <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
         <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
       <?php endif; ?>

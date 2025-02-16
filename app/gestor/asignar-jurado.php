@@ -14,19 +14,32 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 // Verificar si la foto de perfil está configurada en la sesión
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
-// Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "SELECT t.id, t.sede, t.aula, t.fecha_sustentar, t.hora_sustentar, t.tema, t.estado_tema, 
-           u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
-           p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos,
-           j1.nombres AS jurado1_nombre, j2.nombres AS jurado2_nombre, j3.nombres AS jurado3_nombre
+$sql = "SELECT 
+        t.id,
+        t.sede,
+        t.aula,
+        t.fecha_sustentar,
+        t.hora_sustentar,
+        t.tema,
+        t.estado_tema,
+        u.nombres AS postulante_nombres,
+        u.apellidos AS postulante_apellidos,
+        p.nombres AS pareja_nombres,
+        p.apellidos AS pareja_apellidos,
+        j1.nombres AS jurado1_nombre,
+        j2.nombres AS jurado2_nombre,
+        j3.nombres AS jurado3_nombre
     FROM tema t
     JOIN usuarios u ON t.usuario_id = u.id
     LEFT JOIN usuarios p ON t.pareja_id = p.id
     LEFT JOIN tutores j1 ON t.id_jurado_uno = j1.id
     LEFT JOIN tutores j2 ON t.id_jurado_dos = j2.id
     LEFT JOIN tutores j3 ON t.id_jurado_tres = j3.id
-    WHERE t.estado_tema = 'Aprobado' 
-    AND t.estado_registro = 0";
+    WHERE t.estado_tema = 'Aprobado'
+    AND t.estado_registro = 0
+    ORDER BY t.fecha_sustentar ASC, t.hora_sustentar ASC
+";
+
 
 $result = $conn->query($sql);
 ?>
