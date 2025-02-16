@@ -1,38 +1,53 @@
 <?php
 require '../config/config.php';
 
-// Verificar si se enviaron los datos del formulario
-if (isset($_POST['tema_id'], $_POST['jurado_1'], $_POST['jurado_2'], $_POST['jurado_3'])) {
+if (isset($_POST['tema_id'])) {
+    
     $tema_id = intval($_POST['tema_id']);
-    $jurado_1 = intval($_POST['jurado_1']);
-    $jurado_2 = intval($_POST['jurado_2']);
-    $jurado_3 = intval($_POST['jurado_3']);
+    
+    // Si los jurados no están seleccionados, se asigna NULL
+    $jurado_1 = !empty($_POST['jurado_1']) ? intval($_POST['jurado_1']) : NULL;
+    $jurado_2 = !empty($_POST['jurado_2']) ? intval($_POST['jurado_2']) : NULL;
+    $jurado_3 = !empty($_POST['jurado_3']) ? intval($_POST['jurado_3']) : NULL;
+    
+    // Si sede o aula no están seleccionadas, se asigna NULL
+    $sede = !empty($_POST['sede']) ? trim($_POST['sede']) : NULL;
+    $aula = !empty($_POST['aula']) ? trim($_POST['aula']) : NULL;
+    
+    // Si la fecha o la hora no están seleccionadas, se asigna NULL
+    $fecha_sustentar = !empty($_POST['fecha']) ? $_POST['fecha'] : NULL;
+    $hora_sustentar = !empty($_POST['hora']) ? $_POST['hora'] : NULL;
 
-    // Verificar que los jurados no sean duplicados
-    if ($jurado_1 === $jurado_2 || $jurado_1 === $jurado_3 || $jurado_2 === $jurado_3) {
+    // Validar que los jurados sean distintos si están asignados
+    if (($jurado_1 && $jurado_2 && $jurado_1 === $jurado_2) || 
+        ($jurado_1 && $jurado_3 && $jurado_1 === $jurado_3) || 
+        ($jurado_2 && $jurado_3 && $jurado_2 === $jurado_3)) {
         header("Location: asignar-jurado.php?id=$tema_id&status=error_duplicado");
         exit();
     }
 
-    // Preparar el UPDATE para asignar los jurados
+    // Preparar la consulta UPDATE permitiendo valores NULL
     $sql_update = "UPDATE tema 
                    SET id_jurado_uno = ?, 
                        id_jurado_dos = ?, 
-                       id_jurado_tres = ? 
+                       id_jurado_tres = ?, 
+                       sede = ?, 
+                       aula = ?, 
+                       fecha_sustentar = ?, 
+                       hora_sustentar = ? 
                    WHERE id = ?";
+
     $stmt = $conn->prepare($sql_update);
-    $stmt->bind_param("iiii", $jurado_1, $jurado_2, $jurado_3, $tema_id);
+    $stmt->bind_param("iiissssi", $jurado_1, $jurado_2, $jurado_3, $sede, $aula, $fecha_sustentar, $hora_sustentar, $tema_id);
 
     if ($stmt->execute()) {
-        // Redirigir con estado de éxito
-        header("Location: asignar-jurado.php?status=success");
+        header("Location: asignar-jurado.php?id=$tema_id&status=success");
     } else {
-        // Redirigir con estado de error
         header("Location: asignar-jurado.php?id=$tema_id&status=error");
     }
+
     $stmt->close();
 } else {
-    // Redirigir si no se enviaron los datos necesarios
     header("Location: asignar-jurado.php?status=form_error");
 }
 ?>

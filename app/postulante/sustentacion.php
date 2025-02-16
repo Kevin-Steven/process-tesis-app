@@ -65,9 +65,13 @@ $sql_jurados = "SELECT
         u1.nombres AS jurado1_nombre, 
         u2.nombres AS jurado2_nombre, 
         u3.nombres AS jurado3_nombre,
-        t.obs_jurado_uno, 
-        t.obs_jurado_dos, 
-        t.obs_jurado_tres
+        t.j1_nota_sustentar,
+        t.j2_nota_sustentar,
+        t.j3_nota_sustentar,
+        t.sede,
+        t.aula,
+        t.fecha_sustentar,
+        t.hora_sustentar
     FROM tema t
     LEFT JOIN tutores u1 ON t.id_jurado_uno = u1.id
     LEFT JOIN tutores u2 ON t.id_jurado_dos = u2.id
@@ -90,9 +94,18 @@ $jurado1_nombre = $jurados['jurado1_nombre'] ?? 'No asignado';
 $jurado2_nombre = $jurados['jurado2_nombre'] ?? 'No asignado';
 $jurado3_nombre = $jurados['jurado3_nombre'] ?? 'No asignado';
 
-$observacion_jurado1 = $jurados['obs_jurado_uno'] ?? 'Sin observación';
-$observacion_jurado2 = $jurados['obs_jurado_dos'] ?? 'Sin observación';
-$observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
+// $observacion_jurado1 = $jurados['obs_jurado_uno'] ?? 'Sin observación';
+// $observacion_jurado2 = $jurados['obs_jurado_dos'] ?? 'Sin observación';
+// $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
+
+$j1_nota_sustentar = $jurados['j1_nota_sustentar'] ?? 'Sin nota';
+$j2_nota_sustentar = $jurados['j2_nota_sustentar'] ?? 'Sin nota';
+$j3_nota_sustentar = $jurados['j3_nota_sustentar'] ?? 'Sin nota';
+
+$sede = $jurados['sede'] ?? 'No asignado';
+$aula = $jurados['aula'] ?? 'No asignado';
+$fecha_sustentar = $jurados['fecha_sustentar'] ?? 'No asignado';
+$hora_sustentar = $jurados['hora_sustentar'] ?? 'No asignado';
 ?>
 
 <!doctype html>
@@ -110,7 +123,6 @@ $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
 </head>
 
 <body>
-
     <!-- Topbar -->
     <div class="topbar z-1">
         <div class="menu-toggle">
@@ -174,20 +186,31 @@ $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
                 <table class="table table-bordered shadow-lg">
                     <thead class="table-light text-center">
                         <tr>
+                            <th>Sede</th>
+                            <th>Aula</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
                             <th>Jurado 1</th>
                             <th>Jurado 2</th>
                             <th>Jurado 3</th>
-                            <th>Observación 1</th>
-                            <th>Observación 2</th>
-                            <th>Observación 3</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-center"><?php echo strtoupper($jurado1_nombre); ?></td>
-                            <td class="text-center"><?php echo strtoupper($jurado2_nombre); ?></td>
-                            <td class="text-center"><?php echo strtoupper($jurado3_nombre); ?></td>
-                            <td class="text-center">
+                            <td class="text-center"><?php echo mb_strtoupper($sede); ?></td>
+                            <td class="text-center"><?php echo mb_strtoupper($aula); ?></td>
+                            <td class="text-center"><?php echo mb_strtoupper($fecha_sustentar); ?></td>
+                            <td>
+                                <?php
+                                echo $hora_sustentar
+                                    ? date("g:i A", strtotime($hora_sustentar))
+                                    : '<span class="text-muted">No asignado</span>';
+                                ?>
+                            </td>
+                            <td class="text-center"><?php echo mb_strtoupper($jurado1_nombre); ?></td>
+                            <td class="text-center"><?php echo mb_strtoupper($jurado2_nombre); ?></td>
+                            <td class="text-center"><?php echo mb_strtoupper($jurado3_nombre); ?></td>
+                            <!-- <td class="text-center">
                                 <?php if ($observacion_jurado1 !== 'Sin observación'): ?>
                                     <a href="<?php echo $observacion_jurado1; ?>" download>Descargar</a>
                                 <?php else: ?>
@@ -207,7 +230,7 @@ $observacion_jurado3 = $jurados['obs_jurado_tres'] ?? 'Sin observación';
                                 <?php else: ?>
                                     <span>No disponible</span>
                                 <?php endif; ?>
-                            </td>
+                            </td> -->
                         </tr>
                     </tbody>
                 </table>

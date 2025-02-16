@@ -13,7 +13,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id, t.obs_jurado_uno, t.obs_jurado_dos, t.obs_jurado_tres, 
+$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id, 
            t.id_jurado_uno, t.id_jurado_dos, t.id_jurado_tres, 
            u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
            p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 

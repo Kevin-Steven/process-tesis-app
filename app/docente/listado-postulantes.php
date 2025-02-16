@@ -132,7 +132,7 @@ ORDER BY t.fecha_subida DESC";
             <p><?php echo ucfirst($_SESSION['usuario_rol']); ?></p>
         </div>
         <nav class="nav flex-column">
-            <a class="nav-link" href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
+            <a class="nav-link " href="docente-inicio.php"><i class='bx bx-home-alt'></i> Inicio</a>
             <a class="nav-link active" href="listado-postulantes.php"><i class='bx bx-user'></i> Listado Postulantes</a>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuAnteproyecto" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
                 <span><i class='bx bx-file'></i> Anteproyecto</span>
@@ -183,6 +183,7 @@ ORDER BY t.fecha_subida DESC";
                             <i class='bx bx-certification'></i> Certificado revisor
                         </a>
                     </li>
+
                 </ul>
             </div>
             <a class="nav-link collapsed d-flex justify-content-between align-items-center" href="#submenuPlagio" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="submenuInformes">
@@ -305,10 +306,7 @@ ORDER BY t.fecha_subida DESC";
                                         $sql_jurados = "SELECT 
                                     tu1.cedula AS cedula_jurado_1,
                                     tu2.cedula AS cedula_jurado_2,
-                                    tu3.cedula AS cedula_jurado_3,
-                                    t.obs_jurado_uno,
-                                    t.obs_jurado_dos,
-                                    t.obs_jurado_tres
+                                    tu3.cedula AS cedula_jurado_3
                                   FROM tema t
                                   LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
                                   LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id

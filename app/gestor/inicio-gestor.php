@@ -194,6 +194,17 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
               </div>
             </div>
 
+            <div class="col-md-12 mb-3">
+              <div class="card card-principal h-100">
+                <div class="card-body text-center">
+                  <i class='bx bx-time bx-lg mb-3'></i>
+                  <h5 class="card-title">Asignar Horario</h5>
+                  <p class="card-text">Asignar horario de sustentación.</p>
+                  <a href="#" class="btn">Acceder</a>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 create database procesotitulacion;
-use procesotitulacion;
+use procesotitulacion;	
 
 CREATE TABLE usuarios (
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,6 +15,7 @@ CREATE TABLE usuarios (
 	pareja_tesis INT default 0,
 	foto_perfil VARCHAR(255),
 	fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    orcid VARCHAR(255) DEFAULT NULL,
 	rol ENUM('postulante', 'administrador', 'gestor', 'docente') NOT NULL DEFAULT 'postulante'
 );
 
@@ -82,16 +83,54 @@ CREATE TABLE tema (
     observaciones_anteproyecto VARCHAR(255),
     observaciones_tesis VARCHAR(255),
     motivo_rechazo TEXT,
+    motivo_rechazo_correcciones TEXT DEFAULT NULL,
     fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estado_tesis VARCHAR(50),
+    correcciones_tesis VARCHAR(255) DEFAULT NULL,
+    id_revisor_plagio INT, 
+	doc_plagio VARCHAR(255), 
+	id_jurado_uno INT, 
+	id_jurado_dos INT, 
+	id_jurado_tres INT, 
+	obs_jurado_uno VARCHAR(255), 
+	obs_jurado_dos VARCHAR(255), 
+	obs_jurado_tres VARCHAR(255), 
+	ult_correcc_doc_tesis VARCHAR(255), 
+	estado_ultimas_obs VARCHAR(100) DEFAULT 'Pendiente',
+	rubrica_calificacion VARCHAR(255) DEFAULT NULL,
+	certificados VARCHAR(255) DEFAULT NULL,
+	nota_revisor_tesis DECIMAL(4,2) DEFAULT NULL,
+	enlace_plagio VARCHAR(255) DEFAULT NULL,
+	motivo_rechazo_enlace TEXT DEFAULT NULL,
+	estado_enlace VARCHAR(100) DEFAULT 'Pendiente',
+	sede VARCHAR(255) DEFAULT NULL,
+	aula VARCHAR(255) DEFAULT NULL,
+	fecha_sustentar DATE DEFAULT NULL,
+	hora_sustentar TIME DEFAULT NULL,
+	j1_nota_sustentar DECIMAL(4,2) DEFAULT NULL,
+	j2_nota_sustentar DECIMAL(4,2) DEFAULT NULL,
+	j3_nota_sustentar DECIMAL(4,2) DEFAULT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (tutor_id) REFERENCES tutores(id) ON DELETE CASCADE
 );
 
-ALTER TABLE tema 
-ADD COLUMN estado_tesis VARCHAR(50) DEFAULT 'Pendiente';
+CREATE TABLE informes_tutores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_id INT NOT NULL,
+    archivo VARCHAR(255) NOT NULL,
+	estado INT(2) DEFAULT 0,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutor_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
 
-ALTER TABLE tema 
-ADD COLUMN correcciones_tesis VARCHAR(255) DEFAULT NULL;
+CREATE TABLE informes_tesis (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_id INT NOT NULL,
+    informe_tesis VARCHAR(255) NOT NULL,
+	estado INT(2) DEFAULT 0,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutor_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
 
 DELIMITER $$
 CREATE TRIGGER after_user_insert

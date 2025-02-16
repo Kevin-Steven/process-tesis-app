@@ -7,22 +7,19 @@ if (!isset($_SESSION['usuario_nombre']) || !isset($_SESSION['usuario_apellido'])
   exit();
 }
 
-// Obtener el primer nombre y el primer apellido
 $primer_nombre = explode(' ', $_SESSION['usuario_nombre'])[0];
 $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 
-// Verificar si la foto de perfil está configurada en la sesión
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
-// Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "SELECT t.id, t.tema, t.estado_tema, t.fecha_subida, t.tutor_id, t.documento_tesis,
+$sql = "SELECT t.id, t.tema, t.enlace_plagio as link, t.estado_tema, t.fecha_subida, t.tutor_id, t.documento_tesis,
        u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
        p.nombres AS pareja_nombres, t.anteproyecto, t.observaciones_anteproyecto, t.observaciones_tesis, 
        t.rubrica_calificacion as doc_calificacion, t.certificados as tesis_certificado, t.doc_plagio as cert_plagio, 
        p.apellidos AS pareja_apellidos, up.nombres as nombres_plagio, up.apellidos as apellidos_plagio,
        tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis,
        urt.nombres as nombres_rev_tesis, urt.apellidos as apellidos_rev_tesis, t.nota_revisor_tesis as nota_documento, u1.nombres AS jurado1_nombre, 
-        u2.nombres AS jurado2_nombre, u3.nombres AS jurado3_nombre
+        u2.nombres AS jurado2_nombre, u3.nombres AS jurado3_nombre, t.j1_nota_sustentar as nota_uno,t.j2_nota_sustentar as nota_dos,t.j3_nota_sustentar as nota_tres
 FROM tema t
 LEFT JOIN usuarios u ON t.usuario_id = u.id
 LEFT JOIN usuarios up ON t.id_revisor_plagio = up.id
@@ -211,7 +208,10 @@ $result = $conn->query($sql);
                 <th>Documento Tesis</th>
                 <th>Observaciones Tesis</th>
                 <th>Tesis Corregida</th>
+                <th>Rubrica de calificación</th>
+                <th>Certificado Revisor Tesis</th>
                 <th>Revisor Tesis</th>
+                <th>Informe de plagio</th>
                 <th>Certificado AntiPlagio</th>
                 <th>Fiscal Plagio</th>
                 <th>Jurado 1</th>
@@ -253,15 +253,30 @@ $result = $conn->query($sql);
                       <?php endif; ?>
                     </td>
                     <td>
-                      <?php if (!empty($row['observaciones_tesis'])): ?>
-                        <a href="<?php echo '../uploads/observaciones-tesis/' . htmlspecialchars($row['observaciones_tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php if (!empty($row['observaciones_tesis']) && file_exists("../uploads/observaciones-tesis/" . $row['observaciones_tesis'])): ?>
+                        <a href="descargar.php?archivo=<?php echo urlencode($row['observaciones_tesis']); ?>" class="text-decoration-none">Descargar</a>
+                      <?php else: ?>
+                        <span class="text-muted">No hay documentos</span>
+                      <?php endif; ?>
+                    </td>
+
+                    <td>
+                      <?php if (!empty($row['tesis']) && $row['estado_tesis'] === "Aprobado"): ?>
+                        <a href="<?php echo '../uploads/correcciones/' . htmlspecialchars($row['tesis']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
                         <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
                     </td>
                     <td>
-                      <?php if (!empty($row['tesis'])): ?>
-                        <a href="<?php echo '../uploads/correcciones/' . htmlspecialchars($row['tesis']); ?>" target="_blank" download>Descargar</a>
+                      <?php if (!empty($row['doc_calificacion'])): ?>
+                        <a href="<?php echo htmlspecialchars($row['doc_calificacion']); ?>" target="_blank" download>Descargar</a>
+                      <?php else: ?>
+                        <span class="text-muted">No hay documentos</span>
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <?php if (!empty($row['tesis_certificado'])): ?>
+                        <a href="<?php echo htmlspecialchars($row['tesis_certificado']); ?>" target="_blank" download>Descargar</a>
                       <?php else: ?>
                         <span class="text-muted">No hay documentos</span>
                       <?php endif; ?>
@@ -274,6 +289,14 @@ $result = $conn->query($sql);
                         echo '<span class="text-muted">No asignado</span>';
                       }
                       ?>
+                    </td>
+
+                    <td>
+                      <?php if (!empty($row['link'])): ?>
+                        <a href="<?php echo htmlspecialchars($row['link']); ?>" target="_blank">Enlace</a>
+                      <?php else: ?>
+                        <span class="text-muted">No hay enlace</span>
+                      <?php endif; ?>
                     </td>
 
                     <td>
@@ -322,14 +345,44 @@ $result = $conn->query($sql);
                     <td>
                       <?php
                       if (!empty($row['nota_documento'])) {
-                        echo htmlspecialchars($row['nota_documento']);
+                        $nota_documento = floatval($row['nota_documento']);
+                        $nota_equivalente_documento = ($nota_documento / 10) * 6;
+                        echo number_format($nota_documento, 2);
                       } else {
+                        $nota_documento = null;
+                        $nota_equivalente_documento = null;
                         echo '<span class="text-muted">Sin nota</span>';
                       }
                       ?>
                     </td>
-                    <td>En proceso</td>
-                    <td>En proceso</td>
+
+                    <td>
+                      <?php
+                      $nota1 = isset($row['nota_uno']) ? floatval($row['nota_uno']) : null;
+                      $nota2 = isset($row['nota_dos']) ? floatval($row['nota_dos']) : null;
+                      $nota3 = isset($row['nota_tres']) ? floatval($row['nota_tres']) : null;
+
+                      if ($nota1 !== null && $nota2 !== null && $nota3 !== null) {
+                        $promedio_sustentacion = ($nota1 + $nota2 + $nota3) / 3;
+                        $nota_equivalente_sustentacion = ($promedio_sustentacion / 10) * 4;
+                        echo number_format($promedio_sustentacion, 2);
+                      } else {
+                        $nota_equivalente_sustentacion = null;
+                        echo '<span class="text-muted">Sin nota</span>';
+                      }
+                      ?>
+                    </td>
+
+                    <td>
+                      <?php
+                      if ($nota_equivalente_documento !== null && $nota_equivalente_sustentacion !== null) {
+                        $nota_final = $nota_equivalente_documento + $nota_equivalente_sustentacion;
+                        echo number_format($nota_final, 2);
+                      } else {
+                        echo '<span class="text-muted">Sin nota final</span>';
+                      }
+                      ?>
+                    </td>
 
                     <td class="text-center">
                       <div class="d-flex justify-content-center gap-2">

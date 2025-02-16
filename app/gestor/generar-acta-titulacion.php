@@ -2,36 +2,71 @@
 require '../config/config.php';
 require_once('../../TCPDF-main/tcpdf.php');
 
+// Verificar ID
 if (!isset($_GET['id'])) {
     die("ID no proporcionado.");
 }
-
 $id = intval($_GET['id']);
 
-// Consulta para obtener los datos del tema por su ID
-$sql = "SELECT t.tema, t.nota_revisor_tesis as nota_doc, u.cedula, t.nota_revisor_tesis, u.nombres AS estudiante_nombre, u.apellidos AS estudiante_apellidos
+// Consulta para obtener datos (postulante y pareja)
+$sql = "SELECT 
+            t.tema,
+            t.j1_nota_sustentar AS nota_uno,
+            t.j2_nota_sustentar AS nota_dos,
+            t.j3_nota_sustentar AS nota_tres,
+            COALESCE(t.nota_revisor_tesis, 0) AS nota_doc, 
+            u.id AS postulante_id, 
+            u.cedula, 
+            u.nombres AS estudiante_nombre, 
+            u.apellidos AS estudiante_apellidos,
+            p.id AS pareja_id, 
+            p.cedula AS pareja_cedula, 
+            p.nombres AS pareja_nombre, 
+            p.apellidos AS pareja_apellidos
         FROM tema t
         JOIN usuarios u ON t.usuario_id = u.id
+        LEFT JOIN usuarios p ON t.pareja_id = p.id
         WHERE t.id = $id";
 $result = $conn->query($sql);
-
-if ($result->num_rows == 0) {
+if ($result->num_rows === 0) {
     die("No se encontró información para este ID.");
 }
-
 $row = $result->fetch_assoc();
 
-// Clase personalizada para el PDF
-class ActaPDF extends TCPDF {
-    function Header() {
+// ------------------------------------------------------
+// Clase PDF con imagen de fondo en Header
+// ------------------------------------------------------
+class ActaPDF extends TCPDF
+{
+    public function Header() {
+        // Imagen de fondo a página completa
         $this->SetMargins(0, 0, 0);
         $this->SetAutoPageBreak(false, 0);
 
-        // Imagen de fondo (antes del contenido)
-        $this->Image('../../images/acta-formato-con.png', 0, 0, $this->getPageWidth(), $this->getPageHeight(), '', '', '', false, 300, '', false, false, 0);
+        $this->Image(
+            '../../images/acta-formato-con.png',
+            0,
+            0,
+            $this->getPageWidth(),
+            $this->getPageHeight(),
+            '',
+            '',
+            '',
+            false,
+            300,
+            '',
+            false,
+            false,
+            0
+        );
     }
 
-    function MultiCellRow($data, $widths, $height) {
+    public function Footer() {
+        // Dejamos vacío para no tener pie de página
+    }
+
+    // Helper para filas de 2 celdas
+    public function MultiCellRow($data, $widths, $height) {
         $nb = 0;
         foreach ($data as $key => $value) {
             $nb = max($nb, $this->getNumLines($value, $widths[$key]));
@@ -51,190 +86,241 @@ class ActaPDF extends TCPDF {
         $this->Ln($h);
     }
 
-    function CustomCheckPageBreak($h) {
-        if ($this->GetY() + $h > $this->getPageHeight() - $this->getBreakMargin()) {
+    public function CustomCheckPageBreak($h) {
+        if ($this->GetY() + $h > ($this->getPageHeight() - $this->getBreakMargin())) {
             $this->AddPage($this->CurOrientation);
-            $this->SetY(30);
+            $this->SetY(25);
         }
     }
 }
 
-$pdf = new ActaPDF();
+// ------------------------------------------------------
+// Función para generar el PDF (postulante o pareja)
+// ------------------------------------------------------
+function generarPDFCompleto($rowData, $id_formateado) {
+    // Márgenes deseados para el contenido
+    $margen_izquierdo = 18;
+    $margen_superior  = 25;
+    $margen_derecho   = 18;
 
-// Establecer márgenes generales (izquierdo, superior, derecho)
-$margen_izquierdo = 18;  // Margen izquierdo de 30mm
-$margen_superior = 25;   // Margen superior de 20mm
-$margen_derecho = 18;    // Margen derecho de 30mm
+    // Instanciamos
+    $pdf = new ActaPDF();
 
-$pdf->SetMargins($margen_izquierdo, $margen_superior, $margen_derecho);
-$pdf->SetAutoPageBreak(true, 20); // Activa salto de página automático con margen inferior de 20mm
+    // Definir salto auto
+    $pdf->SetAutoPageBreak(true, 20);
+    $pdf->AddPage();
 
-$pdf->AddPage();
+    // Ajustar la posición inicial del contenido
+    $pdf->SetMargins($margen_izquierdo, $margen_superior, $margen_derecho);
+    $pdf->SetY($margen_superior);
+    $pdf->SetX($margen_izquierdo);
 
-// Ajustar la posición inicial del contenido
-$pdf->SetY($margen_superior);
+    // TÍTULOS
+    $pdf->SetFont('times', 'B', 14);
+    // Título principal centrado
+    $pdf->Cell(0, 0, 'ACTA FINAL DE TITULACIÓN', 0, 1, 'C');
+    $pdf->Ln(1);
+    // Subtítulo con la numeración
+    $pdf->Cell(0, 5, 'Nro. ISTJBA-GT-TDS-' . date("Y") . '-' . $id_formateado, 0, 1, 'C');
+    $pdf->Ln(2);
 
-// ======================= CONTENIDO FORMATEADO =======================
-$pdf->SetFont('times', 'B', 14);
-$pdf->Cell(0, 0, 'ACTA FINAL DE TITULACION', 0, 1, 'C');
-$pdf->Cell(0, 5, 'Nro. ISTJBA-GT-TDS-058-2024-1P', 0, 1, 'C');
-$pdf->Ln(1);
+    // PÁRRAFO 1
+    $pdf->SetFont('helvetica', '', 11);
+    $texto1 = ''
+        . '<b>El Comité Específico de Revisión y Aprobación de la Carrera: </b>, '
+        . 'Tecnología en Superior en Desarrollo de Software del Instituto Superior Tecnológico “Juan Bautista Aguirre”, '
+        . 'conforme al proceso de Titulación correspondiente al '
+        . '<b>II periodo académico del año 2024 </b>'
+        . '<b>Comité Específico de Revisión y Aprobación de la Carrera,</b> '
+        . 'y en cumplimiento de lo establecido en el Art. 32 del Reglamento de Régimen Académico:';
+    $pdf->writeHTMLCell(0, 0, '', '', $texto1, 0, 1, false, true, 'J', true);
+    $pdf->Ln(5);
 
-// Aplicar texto con márgenes automáticamente
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Write(5, "El Comité Específico de Revisión y Aprobación de la Carrera: ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "Tecnología en Superior en Desarrollo de Software del Instituto Tecnológico Superior “Juan Bautista Aguirre”, conforme al proceso de Titulación correspondiente al ");
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Write(5, "I periodo académico del año 2024, ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "aprobado en Acta: ");
-$pdf->SetFont('times', 'B', 11);
-$pdf->Write(5, "ISTJBA-GT-TDS-002-2024-1P ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "de fecha 1 de abril del 2024 y en cumplimiento de lo establecido en el Art. 32 del Reglamento de Régimen Académico:\n\n");
+    // PÁRRAFO 2 (ARTÍCULO 32) con mayor margen X
+    $pdf->SetFont('helvetica', '', 10);
+    $texto2 = '<i><strong>Artículo 32.-</strong> Diseño, acceso y aprobación de la unidad de integración curricular del tercer nivel. - Cada IES diseñará la unidad de integración curricular, estableciendo su estructura, contenidos y parámetros para el correspondiente desarrollo y evaluación. Para acceder a la unidad de integración curricular, es necesario haber completado las horas y/o créditos mínimos establecidos por la IES, así como cualquier otro requisito establecido en su normativa interna. Su aprobación se realizará a través de las siguientes opciones: a) Desarrollo de un trabajo de integración curricular; o, b) La aprobación de un examen de carácter complexivo, mediante el cual el estudiante deberá demostrar el manejo integral de los conocimientos adquiridos a lo largo de su formación.</i>';
+    // Le damos un margen extra
+    $margen_izq_parr2 = $margen_izquierdo + 9; 
+    $margen_der_parr2 = $margen_derecho + 9;
+    $ancho_pagina   = $pdf->getPageWidth();
+    $ancho_contenido= $ancho_pagina - ($margen_izq_parr2 + $margen_der_parr2);
+    $pdf->SetX($margen_izq_parr2);
+    $pdf->writeHTMLCell($ancho_contenido, 0, $margen_izq_parr2, $pdf->GetY(), $texto2, 0, 1, false, true, 'J', true);
+    $pdf->Ln(5);
 
+    // PÁRRAFO 3
+    $pdf->SetFont('helvetica', '', 11);
+    $texto3 = ''
+        . 'El suscrito en calidad de <b>Coordinador Académico de la carrera Tecnología Superior en Desarrollo de Software</b>, '
+        . 'después del análisis de los requisitos legales para el proceso de titulación a través de la modalidad: '
+        . '<b>“Proyecto de Titulación”</b> y por autorización del '
+        . '<b>Comité Específico de Revisión y Aprobación de la Carrera,</b> '
+        . 'ratifica la aprobación del proceso al siguiente estudiante:';
+    $pdf->writeHTMLCell(0, 0, '', '', $texto3, 0, 1, false, true, 'J', true);
+    $pdf->Ln(5);
 
-// Definir márgenes específicos para este párrafo
-$margen_izquie = 20; // Mayor margen izquierdo
-$margen_dere = 50;  // Mayor margen derecho
-$ancho_pagina = $pdf->getPageWidth();
-$ancho_contenido = $ancho_pagina - ($margen_izquie + $margen_dere); // Ancho disponible dentro de los márgenes
-$pdf->SetX($margen_izquie);
+    // TABLA DE DATOS DEL ESTUDIANTE
+    $pdf->SetFont('helvetica', '', 11);
+    $widths = [50, 122];
+    $height = 7;
+    $pdf->MultiCellRow(['CARRERA:', 'TECNOLOGÍA SUPERIOR EN DESARROLLO DE SOFTWARE'], $widths, $height);
+    $pdf->MultiCellRow(['APELLIDOS Y NOMBRES:', $rowData['estudiante_nombre'].' '.$rowData['estudiante_apellidos']], $widths, $height);
+    $pdf->MultiCellRow(['CÉDULA:', $rowData['cedula']], $widths, $height);
+    $pdf->MultiCellRow(['TEMA DE PROYECTO:', mb_strtoupper($rowData['tema'])], $widths, $height);
+    $pdf->Ln(5);
 
-// Definir márgenes específicos para este párrafo
-$margen_izquierdo = 27; // Mayor margen izquierdo
-$margen_derecho = 27;  // Mayor margen derecho
-$ancho_pagina = $pdf->getPageWidth();
-$ancho_contenido = $ancho_pagina - ($margen_izquierdo + $margen_derecho); // Ancho disponible dentro de los márgenes
+    // ENCABEZADO NOTAS
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell(0, 6, 'Otorga la siguiente calificación:', 0, 1);
+    $pdf->Ln(2);
 
-// Configurar fuente en tamaño 10 antes de imprimir
-$pdf->SetFont('helvetica', '', 10);
+    // Cálculo de notas
+    $nota_doc    = floatval($rowData['nota_doc']);
+    $nota_uno    = floatval($rowData['nota_uno']);
+    $nota_dos    = floatval($rowData['nota_dos']);
+    $nota_tres   = floatval($rowData['nota_tres']);
 
-// Texto con negrita en la primera parte y cursiva en todo el párrafo
-$texto = '<i><strong>Artículo 32.-</strong> Diseño, acceso y aprobación de la unidad de integración curricular del tercer nivel. - Cada IES diseñará la unidad de integración curricular, estableciendo su estructura, contenidos y parámetros para el correspondiente desarrollo y evaluación. Para acceder a la unidad de integración curricular, es necesario haber completado las horas y/o créditos mínimos establecidos por la IES, así como cualquier otro requisito establecido en su normativa interna. Su aprobación se realizará a través de las siguientes opciones: a) Desarrollo de un trabajo de integración curricular; o, b) La aprobación de un examen de carácter complexivo, mediante el cual el estudiante deberá demostrar el manejo integral de los conocimientos adquiridos a lo largo de su formación.</i>';
+    $peso_revision      = 6.00; // 60%
+    $peso_sustentacion  = 4.00; // 40%
+    $nota_maxima        = 10.00;
 
-// Aplicar margen izquierdo antes de escribir
-$pdf->SetX($margen_izquierdo);
+    $nota_equiv_doc     = ($nota_doc / $nota_maxima) * $peso_revision;
+    $prom_sust          = ($nota_uno + $nota_dos + $nota_tres) / 3;
+    $nota_equiv_sustent = ($prom_sust / $nota_maxima) * $peso_sustentacion;
+    $nota_final         = $nota_equiv_doc + $nota_equiv_sustent;
 
-// Usar writeHTMLCell() para mezclar estilos (cursiva + negrita) y tamaño 10
-$pdf->writeHTMLCell($ancho_contenido, 0, $margen_izquierdo, '', $texto, 0, 1, false, true, 'J', true);
+    // Tabla 3 columnas
+    $col1_width = 95;
+    $col2_width = 30;
+    $col3_width = 35;
 
-$pdf->Ln(5); // Espaciado después del párrafo
+    // FILA ENCABEZADO TABLA
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell($col1_width, 7, 'Detalle', 1, 0, 'L');
+    $pdf->Cell($col2_width, 7, 'Nota Parcial', 1, 0, 'C');
+    $pdf->Cell($col3_width, 7, 'Nota Equivalente', 1, 1, 'C');
 
-// Volver a fuente normal
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "El suscrito en calidad de ");
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Write(5, "Coordinador Académico de la carrera Tecnología Superior en Desarrollo de Software, ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "después del análisis de los requisitos legales para el proceso de titulación a través de la modalidad: ");
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Write(5, "“Proyecto de Titulación” ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "y por autorización del ");
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Write(5, "Comité Específico de Revisión y Aprobación de la Carrera ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "en reunión realizada el 7 de agosto del 2024, ratifica la aprobación del proceso según nómina que consta en el ");
-$pdf->SetFont('times', 'B', 11);
-$pdf->Write(5, "Acta Nro. ISTJBA-GT-TDS-089-2024-1P ");
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Write(5, "el cual fue aplicado a:");
-$pdf->Ln(10);
+    // REVISIÓN
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell($col1_width, 7, 'REVISIÓN DE DOCUMENTO (60%)', 1, 0, 'L');
+    $pdf->Cell($col2_width, 7, number_format($nota_doc, 2). ' / 10.00', 1, 0, 'R');
+    $pdf->Cell($col3_width, 7, number_format($nota_equiv_doc, 2). ' / 6.00', 1, 1, 'R');
 
-// Tabla de Información del Estudiante
-$widths = [50, 122];
-$height = 7;
-$pdf->MultiCellRow(['CARRERA:', 'TECNOLOGÍA SUPERIOR EN DESARROLLO DE SOFTWARE'], $widths, $height);
-$pdf->MultiCellRow(['APELLIDOS Y NOMBRES:', $row['estudiante_nombre'] . ' ' . $row['estudiante_apellidos']], $widths, $height);
-$pdf->MultiCellRow(['CEDULA:', $row['cedula']], $widths, $height);
-$pdf->MultiCellRow(['TEMA DE PROYECTO:', $row['tema']], $widths, $height);
-$pdf->Ln(5);
+    // SUSTENTACIÓN
+    $pdf->Cell($col1_width, 7, 'NOTA DE SUSTENTACIÓN DE PROYECTO (40%)', 1, 0, 'L');
+    $pdf->Cell($col2_width, 7, number_format($prom_sust, 2). ' / 10.00', 1, 0, 'R');
+    $pdf->Cell($col3_width, 7, number_format($nota_equiv_sustent, 2). ' / 4.00', 1, 1, 'R');
 
-// Configurar fuente y encabezado
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell(0, 7, 'Otorga la siguiente calificación:', 0, 1);
-$pdf->Ln(2);
+    // NOTA FINAL
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell($col1_width + $col2_width, 7, 'NOTA FINAL TRABAJO DE TITULACIÓN:', 1, 0, 'L');
+    $pdf->Cell($col3_width, 7, number_format($nota_final, 2). ' / 10.00', 1, 1, 'R');
 
-// Definir anchos de columnas
-$col1_width = 95;  // Ancho para "Detalle"
-$col2_width = 30;  // Ancho para "Nota Parcial"
-$col3_width = 35;  // Ancho para "Nota Equivalente"
-$total_width = $col1_width + $col2_width + $col3_width;
+    $pdf->Ln(5);
 
-// Posicionar la tabla en el centro si es necesario
-$margen_izquierdo = ($pdf->getPageWidth() - $total_width) / 2;
-$pdf->SetX($margen_izquierdo);
+    // FIRMAS
+    $pdf->SetFont('helvetica', '', 11);
 
-// Encabezado de la tabla
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($col1_width, 7, 'Detalle', 1, 0, 'L');
-$pdf->Cell($col2_width, 7, 'Nota Parcial', 1, 0, 'C');
-$pdf->Cell($col3_width, 7, 'Nota Equivalente', 1, 1, 'C');
+    // Fecha actual
+    $meses = [
+        1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril', 5 => 'mayo', 6 => 'junio',
+        7 => 'julio', 8 => 'agosto', 9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+    ];
+    $dia  = date('j');
+    $mes  = $meses[intval(date('n'))];
+    $anio = date('Y');
+    $fecha_actual = "$dia de $mes de $anio";
 
-// Filas de la tabla con alineación correcta
-$pdf->SetFont('helvetica', '', 11);
+    $pdf->Cell(0, 7, "Para constancia firman los que en ella intervinieron en la ciudad de Daule, el $fecha_actual.", 0, 1);
+    $pdf->Ln(10);
 
-// Definir el peso de cada evaluación
-$peso_revision = 6.00; // 60% de 10 es 6.00
-$nota_maxima = 10.00; // Nota máxima posible
+    $pdf->Cell(90, 5, '_____________________________________', 0, 0, 'C');
+    $pdf->Cell(90, 5, '_____________________________________', 0, 1, 'C');
 
-// Calcular Nota Equivalente de Revisión de Documento
-$nota_parcial_revision = $row['nota_doc']; // Nota obtenida
-$nota_equivalente_revision = ($nota_parcial_revision / $nota_maxima) * $peso_revision;
-$nota_equivalente_revision = number_format($nota_equivalente_revision, 2); // Formatear a 2 decimales
+    $nombreCompleto = mb_convert_case($rowData['estudiante_nombre'].' '.$rowData['estudiante_apellidos'], MB_CASE_TITLE, "UTF-8");
 
-// Primera fila: Tres columnas
-$pdf->SetX($margen_izquierdo);
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($col1_width, 7, 'REVISIÓN DE DOCUMENTO (60%)', 1, 0, 'L');
-$pdf->SetFont('helvetica', 'B', 11);
-// Imprimir la fila con la Nota Parcial y la Nota Equivalente calculada
-$pdf->Cell($col2_width, 7, $nota_parcial_revision . ' / 10.00', 1, 0, 'R'); 
-$pdf->Cell($col3_width, 7, $nota_equivalente_revision . ' / 6.00', 1, 1, 'R');
+    $pdf->Cell(90, 6, 'Ing. Jonathan Cevallos Guambuguete, Mgtr.', 0, 0, 'C');
+    $pdf->Cell(90, 6, $nombreCompleto, 0, 1, 'C');
 
-// Segunda fila: Tres columnas
-$pdf->SetX($margen_izquierdo);
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($col1_width, 7, 'NOTA DE SUSTENTACIÓN DE PROYECTO (40%)', 1, 0, 'L');
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($col2_width, 7, '/10.00', 1, 0, 'R');
-$pdf->Cell($col3_width, 7, '/ 4.00', 1, 1, 'R');
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(90, 5, 'Coordinador de Carrera', 0, 0, 'C');
+    $pdf->Cell(90, 5, 'Alumno Egresado', 0, 1, 'C');
+    $pdf->Cell(90, 5, 'Tecnología Superior en Desarrollo de Software', 0, 0, 'C');
+    $pdf->Cell(90, 5, 'Tecnología Superior en Desarrollo de Software', 0, 1, 'C');
 
-// Última fila: Fusionar primera y segunda columna
-$pdf->SetX($margen_izquierdo);
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($col1_width + $col2_width, 7, 'NOTA FINAL TRABAJO DE TITULACIÓN:', 1, 0, 'L'); // Fusiona las dos primeras columnas
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($col3_width, 7, '/10.00', 1, 1, 'R'); // Solo una celda a la derecha
+    // Devolvemos el PDF en MEMORIA para luego ver cómo lo servimos
+    return $pdf->Output('', 'S'); 
+    // 'S' => devuelve como cadena (string) el contenido binario del PDF
+}
 
-$pdf->Ln(5);
+// ------------------------------------------------------
+// LÓGICA PRINCIPAL
+// ------------------------------------------------------
 
+// 1) Generar el PDF principal
+$id_formateado_postulante = sprintf("%03d", $row['postulante_id']);
+$pdfStringPostulante = generarPDFCompleto($row, $id_formateado_postulante);
 
-// Firmas
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell(0, 7, 'Para constancia firman los que en ella intervinieron en la ciudad de Daule, el 6 de agosto de 2024.', 0, 1);
-$pdf->Ln(10);
-$pdf->Cell(90, 7, '_____________________________________', 0, 0, 'C');
-$pdf->Cell(90, 7, '_____________________________________', 0, 1, 'C');
+// 2) Revisar si hay pareja
+if (!empty($row['pareja_id'])) {
+    // Hay pareja => generamos el PDF de la pareja y empaquetamos en ZIP
 
-// Nombres (Misma fuente original)
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell(90, 7, 'Ing. Jonathan Cevallos Guambuguete, Mgtr.', 0, 0, 'C');
-$pdf->Cell(90, 7, $row['estudiante_nombre'] . ' ' . $row['estudiante_apellidos'], 0, 1, 'C');
+    // Cambiar datos a la pareja
+    $rowPareja = $row;
+    $rowPareja['estudiante_nombre']    = $row['pareja_nombre'];
+    $rowPareja['estudiante_apellidos'] = $row['pareja_apellidos'];
+    $rowPareja['cedula']               = $row['pareja_cedula'];
+    $rowPareja['postulante_id']        = $row['pareja_id'];
 
-// Cambiar fuente a negrita y tamaño 10 SOLO para los cargos
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(90, 5, 'Coordinador de Carrera', 0, 0, 'C');
-$pdf->Cell(90, 5, 'Alumno Egresado', 0, 1, 'C');
+    $id_formateado_pareja = sprintf("%03d", $row['pareja_id']);
 
-// Mantener el mismo estilo de negrita y tamaño para la última línea
-$pdf->Cell(90, 5, 'Tecnología Superior en Desarrollo de Software', 0, 0, 'C');
-$pdf->Cell(90, 5, 'Tecnología Superior en Desarrollo de Software', 0, 1, 'C');
+    // Generamos su PDF (string binario)
+    $pdfStringPareja = generarPDFCompleto($rowPareja, $id_formateado_pareja);
 
-// Volver a la fuente original (opcional si hay más contenido después)
-$pdf->SetFont('helvetica', '', 11);
+    // Crear en un directorio temporal dos archivos .pdf y luego meterlos a un ZIP
+    $directorioTemporal = sys_get_temp_dir();
 
-$pdf->Output('ACTA_FINAL_TITULACION.PDF', 'I');
-?>
+    // PDF postulante
+    $nombrePdfPostulante = "ACTA_TITULACION_ISTJBA_" . date("Y") . "_" . $id_formateado_postulante . ".pdf";
+    $rutaPdfPostulante   = $directorioTemporal . '/' . $nombrePdfPostulante;
+    file_put_contents($rutaPdfPostulante, $pdfStringPostulante);
+
+    // PDF pareja
+    $nombrePdfPareja = "ACTA_TITULACION_ISTJBA_" . date("Y") . "_" . $id_formateado_pareja . ".pdf";
+    $rutaPdfPareja   = $directorioTemporal . '/' . $nombrePdfPareja;
+    file_put_contents($rutaPdfPareja, $pdfStringPareja);
+
+    // Crear ZIP
+    $zipFileName = "ACTAS_TITULACION_PDFs_{$id}.zip";
+    $zipFilePath = "$directorioTemporal/$zipFileName";
+
+    $zip = new ZipArchive();
+    if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+        $zip->addFile($rutaPdfPostulante, $nombrePdfPostulante);
+        $zip->addFile($rutaPdfPareja, $nombrePdfPareja);
+        $zip->close();
+    } else {
+        die("Error al crear ZIP");
+    }
+
+    // Descargamos el ZIP
+    header("Content-Type: application/zip");
+    header("Content-Disposition: attachment; filename=\"$zipFileName\"");
+    readfile($zipFilePath);
+
+    // Borrar archivos temporales
+    @unlink($rutaPdfPostulante);
+    @unlink($rutaPdfPareja);
+    @unlink($zipFilePath);
+    exit();
+
+} else {
+    // NO hay pareja => sirve el PDF directamente en el navegador (inline)
+    $filenameSolo = "ACTA_TITULACION_ISTJBA_" . date("Y") . "_" . $id_formateado_postulante . ".pdf";
+
+    header("Content-Type: application/pdf");
+    // 'inline' hace que se intente visualizar en el navegador
+    header("Content-Disposition: inline; filename=\"$filenameSolo\""); 
+    echo $pdfStringPostulante; 
+    exit();
+}

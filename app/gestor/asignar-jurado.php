@@ -15,7 +15,7 @@ $primer_apellido = explode(' ', $_SESSION['usuario_apellido'])[0];
 $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '../../images/user.png';
 
 // Consulta para obtener los temas aprobados con estado de registro 0
-$sql = "SELECT t.id, t.tema, t.estado_tema, 
+$sql = "SELECT t.id, t.sede, t.aula, t.fecha_sustentar, t.hora_sustentar, t.tema, t.estado_tema, 
            u.nombres AS postulante_nombres, u.apellidos AS postulante_apellidos, 
            p.nombres AS pareja_nombres, p.apellidos AS pareja_apellidos,
            j1.nombres AS jurado1_nombre, j2.nombres AS jurado2_nombre, j3.nombres AS jurado3_nombre
@@ -45,7 +45,6 @@ $result = $conn->query($sql);
 </head>
 
 <body>
-
     <!-- Topbar -->
     <div class="topbar z-1">
         <div class="menu-toggle">
@@ -201,6 +200,10 @@ $result = $conn->query($sql);
                             <th>Jurado 1</th>
                             <th>Jurado 2</th>
                             <th>Jurado 3</th>
+                            <th>Sede</th>
+                            <th>Aula</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -210,10 +213,21 @@ $result = $conn->query($sql);
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['tema']); ?></td>
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
-                                    <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>
-                                    <td><?php echo $row['jurado1_nombre'] ? strtoupper(htmlspecialchars($row['jurado1_nombre'])) : 'No asignado'; ?></td>
-                                    <td><?php echo $row['jurado2_nombre'] ? strtoupper(htmlspecialchars($row['jurado2_nombre'])) : 'No asignado'; ?></td>
-                                    <td><?php echo $row['jurado3_nombre'] ? strtoupper(htmlspecialchars($row['jurado3_nombre'])) : 'No asignado'; ?></td>
+                                    <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : '<span class="text-muted">No aplica</span>'; ?></td>
+                                    <td><?php echo $row['jurado1_nombre'] ? mb_strtoupper(htmlspecialchars($row['jurado1_nombre'])) : '<span class="text-muted">No asignado</span>'; ?></td>
+                                    <td><?php echo $row['jurado2_nombre'] ? mb_strtoupper(htmlspecialchars($row['jurado2_nombre'])) : '<span class="text-muted">No asignado</span>'; ?></td>
+                                    <td><?php echo $row['jurado3_nombre'] ? mb_strtoupper(htmlspecialchars($row['jurado3_nombre'])) : '<span class="text-muted">No asignado</span>'; ?></td>
+                                    <td><?php echo $row['sede'] ? htmlspecialchars($row['sede']) : '<span class="text-muted">No asignado</span>'; ?></td>
+                                    <td><?php echo $row['aula'] ? htmlspecialchars($row['aula']) : '<span class="text-muted">No asignado</span>'; ?></td>
+                                    <td><?php echo $row['fecha_sustentar'] ? htmlspecialchars($row['fecha_sustentar']) : '<span class="text-muted">No asignado</span>'; ?></td>
+                                    <td>
+                                        <?php
+                                        echo $row['hora_sustentar']
+                                            ? date("g:i A", strtotime($row['hora_sustentar']))
+                                            : '<span class="text-muted">No asignado</span>';
+                                        ?>
+                                    </td>
+
                                     <td class="text-center">
                                         <a href="detalles-asignar-jurado.php?id=<?php echo $row['id']; ?>" class="text-decoration-none">
                                             <i class='bx bx-search'></i> Ver detalles
@@ -223,7 +237,7 @@ $result = $conn->query($sql);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center">No se encontraron temas.</td>
+                                <td colspan="11" class="text-center">No se encontraron temas.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

@@ -16,10 +16,18 @@ if (isset($_GET['id'])) {
     $tema_id = intval($_GET['id']);
 
     // Consulta para obtener los detalles del tema y el tutor actual
-    $sql = "SELECT t.tema, tut.nombres AS tutor_nombres, tut.id AS tutor_id 
-            FROM tema t
-            JOIN tutores tut ON t.tutor_id = tut.id
-            WHERE t.id = ?";
+    $sql = "SELECT t.tema, tut.nombres AS tutor_nombres, tut.id AS tutor_id, 
+            t.aula, t.sede, t.fecha_sustentar, t.hora_sustentar,  
+            j1.id AS jurado_1_id, j1.nombres AS jurado_1_nombre, 
+            j2.id AS jurado_2_id, j2.nombres AS jurado_2_nombre, 
+            j3.id AS jurado_3_id, j3.nombres AS jurado_3_nombre
+        FROM tema t
+        JOIN tutores tut ON t.tutor_id = tut.id
+        LEFT JOIN tutores j1 ON t.id_jurado_uno = j1.id
+        LEFT JOIN tutores j2 ON t.id_jurado_dos = j2.id
+        LEFT JOIN tutores j3 ON t.id_jurado_tres = j3.id
+        WHERE t.id = ?";
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $tema_id);
     $stmt->execute();
@@ -138,13 +146,46 @@ if (isset($_GET['id'])) {
                     <form action="logica-asignar-jurado.php" method="POST">
                         <input type="hidden" name="tema_id" value="<?php echo $tema_id; ?>">
 
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="sede" class="form-label fw-bold">Sede</label>
+                                <select class="form-select" id="sede" name="sede">
+                                    <option value="">Seleccionar sede</option>
+                                    <option value="SEDE JULIO CARCHI VARGAS" <?php echo ($tema['sede'] == "SEDE JULIO CARCHI VARGAS") ? "selected" : ""; ?>>SEDE JULIO CARCHI VARGAS</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="aula" class="form-label fw-bold">Aula</label>
+                                <select class="form-select" id="aula" name="aula">
+                                    <option value="">Seleccionar Aula</option>
+                                    <option value="LABORATORIO DE COMPUTO" <?php echo ($tema['aula'] == "LABORATORIO DE COMPUTO") ? "selected" : ""; ?>>LABORATORIO DE COMPUTO</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fecha" class="form-label fw-bold">Fecha</label>
+                                <input class="form-control" name="fecha" id="fecha" type="date" value="<?php echo isset($tema['fecha_sustentar']) ? $tema['fecha_sustentar'] : ''; ?>">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="hora" class="form-label fw-bold">Hora</label>
+                                <input class="form-control" name="hora" id="hora" type="time" value="<?php echo isset($tema['hora_sustentar']) ? $tema['hora_sustentar'] : ''; ?>">
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label for="jurado_1" class="form-label fw-bold">Jurado 1</label>
-                            <select class="form-select" id="jurado_1" name="jurado_1" required>
+                            <select class="form-select" id="jurado_1" name="jurado_1">
                                 <option value="">Seleccionar jurado</option>
-                                <?php while ($tutor = $result_tutores->fetch_assoc()): ?>
-                                    <option value="<?php echo $tutor['id']; ?>">
-                                        <?php echo htmlspecialchars($tutor['nombres']); ?>
+                                <?php
+                                $result_tutores->data_seek(0);
+                                while ($tutor = $result_tutores->fetch_assoc()): ?>
+                                    <option value="<?php echo $tutor['id']; ?>"
+                                        <?php echo (isset($tema['jurado_1_id']) && $tema['jurado_1_id'] == $tutor['id']) ? 'selected' : ''; ?>>
+                                        <?php echo mb_strtoupper(htmlspecialchars($tutor['nombres'])); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
@@ -152,14 +193,14 @@ if (isset($_GET['id'])) {
 
                         <div class="mb-3">
                             <label for="jurado_2" class="form-label fw-bold">Jurado 2</label>
-                            <select class="form-select" id="jurado_2" name="jurado_2" required>
+                            <select class="form-select" id="jurado_2" name="jurado_2">
                                 <option value="">Seleccionar jurado</option>
                                 <?php
-                                // Rehacer la consulta para los tutores disponibles
-                                $result_tutores->data_seek(0); // Reiniciar puntero de resultados
+                                $result_tutores->data_seek(0);
                                 while ($tutor = $result_tutores->fetch_assoc()): ?>
-                                    <option value="<?php echo $tutor['id']; ?>">
-                                        <?php echo htmlspecialchars($tutor['nombres']); ?>
+                                    <option value="<?php echo $tutor['id']; ?>"
+                                        <?php echo (isset($tema['jurado_2_id']) && $tema['jurado_2_id'] == $tutor['id']) ? 'selected' : ''; ?>>
+                                        <?php echo mb_strtoupper(htmlspecialchars($tutor['nombres'])); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
@@ -167,20 +208,20 @@ if (isset($_GET['id'])) {
 
                         <div class="mb-3">
                             <label for="jurado_3" class="form-label fw-bold">Jurado 3</label>
-                            <select class="form-select" id="jurado_3" name="jurado_3" required>
+                            <select class="form-select" id="jurado_3" name="jurado_3">
                                 <option value="">Seleccionar jurado</option>
                                 <?php
-                                // Rehacer la consulta para los tutores disponibles
                                 $result_tutores->data_seek(0);
                                 while ($tutor = $result_tutores->fetch_assoc()): ?>
-                                    <option value="<?php echo $tutor['id']; ?>">
-                                        <?php echo htmlspecialchars($tutor['nombres']); ?>
+                                    <option value="<?php echo $tutor['id']; ?>"
+                                        <?php echo (isset($tema['jurado_3_id']) && $tema['jurado_3_id'] == $tutor['id']) ? 'selected' : ''; ?>>
+                                        <?php echo mb_strtoupper(htmlspecialchars($tutor['nombres'])); ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
 
-
+                        <!-- Botones -->
                         <div class="text-center botones-detalle-tema mt-4 d-flex justify-content-center gap-4">
                             <button type="button" id="cancelar-btn" class="btn" onclick="history.back()">Cancelar</button>
                             <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modalConfirmarActualizar">
@@ -196,7 +237,7 @@ if (isset($_GET['id'])) {
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        ¿Estás seguro de asignar a estos tres jurados para la sustentación de tesis?
+                                        ¿Estás seguro de realizar estos cambios?
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -205,8 +246,8 @@ if (isset($_GET['id'])) {
                                 </div>
                             </div>
                         </div>
-
                     </form>
+
                 </div>
             </div>
         </div>
