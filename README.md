@@ -30,7 +30,8 @@ Implementar una aplicación web que permita **optimizar la gestión del proceso 
 - **Framework Frontend:** Bootstrap 5  
 - **Base de Datos:** MySQL Workbench  
 - **Entorno de Desarrollo:** Visual Studio Code  
-- **Generación de Documentos PDF:** TCPDF  
+- **Generación de Documentos PDF:** TCPDF
+- **Generación de Documentos WORD:** PHPWord  
 
 ---
 
