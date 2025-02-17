@@ -33,7 +33,7 @@ if (isset($_GET['id'])) {
   }
 
   // Obtener todos los tutores disponibles
-  $sql_tutores = "SELECT id, nombres FROM tutores";
+  $sql_tutores = "SELECT id, nombres, estado FROM tutores where estado = 0";
   $result_tutores = $conn->query($sql_tutores);
 } else {
   echo "No se especificó ningún ID de tema.";

@@ -154,9 +154,6 @@ $result = $conn->query($sql);
                             <th>Jurado 1</th>
                             <th>Jurado 2</th>
                             <th>Jurado 3</th>
-                            <th>Observación 1</th>
-                            <th>Observación 2</th>
-                            <th>Observación 3</th>
                             <th>Estudiante 1</th>
                             <th>Estudiante 2</th>
                         </tr>
@@ -169,26 +166,7 @@ $result = $conn->query($sql);
                                     <td><?php echo $row['jurado1_nombre'] ? htmlspecialchars(mb_strtoupper($row['jurado1_nombre'])) : 'No asignado';?></td>
                                     <td><?php echo $row['jurado2_nombre'] ? htmlspecialchars(mb_strtoupper($row['jurado2_nombre'])) : 'No asignado';?></td>
                                     <td><?php echo $row['jurado3_nombre'] ? htmlspecialchars(mb_strtoupper($row['jurado3_nombre'])) : 'No asignado';?></td>
-                                    <td>
-                                        <?php if (!empty($row['obs_jurado_uno'])): ?>
-                                            <a href="<?php echo htmlspecialchars($row['obs_jurado_uno']); ?>" target="_blank" download>Descargar</a>
-                                        <?php else: ?>
-                                            No disponible
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if (!empty($row['obs_jurado_dos'])): ?>
-                                            <a href="<?php echo htmlspecialchars($row['obs_jurado_dos']); ?>" target="_blank" download>Descargar</a>
-                                        <?php else: ?>
-                                            No disponible
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if (!empty($row['obs_jurado_tres'])): ?>
-                                            <a href="<?php echo htmlspecialchars($row['obs_jurado_tres']); ?>" target="_blank" download>Descargar</a>
-                                        <?php else: ?>
-                                            No disponible
-                                        <?php endif; ?>
+                                    
                                     </td>
                                     <td><?php echo htmlspecialchars($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']); ?></td>
                                     <td><?php echo $row['pareja_nombres'] ? htmlspecialchars($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) : 'No aplica'; ?></td>

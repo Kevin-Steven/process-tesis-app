@@ -57,7 +57,7 @@ $tema = $result->fetch_assoc();
 $stmt->close();
 
 // Consulta para obtener todos los tutores
-$sql_tutores = "SELECT id, nombres FROM tutores";
+$sql_tutores = "SELECT id, nombres, estado FROM tutores where estado = 0";
 $result_tutores = $conn->query($sql_tutores);
 
 // Consulta para obtener la pareja de tesis actual si existe

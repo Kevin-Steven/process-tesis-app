@@ -15,7 +15,7 @@ if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-$sql_tutores = "SELECT id, nombres FROM tutores";
+$sql_tutores = "SELECT id, nombres, cedula, estado FROM tutores";
 $result_tutores = $conn->query($sql_tutores);
 
 ?>
@@ -106,89 +106,95 @@ $result_tutores = $conn->query($sql_tutores);
         </nav>
     </div>
 
-    <!-- Content -->
+    <!-- Toast -->
+    <?php if (isset($_GET['status'])): ?>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <?php
+                    // Filtrar el valor para evitar problemas con inyecciones
+                    $status = htmlspecialchars($_GET['status']);
+
+                    // Seleccionar el ícono y el mensaje según el estado
+                    if ($status === 'success'): ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
+                        <strong class="me-auto">Tutor Agregado</strong>
+                    <?php elseif ($status === 'updated'): ?>
+                        <i class='bx bx-check-circle fs-4 me-2 text-primary'></i>
+                        <strong class="me-auto">Tutor Actualizado</strong>
+                    <?php elseif ($status === 'deleted'): ?>
+                        <i class='bx bx-trash-alt fs-4 me-2 text-warning'></i>
+                        <strong class="me-auto">Tutor Eliminado</strong>
+                    <?php elseif ($status === 'repeat-ci'): ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-warning'></i>
+                        <strong class="me-auto">Cédula Duplicada</strong>
+                    <?php elseif ($status === 'empty-fields'): ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Campos Vacíos</strong>
+                    <?php elseif ($status === 'error'): ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Error</strong>
+                    <?php else: ?>
+                        <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
+                        <strong class="me-auto">Error Desconocido</strong>
+                    <?php endif; ?>
+                    <small>Justo ahora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <?php
+                    switch ($status) {
+                        case 'success':
+                            echo "El tutor ha sido agregado correctamente.";
+                            break;
+                        case 'updated':
+                            echo "Los datos del tutor han sido actualizados correctamente.";
+                            break;
+                        case 'deleted':
+                            echo "El tutor ha sido eliminado (borrado lógico).";
+                            break;
+                        case 'repeat-ci':
+                            echo "La cédula ya está registrada. Ingresa una cédula diferente.";
+                            break;
+                        case 'empty-fields':
+                            echo "Todos los campos son obligatorios. Por favor, completa el formulario.";
+                            break;
+                        case 'error':
+                            echo "Ocurrió un error inesperado. Inténtalo de nuevo.";
+                            break;
+                        default:
+                            echo "Ha ocurrido un error desconocido. Inténtalo nuevamente.";
+                            break;
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
     <div class="content" id="content">
         <div class="container mt-2">
-            <!-- Toast -->
-            <?php if (isset($_GET['status'])): ?>
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="toast-header">
-                            <?php
-                            // Filtrar el valor para evitar problemas con inyecciones
-                            $status = htmlspecialchars($_GET['status']);
-
-                            // Seleccionar el ícono y el mensaje según el estado
-                            if ($status === 'success'): ?>
-                                <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                                <strong class="me-auto">Acción Exitosa</strong>
-                            <?php elseif ($status === 'error'): ?>
-                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                                <strong class="me-auto">Error</strong>
-                            <?php elseif ($status === 'repeat-ci'): ?>
-                                <i class='bx bx-error-circle fs-4 me-2 text-warning'></i>
-                                <strong class="me-auto">Cédula Duplicada</strong>
-                            <?php elseif ($status === 'empty-tutor'): ?>
-                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                                <strong class="me-auto">Tutor no Seleccionado</strong>
-                            <?php elseif ($status === 'empty-fields'): ?>
-                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                                <strong class="me-auto">Campos vacios</strong>
-                            <?php elseif ($status === 'tutor_deleted'): ?>
-                                <i class='bx bx-check-circle fs-4 me-2 text-success'></i>
-                                <strong class="me-auto">Tutor Eliminado</strong>
-                            <?php else: ?>
-                                <i class='bx bx-error-circle fs-4 me-2 text-danger'></i>
-                                <strong class="me-auto">Error Desconocido</strong>
-                            <?php endif; ?>
-                            <small>Justo ahora</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            <?php
-                            switch ($status) {
-                                case 'success':
-                                    echo "El tutor ha sido agregado correctamente.";
-                                    break;
-                                case 'error':
-                                    echo "Ocurrió un error al agregar el tutor.";
-                                    break;
-                                case 'repeat-ci':
-                                    echo "La cédula ya está registrada. Por favor, ingresa una cédula diferente.";
-                                    break;
-                                case 'empty-tutor':
-                                    echo "No has seleccionado un tutor para eliminar. Intenta nuevamente.";
-                                    break;
-                                case 'tutor_deleted':
-                                    echo "El tutor ha sido eliminado exitosamente.";
-                                    break;
-                                default:
-                                    echo "Ha ocurrido un error desconocido. Inténtalo nuevamente.";
-                                    break;
-                            }
-                            ?>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
 
             <h1 class="mb-4 text-center fw-bold">Gestión de Tutores</h1>
-
+            
             <div class="row g-4">
                 <!-- Agregar Tutor -->
-                <div class="col-md-12">
+                <div class="col-md-5">
                     <div class="card shadow-lg">
                         <div class="card-body">
                             <h5 class="card-title text-primary fw-bold mb-3 text-center">Agregar Tutor</h5>
                             <form id="formAgregarTutor" method="POST" action="logica-agregar-tutores.php">
+                                <input type="hidden" name="accion" value="agregar">
+                                
                                 <div class="mb-3">
                                     <label for="nombre" class="form-label fw-bold">Nombre del Tutor</label>
-                                    <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                    <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Apellidos y Nombres" required>
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="cedula" class="form-label fw-bold">Cédula</label>
-                                    <input type="text" name="cedula" id="cedula" maxlength="10" class="form-control" required oninput="validateInput(this)">
+                                    <input type="text" name="cedula" id="cedula" maxlength="10" class="form-control" placeholder="Ingrese la cédula" required oninput="validateInput(this)">
                                 </div>
+                                
                                 <div class="text-center formulario-aceptar-rechazar">
                                     <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#modalConfirmarAgregarTutor">Agregar Tutor</button>
                                 </div>
@@ -196,13 +202,12 @@ $result_tutores = $conn->query($sql_tutores);
                         </div>
                     </div>
                 </div>
-
                 <!-- Modal de confirmación para agregar tutor -->
-                <div class="modal fade" id="modalConfirmarAgregarTutor" tabindex="-1" aria-labelledby="modalConfirmarActualizarLabel" aria-hidden="true">
+                <div class="modal fade" id="modalConfirmarAgregarTutor" tabindex="-1" aria-labelledby="modalConfirmarAgregarTutorLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="modalConfirmarActualizarLabel">Confirmar Agregar Tutor</h5>
+                                <h5 class="modal-title" id="modalConfirmarAgregarTutorLabel">Confirmar Agregar Tutor</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
@@ -215,54 +220,105 @@ $result_tutores = $conn->query($sql_tutores);
                         </div>
                     </div>
                 </div>
+                
+                <!-- Tabla de Tutores -->
+                <div class="col-md-7">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="tutores">
+                            <thead class="table-header-fixed">
+                                <tr>
+                                    <th>Tutores</th>
+                                    <th>Cédula</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $result_tutores->fetch_assoc()): ?>
+                                    <?php if ($row['estado'] === '0'): ?>
+                                        <tr>
+                                            <td><?php echo mb_strtoupper($row['nombres']); ?></td>
+                                            <td><?php echo mb_strtoupper($row['cedula']); ?></td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <!-- Botón Editar -->
+                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditar<?php echo $row['id']; ?>">
+                                                        <i class='bx bx-edit-alt'></i>
+                                                    </button>
 
-                 <!-- Eliminar Tutor 
-                <div class="col-md-6">
-                    <div class="card shadow-lg">
-                        <div class="card-body">
-                            <h5 class="card-title text-danger fw-bold mb-3">Eliminar Tutor</h5>
-                            <form id="formEliminarTutor" method="POST" action="logica-borrar-tutores.php">
-                                <div class="mb-3">
-                                    <label for="tutor_id" class="form-label fw-bold">Seleccionar Tutor para Eliminar</label>
-                                    <select class="form-select" id="tutor_id" name="tutor_id" required>
-                                        <option value="">Seleccionar tutor</option>
-                                        <?php while ($tutor = $result_tutores->fetch_assoc()): ?>
-                                            <option value="<?php echo $tutor['id']; ?>">
-                                                <?php echo htmlspecialchars($tutor['nombres']); ?>
-                                            </option>
-                                        <?php endwhile; ?>
-                                    </select>
-                                </div>
-                                <div class="text-center formulario-aceptar-rechazar">
-                                    <button type="button" class="btn color-rojo" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminarTutor">Eliminar Tutor</button>
-                                </div>
-                            </form>
-                        </div>
+                                                    <!-- Botón Eliminar -->
+                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar<?php echo $row['id']; ?>">
+                                                        <i class='bx bx-trash'></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Modal Editar -->
+                                        <div class="modal fade" id="modalEditar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEditarLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form action="logica-agregar-tutores.php" method="POST">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Editar Tutor</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <input type="hidden" name="accion" value="editar">
+                                                            <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+
+                                                            <div class="mb-3">
+                                                                <label for="nombre-<?php echo $row['id']; ?>" class="form-label">Nombre del Tutor</label>
+                                                                <input type="text" name="nombre" id="nombre-<?php echo $row['id']; ?>" class="form-control" value="<?php echo htmlspecialchars($row['nombres']); ?>" required>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="cedula-<?php echo $row['id']; ?>" class="form-label">Cédula</label>
+                                                                <input type="text" name="cedula" id="cedula-<?php echo $row['id']; ?>" class="form-control" value="<?php echo htmlspecialchars($row['cedula']); ?>" required maxlength="10">
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal Eliminar -->
+                                        <div class="modal fade" id="modalEliminar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEliminarLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form action="logica-agregar-tutores.php" method="POST">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Eliminar Tutor</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            ¿Estás seguro de que deseas eliminar al tutor <strong><?php echo htmlspecialchars($row['nombres']); ?></strong>?
+                                                            <input type="hidden" name="accion" value="eliminar">
+                                                            <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    <?php endif; ?>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                Modal de confirmación para eliminar tutor
-                <div class="modal fade" id="modalConfirmarEliminarTutor" tabindex="-1" aria-labelledby="modalConfirmarActualizarLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="modalConfirmarActualizarLabel">Confirmar Eliminar Tutor</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                ¿Estás seguro de que deseas eliminar el tutor seleccionado?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" class="btn btn-primary" onclick="document.getElementById('formEliminarTutor').submit();">Confirmar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
             </div>
 
         </div>
     </div>
+
 
 
     <!-- Footer -->

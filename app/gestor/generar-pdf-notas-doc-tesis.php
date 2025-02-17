@@ -80,7 +80,7 @@ $sql = "SELECT t.tema, t.nota_revisor_tesis as nota,
 FROM tema t
 JOIN usuarios u ON t.usuario_id = u.id
 LEFT JOIN usuarios p ON t.pareja_id = p.id
-WHERE t.estado_tema = 'Aprobado'
+WHERE t.estado_tesis = 'Aprobado'
 AND t.estado_registro = 0;
 ";
 $result = $conn->query($sql);

@@ -90,12 +90,14 @@ $sql = "SELECT
          t.sede,
          t.aula,
          t.fecha_sustentar,
-         t.hora_sustentar
+         t.hora_sustentar,
+         t.estado_tesis
        FROM tema t
        JOIN usuarios u ON t.usuario_id = u.id
        LEFT JOIN usuarios p ON t.pareja_id = p.id
        WHERE t.estado_tema = 'Aprobado'
          AND t.estado_registro = 0
+         AND t.estado_tesis = 'Aprobado'
        ORDER BY t.fecha_sustentar ASC, t.hora_sustentar ASC";
 
 

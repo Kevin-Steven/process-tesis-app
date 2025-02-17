@@ -63,22 +63,24 @@ $pdf->SetFont('helvetica', 'B', 14);
 $pdf->Cell(0, 10, 'Cronograma de Sustentación', 0, 1, 'C');
 $pdf->Ln(5);
 
-$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetFont('helvetica', 'B', 7.5);
 
 // **Ajuste de columnas**
-$widths = [25, 25, 22, 22, 22, 17, 25, 19, 13];
+$widths = [36,19, 19, 19, 19, 19, 13, 20, 15,10];
 $height = 6;
 
 // **Encabezados corregidos**
-$headers = ['Postulante 1', 'Postulante 2', 'Jurado 1', 'Jurado 2', 'Jurado 3', 'Sede', 'Aula', 'Fecha', 'Hora'];
+$headers = ['Tema','Postulante 1', 'Postulante 2', 'Jurado 1', 'Jurado 2', 'Jurado 3', 'Sede', 'Aula', 'Fecha', 'Hora'];
 $pdf->MultiCellRow($headers, $widths, $height);
 
 $sql = "SELECT 
     t.id, 
+    t.tema,
     t.sede, 
     t.aula, 
     t.fecha_sustentar, 
     t.hora_sustentar, 
+    t.estado_tesis,
     u.nombres AS postulante_nombres, 
     u.apellidos AS postulante_apellidos, 
     p.nombres AS pareja_nombres, 
@@ -92,17 +94,20 @@ LEFT JOIN usuarios p ON t.pareja_id = p.id
 LEFT JOIN tutores j1 ON t.id_jurado_uno = j1.id
 LEFT JOIN tutores j2 ON t.id_jurado_dos = j2.id
 LEFT JOIN tutores j3 ON t.id_jurado_tres = j3.id
-WHERE t.estado_tema = 'Aprobado' 
-AND t.estado_registro = 0";
+WHERE t.estado_tesis = 'Aprobado' 
+AND t.estado_registro = 0
+ORDER BY t.fecha_sustentar ASC, t.hora_sustentar ASC";
 
 $result = $conn->query($sql);
 
 // ------------------------------
 // 4. LLENAR EL CONTENIDO DE LA TABLA
 // ------------------------------
-$pdf->SetFont('helvetica', '', 9);
+$pdf->SetFont('helvetica', '', 7);
 
 while ($row = $result->fetch_assoc()) {
+    $tema = mb_strtoupper($row['tema']);
+
     $postulante1 = trim($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']);
     $postulante2 = (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) 
         ? trim($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) 
@@ -118,7 +123,7 @@ while ($row = $result->fetch_assoc()) {
     $hora = $row['hora_sustentar'] ? date("g:i A", strtotime($row['hora_sustentar'])) : 'Pendiente';
 
     $pdf->MultiCellRow([
-        $postulante1, $postulante2, $jurado1, $jurado2, $jurado3,
+        $tema, $postulante1, $postulante2, $jurado1, $jurado2, $jurado3,
         $sede, $aula, $fecha, $hora
     ], $widths, $height);
 }

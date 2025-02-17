@@ -109,7 +109,7 @@ function generarActaCompleta($row, $rutaSalida, $id_formateado)
     );
     // "II periodo académico del año 2024" en negrita
     $textRun->addText(
-        "II periodo académico del año 2024",
+        "II periodo académico del año 2024 del Comité Específico de Revisión y Aprobación de la Carrera,",
         ['bold' => true, 'size' => 11, 'name' => 'Calibri (Cuerpo)']
     );
     // Continuación
@@ -364,7 +364,7 @@ $directorioTemporal = sys_get_temp_dir();
 
 // 1) Generar el Acta del Postulante Principal
 $id_formateado_postulante = sprintf("%03d", $row['postulante_id']);
-$nombreArchivoPostulante = "ACTA_DE_TITULACIÓN_ISTJBA_ISTJBA-GT-TDS-" . date("Y") . "-" . $id_formateado . ".docx";
+$nombreArchivoPostulante = "ACTA_DE_TITULACIÓN_ISTJBA_ISTJBA-GT-TDS-" . date("Y") . "-" . $id_formateado_postulante . ".docx";
 $rutaPostulante = "$directorioTemporal/$nombreArchivoPostulante";
 
 generarActaCompleta($row, $rutaPostulante, $id_formateado_postulante);

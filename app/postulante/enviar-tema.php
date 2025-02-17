@@ -25,7 +25,7 @@ $stmt->close();
 $estado_inscripcion = $inscripcion['estado_inscripcion'] ?? null;
 
 // Consulta para obtener los tutores
-$sql_tutores = "SELECT id, nombres FROM tutores";
+$sql_tutores = "SELECT id, nombres, estado FROM tutores where estado = 0";
 $result_tutores = $conn->query($sql_tutores);
 
 // Consulta para obtener los postulantes disponibles para ser pareja de tesis

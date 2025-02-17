@@ -47,7 +47,8 @@ CREATE TABLE documentos_postulante (
 CREATE TABLE tutores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombres VARCHAR(255) NOT NULL,
-    cedula VARCHAR(20) NOT NULL UNIQUE
+    cedula VARCHAR(20) NOT NULL UNIQUE,
+    estado INT(2) DEFAULT 0
 );
 
 -- Insertar datos en la tabla tutores
@@ -62,8 +63,6 @@ VALUES
 ('Olvera Moran Mariuxi', '0920163334'),
 ('Plaza Quizhpi Jorge', '0920521465'),
 ('Tamayo Miranda Marco', '0920371887');
-
-
 
 -- Crear tabla tema
 CREATE TABLE tema (
@@ -122,7 +121,6 @@ CREATE TABLE periodo_academico (
 );
 
 INSERT INTO procesotitulacion.periodo_academico (periodo) value ('II periodo académico del año 2024');
-INSERT INTO procesotitulacion.periodo_academico (periodo) value ('III periodo académico del año 2024');
 
 CREATE TABLE informes_tutores (
     id INT AUTO_INCREMENT PRIMARY KEY,

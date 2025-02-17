@@ -39,7 +39,10 @@ $sql_temas = "SELECT
     t.correcciones_tesis, 
     t.estado_tesis,
     t.pareja_id,
-    t.sede, t.aula, t.fecha_sustentar, t.hora_sustentar,
+    t.sede, 
+    t.aula, 
+    t.fecha_sustentar, 
+    t.hora_sustentar,
     u.nombres AS postulante_nombres, 
     u.apellidos AS postulante_apellidos, 
     p.nombres AS pareja_nombres, 
@@ -59,7 +62,7 @@ LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
 WHERE 
     (tu1.cedula = ? OR tu2.cedula = ? OR tu3.cedula = ?) -- Compara cédula del docente con los 3 jurados
     AND t.estado_registro = 0 -- Estado de registro
-ORDER BY t.fecha_subida DESC";
+ORDER BY t.fecha_sustentar ASC, t.hora_sustentar ASC";
 
 // Preparamos la consulta y vinculamos la cédula del docente actual a los 3 jurados
 $stmt_temas = $conn->prepare($sql_temas);
@@ -334,6 +337,7 @@ $result_temas = $stmt_temas->get_result();
                 <th>Sede</th>
                 <th>Aula</th>
                 <th>Fecha</th>
+                <th>Hora</th>
                 <th>Calificación 1</th>
                 <th>Calificación 2</th>
                 <th class="text-center">Acciones</th>
@@ -371,6 +375,13 @@ $result_temas = $stmt_temas->get_result();
                   <td><?php echo $row['sede'] ? htmlspecialchars($row['sede']) : '<span class="text-muted">No asignado</span>'; ?></td>
                   <td><?php echo $row['aula'] ? htmlspecialchars($row['aula']) : '<span class="text-muted">No asignado</span>'; ?></td>
                   <td><?php echo $row['fecha_sustentar'] ? htmlspecialchars($row['fecha_sustentar']) : '<span class="text-muted">No asignado</span>'; ?></td>
+                  <td>
+                    <?php
+                    echo $row['hora_sustentar']
+                      ? date("g:i A", strtotime($row['hora_sustentar']))
+                      : '<span class="text-muted">No asignado</span>';
+                    ?>
+                  </td>
 
                   <td>
                     <?php
@@ -448,7 +459,7 @@ $result_temas = $stmt_temas->get_result();
                                   WHERE t.id = ?";
 
                     $stmt_jurados = $conn->prepare($sql_jurados);
-                    $stmt_jurados->bind_param("i", $tema_id); 
+                    $stmt_jurados->bind_param("i", $tema_id);
                     $stmt_jurados->execute();
                     $result_jurados = $stmt_jurados->get_result();
 
@@ -668,6 +679,32 @@ $result_temas = $stmt_temas->get_result();
                     </div>
                   </div>
                 </div>
+
+                <!-- Modal Eliminar Nota -->
+                <div class="modal fade" id="modalEliminar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEliminarLabel<?php echo $row['id']; ?>" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form action="subir-observaciones-sust.php" method="POST">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="modalEliminarLabel<?php echo $row['id']; ?>">Eliminar Nota de Sustentación</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <p>¿Estás seguro de que deseas eliminar la <strong>nota</strong> de sustentación del tema "<strong><?php echo htmlspecialchars($row['tema']); ?></strong>"?</p>
+                          <input type="hidden" name="accion" value="eliminar">
+                          <input type="hidden" name="tesis_id" value="<?php echo $row['id']; ?>">
+                          <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
+                          <input type="hidden" name="pareja_id" value="<?php echo $row['pareja_id']; ?>">
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-danger">Eliminar Nota</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
 
               <?php endwhile; ?>
             </tbody>

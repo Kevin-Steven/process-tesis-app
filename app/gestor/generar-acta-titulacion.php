@@ -135,7 +135,7 @@ function generarPDFCompleto($rowData, $id_formateado) {
         . '<b>El Comité Específico de Revisión y Aprobación de la Carrera: </b>, '
         . 'Tecnología en Superior en Desarrollo de Software del Instituto Superior Tecnológico “Juan Bautista Aguirre”, '
         . 'conforme al proceso de Titulación correspondiente al '
-        . '<b>II periodo académico del año 2024 </b>'
+        . '<b>II periodo académico del año 2024 del </b>'
         . '<b>Comité Específico de Revisión y Aprobación de la Carrera,</b> '
         . 'y en cumplimiento de lo establecido en el Art. 32 del Reglamento de Régimen Académico:';
     $pdf->writeHTMLCell(0, 0, '', '', $texto1, 0, 1, false, true, 'J', true);
