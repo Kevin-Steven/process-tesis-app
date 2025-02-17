@@ -34,9 +34,23 @@ Implementar una aplicación web que permita **optimizar la gestión del proceso 
 
 ---
 
-## 📂 **Estructura del Proyecto**  
+## 📂 Estructura del Proyecto  
 
-📂 PHPWord-master # Módulo para trabajar con documentos Word (v3.1) 📂 TCPDF-main # Generación de archivos PDF (v3.1) 📂 app # Código principal de la aplicación (v4.0) 📂 database # Configuración y migraciones de base de datos (v4.0) 📂 images # Archivos de imágenes (v3.1) 📂 admin # Panel de administración 📂 config # Configuración del sistema 📂 js # Archivos JavaScript 📂 gestor # Módulo para la gestión del proceso de titulación 📂 registrar # Módulo de registro de estudiantes 📂 postulante # Módulo de gestión de postulantes 📂 docente # Módulo para la gestión de tutores y docentes 📂 photos # Carpeta para almacenamiento de fotos de usuarios 📜 index.php # Archivo principal de la aplicación (v3)
+- 📂 **PHPWord-master** → Módulo para trabajar con documentos Word (v3.1)  
+- 📂 **TCPDF-main** → Generación de archivos PDF (v3.1)  
+- 📂 **app** → Código principal de la aplicación (v4.0)  
+- 📂 **database** → Configuración y migraciones de base de datos (v4.0)  
+- 📂 **images** → Archivos de imágenes (v3.1)  
+- 📂 **admin** → Panel de administración  
+- 📂 **config** → Configuración del sistema  
+- 📂 **js** → Archivos JavaScript  
+- 📂 **gestor** → Módulo para la gestión del proceso de titulación  
+- 📂 **registrar** → Módulo de registro de estudiantes  
+- 📂 **postulante** → Módulo de gestión de postulantes  
+- 📂 **docente** → Módulo para la gestión de tutores y docentes  
+- 📂 **photos** → Carpeta para almacenamiento de fotos de usuarios  
+- 📜 **index.php** → Archivo principal de la aplicación (v3)  
+
 
 ---
 
