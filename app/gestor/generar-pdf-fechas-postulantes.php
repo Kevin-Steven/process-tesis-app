@@ -63,7 +63,7 @@ $pdf->SetY(25); // Ajusta la posición del contenido en la primera página
 
 // Configurar la fuente para el título de la tabla
 $pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 10, 'Fecha Sustentación', 0, 1, 'C');
+$pdf->Cell(0, 10, 'Cronograma de Sustentación', 0, 1, 'C');
 $pdf->Ln(5); // Ajuste para añadir más espacio debajo del título
 
 // ----------------------
@@ -83,20 +83,21 @@ $pdf->MultiCellRow($headers, $widths, $height);
 // CONSULTA A LA BASE DE DATOS
 // ----------------------
 $sql = "SELECT 
-       u.nombres AS postulante_nombres, 
-       u.apellidos AS postulante_apellidos,
-       p.nombres AS pareja_nombres, 
-       p.apellidos AS pareja_apellidos,
-       t.sede,
-       t.aula,
-       t.fecha_sustentar,
-       t.hora_sustentar
-FROM tema t
-JOIN usuarios u ON t.usuario_id = u.id
-LEFT JOIN usuarios p ON t.pareja_id = p.id
-WHERE t.estado_tema = 'Aprobado'
-AND t.estado_registro = 0;
-";
+         u.nombres AS postulante_nombres, 
+         u.apellidos AS postulante_apellidos,
+         p.nombres AS pareja_nombres, 
+         p.apellidos AS pareja_apellidos,
+         t.sede,
+         t.aula,
+         t.fecha_sustentar,
+         t.hora_sustentar
+       FROM tema t
+       JOIN usuarios u ON t.usuario_id = u.id
+       LEFT JOIN usuarios p ON t.pareja_id = p.id
+       WHERE t.estado_tema = 'Aprobado'
+         AND t.estado_registro = 0
+       ORDER BY t.fecha_sustentar ASC, t.hora_sustentar ASC";
+
 
 $result = $conn->query($sql);
 

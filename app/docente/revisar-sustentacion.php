@@ -38,6 +38,7 @@ $sql_temas = "SELECT
     t.tema, 
     t.correcciones_tesis, 
     t.estado_tesis,
+    t.pareja_id,
     t.sede, t.aula, t.fecha_sustentar, t.hora_sustentar,
     u.nombres AS postulante_nombres, 
     u.apellidos AS postulante_apellidos, 
@@ -333,7 +334,8 @@ $result_temas = $stmt_temas->get_result();
                 <th>Sede</th>
                 <th>Aula</th>
                 <th>Fecha</th>
-                <th>Calificación</th>
+                <th>Calificación 1</th>
+                <th>Calificación 2</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
@@ -427,6 +429,63 @@ $result_temas = $stmt_temas->get_result();
                     ?>
                   </td>
 
+                  <td>
+                    <?php
+                    $cedula_docente = $docente['cedula'];
+                    $tema_id = $row['id'];
+
+                    $sql_jurados = "SELECT 
+                                    tu1.cedula AS cedula_jurado_1,
+                                    tu2.cedula AS cedula_jurado_2,
+                                    tu3.cedula AS cedula_jurado_3,
+                                    t.j1_nota_sustentar_2,
+                                    t.j2_nota_sustentar_2,
+                                    t.j3_nota_sustentar_2
+                                  FROM tema t
+                                  LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
+                                  LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id
+                                  LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
+                                  WHERE t.id = ?";
+
+                    $stmt_jurados = $conn->prepare($sql_jurados);
+                    $stmt_jurados->bind_param("i", $tema_id); 
+                    $stmt_jurados->execute();
+                    $result_jurados = $stmt_jurados->get_result();
+
+                    // Verificamos si obtenemos datos
+                    if ($result_jurados->num_rows > 0) {
+                      $row_jurados = $result_jurados->fetch_assoc();
+
+                      // Extraemos las cédulas de los jurados
+                      $cedula_jurado_1 = $row_jurados['cedula_jurado_1'];
+                      $cedula_jurado_2 = $row_jurados['cedula_jurado_2'];
+                      $cedula_jurado_3 = $row_jurados['cedula_jurado_3'];
+
+                      // Comprobamos qué observación mostrar dependiendo de la cédula del docente
+                      $nota_jurado = "";
+                      if ($cedula_docente == $cedula_jurado_1 && !empty($row_jurados['j1_nota_sustentar_2'])) {
+                        $nota_jurado = $row_jurados['j1_nota_sustentar_2'];
+                      } elseif ($cedula_docente == $cedula_jurado_2 && !empty($row_jurados['j2_nota_sustentar_2'])) {
+                        $nota_jurado = $row_jurados['j2_nota_sustentar_2'];
+                      } elseif ($cedula_docente == $cedula_jurado_3 && !empty($row_jurados['j3_nota_sustentar_2'])) {
+                        $nota_jurado = $row_jurados['j3_nota_sustentar_2'];
+                      }
+
+                      // Si el archivo está especificado y existe, mostrar el enlace de descarga
+                      if ($nota_jurado && !empty($nota_jurado)):
+                    ?>
+                        <?php echo $nota_jurado; ?>
+                    <?php
+                      else:
+                        // Si no hay archivo o no existe, mostramos un mensaje
+                        echo '<span class="text-muted">No hay nota</span>';
+                      endif;
+                    } else {
+                      echo '<span class="text-muted">Datos de jurados no encontrados</span>';
+                    }
+                    ?>
+                  </td>
+
                   <td class="text-center">
                     <div class="d-flex justify-content-center gap-2">
                       <!-- Botón Subir Observaciones -->
@@ -457,19 +516,49 @@ $result_temas = $stmt_temas->get_result();
                           <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
                           <input type="hidden" name="accion" value="subir">
 
+                          <!-- También enviamos el pareja_id para saber si mostrar el segundo campo -->
+                          <input type="hidden" name="pareja_id" value="<?php echo $row['pareja_id']; ?>">
+
                           <h5 class="modal-title" id="modalEditarLabel">Subir Nota</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          <!-- <div class="mb-3">
-                            <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
-                            <input type="file" class="form-control documentoCarpeta" name="archivo_tesis" accept=".doc,.docx,.pdf,.zip" required onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 5 MB.</small>
-                          </div> -->
+                          <!-- Nota del primer estudiante -->
                           <div class="mb-3">
-                            <label for="nota_sustentar" class="form-label">Subir Nota de sustentación</label>
-                            <input type="number" class="form-control" name="nota_sustentar" id="nota_sustentar-<?php echo $row['id']; ?>" required min="0" max="10" step="0.01" placeholder="Ingrese la nota">
+                            <label for="nota_sustentar" class="form-label">
+                              Nota para: <?php echo $row['postulante_nombres'] . ' ' . $row['postulante_apellidos']; ?>
+                            </label>
+                            <input
+                              type="number"
+                              class="form-control"
+                              name="nota_sustentar"
+                              id="nota_sustentar-<?php echo $row['id']; ?>"
+                              required
+                              min="0"
+                              max="10"
+                              step="0.01"
+                              placeholder="Ingrese la nota">
                           </div>
+
+                          <!-- Mostrar nota de la pareja SOLO si pareja_id > 0 -->
+                          <?php if (!empty($row['pareja_id']) && $row['pareja_id'] > 0): ?>
+                            <div class="mb-3">
+                              <label for="nota_sustentar_2" class="form-label">
+                                Nota para: <?php echo $row['pareja_nombres'] . ' ' . $row['pareja_apellidos']; ?>
+                              </label>
+                              <input
+                                type="number"
+                                class="form-control"
+                                name="nota_sustentar_2"
+                                id="nota_sustentar_2-<?php echo $row['id']; ?>"
+                                required
+                                min="0"
+                                max="10"
+                                step="0.01"
+                                placeholder="Ingrese la nota">
+                            </div>
+                          <?php endif; ?>
+
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -479,13 +568,13 @@ $result_temas = $stmt_temas->get_result();
                     </div>
                   </div>
                 </div>
+
                 <!-- Modal Editar -->
                 <div class="modal fade" id="modalEditar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEditarLabel<?php echo $row['id']; ?>" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <form action="subir-observaciones-sust.php" method="POST" enctype="multipart/form-data">
                         <div class="modal-header">
-                          
                           <h5 class="modal-title" id="modalEditarLabel<?php echo $row['id']; ?>">Editar Nota</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -494,15 +583,82 @@ $result_temas = $stmt_temas->get_result();
                           <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
                           <input type="hidden" name="accion" value="editar">
 
-                          <!-- <div class="mb-3">
-                            <label for="archivoEditar<?php echo $row['id']; ?>" class="form-label">Subir Nuevo Archivo</label>
-                            <input type="file" class="form-control documentoCarpeta" name="observaciones-tesis-sust" accept=".doc,.docx,.pdf,.zip" onchange="validarTamanoArchivo()">
-                            <small class="form-text text-muted">Se permiten archivos .zip, .pdf, .doc, .docx con un tamaño máximo de 5 MB.</small>
-                          </div> -->
+                          <!-- También enviamos el pareja_id para el modal de edición -->
+                          <input type="hidden" name="pareja_id" value="<?php echo $row['pareja_id']; ?>">
+
+                          <!-- Lógica para asignar la nota actual del jurado, si es que existe -->
+                          <?php
+                          // Nota del primer estudiante
+                          $nota_jurado = "";
+                          $sql_jurados = "SELECT 
+                              tu1.cedula AS cedula_jurado_1,
+                              tu2.cedula AS cedula_jurado_2,
+                              tu3.cedula AS cedula_jurado_3,
+                              t.j1_nota_sustentar,
+                              t.j2_nota_sustentar,
+                              t.j3_nota_sustentar,
+                              t.j1_nota_sustentar_2,
+                              t.j2_nota_sustentar_2,
+                              t.j3_nota_sustentar_2
+                          FROM tema t
+                          LEFT JOIN tutores tu1 ON t.id_jurado_uno = tu1.id
+                          LEFT JOIN tutores tu2 ON t.id_jurado_dos = tu2.id
+                          LEFT JOIN tutores tu3 ON t.id_jurado_tres = tu3.id
+                          WHERE t.id = ?";
+                          $stmt_jurados = $conn->prepare($sql_jurados);
+                          $stmt_jurados->bind_param("i", $row['id']);
+                          $stmt_jurados->execute();
+                          $result_jurados = $stmt_jurados->get_result();
+                          $nota_1 = $nota_2 = '';
+
+                          if ($result_jurados->num_rows > 0) {
+                            $row_jurados = $result_jurados->fetch_assoc();
+
+                            if ($cedula_docente == $row_jurados['cedula_jurado_1']) {
+                              $nota_1 = $row_jurados['j1_nota_sustentar'];
+                              $nota_2 = $row_jurados['j1_nota_sustentar_2'];
+                            } elseif ($cedula_docente == $row_jurados['cedula_jurado_2']) {
+                              $nota_1 = $row_jurados['j2_nota_sustentar'];
+                              $nota_2 = $row_jurados['j2_nota_sustentar_2'];
+                            } elseif ($cedula_docente == $row_jurados['cedula_jurado_3']) {
+                              $nota_1 = $row_jurados['j3_nota_sustentar'];
+                              $nota_2 = $row_jurados['j3_nota_sustentar_2'];
+                            }
+                          }
+                          ?>
+
                           <div class="mb-3">
-                            <label for="nota_sustentar" class="form-label">Subir Nueva Nota</label>
-                            <input type="number" class="form-control" name="nota_sustentar" required id="nota_sustentar-<?php echo $row['id']; ?>" value="<?php echo htmlspecialchars($nota_jurado); ?>" min="0" max="10" step="0.01" placeholder="Ingrese la nueva nota">
+                            <label for="nota_sustentar" class="form-label">Nueva Nota (Estudiante 1)</label>
+                            <input
+                              type="number"
+                              class="form-control"
+                              name="nota_sustentar"
+                              required
+                              id="nota_sustentar-<?php echo $row['id']; ?>"
+                              value="<?php echo htmlspecialchars($nota_1); ?>"
+                              min="0"
+                              max="10"
+                              step="0.01"
+                              placeholder="Ingrese la nueva nota">
                           </div>
+
+                          <!-- Mostrar campo para segunda nota SOLO si hay pareja -->
+                          <?php if (!empty($row['pareja_id']) && $row['pareja_id'] > 0): ?>
+                            <div class="mb-3">
+                              <label for="nota_sustentar_2" class="form-label">Nueva Nota (Estudiante 2)</label>
+                              <input
+                                type="number"
+                                class="form-control"
+                                name="nota_sustentar_2"
+                                id="nota_sustentar_2-<?php echo $row['id']; ?>"
+                                value="<?php echo htmlspecialchars($nota_2); ?>"
+                                min="0"
+                                max="10"
+                                step="0.01"
+                                placeholder="Ingrese la nueva nota">
+                            </div>
+                          <?php endif; ?>
+
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -512,30 +668,7 @@ $result_temas = $stmt_temas->get_result();
                     </div>
                   </div>
                 </div>
-                <!-- Modal Eliminar -->
-                <div class="modal fade" id="modalEliminar<?php echo $row['id']; ?>" tabindex="-1" aria-labelledby="modalEliminarLabel<?php echo $row['id']; ?>" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <form action="subir-observaciones-sust.php" method="POST">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="modalEliminarLabel<?php echo $row['id']; ?>">Eliminar Observaciones</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <input type="hidden" name="tesis_id" value="<?php echo $row['id']; ?>">
-                          <input type="hidden" name="cedula_docente" value="<?php echo $cedula_docente; ?>">
-                          <input type="hidden" name="accion" value="eliminar">
 
-                          <p>¿Está seguro de que desea eliminar la nota tema?</p>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                          <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
               <?php endwhile; ?>
             </tbody>
           </table>

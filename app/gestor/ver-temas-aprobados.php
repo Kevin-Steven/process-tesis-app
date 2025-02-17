@@ -19,7 +19,8 @@ $sql = "SELECT t.id, t.tema, t.enlace_plagio as link, t.estado_tema, t.fecha_sub
        p.apellidos AS pareja_apellidos, up.nombres as nombres_plagio, up.apellidos as apellidos_plagio,
        tutores.nombres AS tutor_nombre, p.id AS pareja_id, t.correcciones_tesis as tesis, t.estado_tesis,
        urt.nombres as nombres_rev_tesis, urt.apellidos as apellidos_rev_tesis, t.nota_revisor_tesis as nota_documento, u1.nombres AS jurado1_nombre, 
-        u2.nombres AS jurado2_nombre, u3.nombres AS jurado3_nombre, t.j1_nota_sustentar as nota_uno,t.j2_nota_sustentar as nota_dos,t.j3_nota_sustentar as nota_tres
+       u2.nombres AS jurado2_nombre, u3.nombres AS jurado3_nombre, t.j1_nota_sustentar as nota_uno,t.j2_nota_sustentar as nota_dos,t.j3_nota_sustentar as nota_tres,
+       t.j1_nota_sustentar_2 as nota_uno_2, t.j2_nota_sustentar_2 as nota_dos_2, t.j3_nota_sustentar_2 as nota_tres_2
 FROM tema t
 LEFT JOIN usuarios u ON t.usuario_id = u.id
 LEFT JOIN usuarios up ON t.id_revisor_plagio = up.id
@@ -218,8 +219,10 @@ $result = $conn->query($sql);
                 <th>Jurado 2</th>
                 <th>Jurado 3</th>
                 <th>Nota Documento</th>
-                <th>Nota Exposición</th>
-                <th>Nota Final Titulación</th>
+                <th>Nota Exposición Estudiante 1</th>
+                <th>Nota Exposición Estudiante 2</th>
+                <th>Nota Final Titulación Estudiante 1</th>
+                <th>Nota Final Titulación Estudiante 2</th>
                 <th class="text-center">Acciones</th>
               </tr>
             </thead>
@@ -342,6 +345,7 @@ $result = $conn->query($sql);
                       }
                       ?>
                     </td>
+
                     <td>
                       <?php
                       if (!empty($row['nota_documento'])) {
@@ -375,9 +379,37 @@ $result = $conn->query($sql);
 
                     <td>
                       <?php
+                      $nota_uno_2 = isset($row['nota_uno_2']) ? floatval($row['nota_uno_2']) : null;
+                      $nota_dos_2 = isset($row['nota_dos_2']) ? floatval($row['nota_dos_2']) : null;
+                      $nota_tres_2 = isset($row['nota_tres_2']) ? floatval($row['nota_tres_2']) : null;
+
+                      if ($nota_uno_2 !== null && $nota_dos_2 !== null && $nota_tres_2 !== null) {
+                        $promedio_sustentacion_2 = ($nota_uno_2 + $nota_dos_2 + $nota_tres_2) / 3;
+                        $nota_equivalente_sustentacion_2 = ($promedio_sustentacion_2 / 10) * 4;
+                        echo number_format($promedio_sustentacion_2, 2);
+                      } else {
+                        $nota_equivalente_sustentacion_2 = null;
+                        echo '<span class="text-muted">Sin nota</span>';
+                      }
+                      ?>
+                    </td>
+
+                    <td>
+                      <?php
                       if ($nota_equivalente_documento !== null && $nota_equivalente_sustentacion !== null) {
                         $nota_final = $nota_equivalente_documento + $nota_equivalente_sustentacion;
                         echo number_format($nota_final, 2);
+                      } else {
+                        echo '<span class="text-muted">Sin nota final</span>';
+                      }
+                      ?>
+                    </td>
+
+                    <td>
+                      <?php
+                      if ($nota_equivalente_documento !== null && $nota_equivalente_sustentacion_2 !== null) {
+                        $nota_final_2 = $nota_equivalente_documento + $nota_equivalente_sustentacion_2;
+                        echo number_format($nota_final_2, 2);
                       } else {
                         echo '<span class="text-muted">Sin nota final</span>';
                       }

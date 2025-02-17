@@ -134,8 +134,9 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                                 <option value="generar-pdf-postulantes.php">Postulantes Aprobados</option>
                                 <option value="generar-pdf-temas.php">Temas Aprobados</option>
                                 <option value="generar-pdf-notas-doc-tesis.php">Notas de Documentos de Tesis</option>
-                                <option value="generar-pdf-fechas-postulantes.php">Fecha Sustentación</option>
-                                <option value="generar-pdf-jurado.php">Jurados</option>
+                                <option value="generar-pdf-fechas-postulantes.php">Generar reporte Sustentación Estudiante</option>
+                                <option value="generar-pdf-jurado.php">Generar reporte Sustentación Docente</option>
+                                <option value="generar-pdf-notas-sustentacion.php">Generar reporte nota Sustentación</option>
                             </select>
                             <div class="generar-reporte">
                                 <button class="btn" onclick="generarPDF()">

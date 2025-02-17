@@ -20,8 +20,7 @@ if (isset($_GET['id'])) {
     $tema_id = $_GET['id'];
 
     // Consulta para obtener los detalles del tema, el revisor actual, y el tutor asignado
-    $sql = "
-        SELECT 
+    $sql = "SELECT 
             t.tema, 
             CONCAT(r.nombres, ' ', r.apellidos) AS revisor, 
             COALESCE(CONCAT(tutor_usuario.nombres, ' ', tutor_usuario.apellidos), tu.nombres) AS tutor_nombre

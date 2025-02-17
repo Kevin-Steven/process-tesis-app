@@ -11,23 +11,28 @@ $id = intval($_GET['id']);
 
 // Consulta para obtener datos de postulante y pareja
 $sql = "SELECT 
-            t.tema,
-            t.j1_nota_sustentar AS nota_uno,
-            t.j2_nota_sustentar AS nota_dos,
-            t.j3_nota_sustentar AS nota_tres,
-            COALESCE(t.nota_revisor_tesis, 0) AS nota_doc, 
-            u.id AS postulante_id, 
-            u.cedula, 
-            u.nombres AS estudiante_nombre, 
-            u.apellidos AS estudiante_apellidos,
-            p.id AS pareja_id, 
-            p.cedula AS pareja_cedula, 
-            p.nombres AS pareja_nombre, 
-            p.apellidos AS pareja_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios p ON t.pareja_id = p.id
-        WHERE t.id = $id";
+        t.tema,
+        t.j1_nota_sustentar AS nota_uno,
+        t.j2_nota_sustentar AS nota_dos,
+        t.j3_nota_sustentar AS nota_tres,
+        t.j1_nota_sustentar_2,
+        t.j2_nota_sustentar_2,
+        t.j3_nota_sustentar_2,
+        COALESCE(t.nota_revisor_tesis, 0) AS nota_doc, 
+        u.id AS postulante_id, 
+        u.cedula, 
+        u.nombres AS estudiante_nombre, 
+        u.apellidos AS estudiante_apellidos,
+        p.id AS pareja_id, 
+        p.cedula AS pareja_cedula, 
+        p.nombres AS pareja_nombre, 
+        p.apellidos AS pareja_apellidos
+    FROM tema t
+    JOIN usuarios u ON t.usuario_id = u.id
+    LEFT JOIN usuarios p ON t.pareja_id = p.id
+    WHERE t.id = $id
+";
+
 
 $result = $conn->query($sql);
 if ($result->num_rows == 0) {
@@ -47,7 +52,8 @@ use ZipArchive;
 // -----------------------------------------
 // Función para generar todo el texto y formato del acta
 // -----------------------------------------
-function generarActaCompleta($row, $rutaSalida, $id_formateado) {
+function generarActaCompleta($row, $rutaSalida, $id_formateado)
+{
 
     $phpWord = new PhpWord();
 
@@ -181,7 +187,7 @@ function generarActaCompleta($row, $rutaSalida, $id_formateado) {
         $table->addRow();
         // Primera columna
         $table->addCell(4000, ['valign' => 'center'])
-              ->addText($inf[0], ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'], ['alignment' => Jc::START]);
+            ->addText($inf[0], ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'], ['alignment' => Jc::START]);
         // Segunda columna
         $cell = $table->addCell(8000, ['valign' => 'center']);
         $cell->addText($inf[1], ['size' => $inf[2], 'name' => $inf[3]], ['alignment' => Jc::CENTER]);
@@ -210,56 +216,67 @@ function generarActaCompleta($row, $rutaSalida, $id_formateado) {
 
     // Fila Encabezado
     $tableNotas->addRow(200);
-    $tableNotas->addCell(6000)->addText('Detalle',
+    $tableNotas->addCell(6000)->addText(
+        'Detalle',
         ['bold' => true, 'size' => 11, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::CENTER]
     );
-    $tableNotas->addCell(1500)->addText('Nota Parcial',
+    $tableNotas->addCell(1500)->addText(
+        'Nota Parcial',
         ['bold' => true, 'size' => 11, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::CENTER]
     );
-    $tableNotas->addCell(1500)->addText('Nota Equivalente',
+    $tableNotas->addCell(1500)->addText(
+        'Nota Equivalente',
         ['bold' => true, 'size' => 11, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::CENTER]
     );
 
     // Fila Revisión
     $tableNotas->addRow();
-    $tableNotas->addCell(6000)->addText('REVISIÓN DE DOCUMENTO (60%)',
+    $tableNotas->addCell(6000)->addText(
+        'REVISIÓN DE DOCUMENTO (60%)',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::START]
     );
-    $tableNotas->addCell(1500)->addText(number_format($nota_doc, 2) . ' / 10.00',
+    $tableNotas->addCell(1500)->addText(
+        number_format($nota_doc, 2) . ' / 10.00',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::END]
     );
-    $tableNotas->addCell(1500)->addText(number_format($nota_equivalente_revision, 2) . ' / 6.00',
+    $tableNotas->addCell(1500)->addText(
+        number_format($nota_equivalente_revision, 2) . ' / 6.00',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::END]
     );
 
     // Fila Sustentación
     $tableNotas->addRow();
-    $tableNotas->addCell(6000)->addText('NOTA DE SUSTENTACIÓN DE PROYECTO (40%)',
+    $tableNotas->addCell(6000)->addText(
+        'NOTA DE SUSTENTACIÓN DE PROYECTO (40%)',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::START]
     );
-    $tableNotas->addCell(1500)->addText(number_format($promedio_sustentacion, 2) . ' / 10.00',
+    $tableNotas->addCell(1500)->addText(
+        number_format($promedio_sustentacion, 2) . ' / 10.00',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::END]
     );
-    $tableNotas->addCell(1500)->addText(number_format($nota_equivalente_sustentacion, 2) . ' / 4.00',
+    $tableNotas->addCell(1500)->addText(
+        number_format($nota_equivalente_sustentacion, 2) . ' / 4.00',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::END]
     );
 
     // Fila Nota Final
     $tableNotas->addRow();
-    $tableNotas->addCell(8000, ['gridSpan' => 2])->addText('NOTA FINAL TRABAJO DE TITULACIÓN:',
+    $tableNotas->addCell(8000, ['gridSpan' => 2])->addText(
+        'NOTA FINAL TRABAJO DE TITULACIÓN:',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::START]
     );
-    $tableNotas->addCell(2000)->addText(number_format($nota_final, 2) . ' / 10.00',
+    $tableNotas->addCell(2000)->addText(
+        number_format($nota_final, 2) . ' / 10.00',
         ['bold' => true, 'size' => 12, 'name' => 'Calibri (Cuerpo)'],
         ['alignment' => Jc::END]
     );
@@ -268,12 +285,24 @@ function generarActaCompleta($row, $rutaSalida, $id_formateado) {
     $section->addTextBreak(1);
 
     $textRunFirmas = $section->addTextRun(['alignment' => Jc::BOTH]);
-    $textRunFirmas->addText("Para constancia firman los que en ella intervinieron en la ciudad de Daule, el ",
-        ['size' => 11, 'name' => 'Calibri (Cuerpo)']);
+    $textRunFirmas->addText(
+        "Para constancia firman los que en ella intervinieron en la ciudad de Daule, el ",
+        ['size' => 11, 'name' => 'Calibri (Cuerpo)']
+    );
     // Fecha actual
     $meses = [
-        1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril', 5 => 'mayo', 6 => 'junio',
-        7 => 'julio', 8 => 'agosto', 9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+        1 => 'enero',
+        2 => 'febrero',
+        3 => 'marzo',
+        4 => 'abril',
+        5 => 'mayo',
+        6 => 'junio',
+        7 => 'julio',
+        8 => 'agosto',
+        9 => 'septiembre',
+        10 => 'octubre',
+        11 => 'noviembre',
+        12 => 'diciembre'
     ];
     $dia = date('j');
     $mes = $meses[intval(date('n'))];
@@ -284,31 +313,43 @@ function generarActaCompleta($row, $rutaSalida, $id_formateado) {
     $section->addTextBreak(2);
 
     $paragraphStyle = [
-        'alignment' => Jc::CENTER, 
-        'lineHeight' => 1.0, 
+        'alignment' => Jc::CENTER,
+        'lineHeight' => 1.0,
         'spaceAfter' => 0,
         'spaceBefore' => 0
     ];
 
     $tableFirmas = $section->addTable(['alignment' => Jc::CENTER]);
     $tableFirmas->addRow();
-    $tableFirmas->addCell(5000)->addText("_____________________________________", ['size' => 11,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
-    $tableFirmas->addCell(5000)->addText("_____________________________________", ['size' => 11,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("_____________________________________", ['size' => 11, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("_____________________________________", ['size' => 11, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
 
     // Coordinador - Nombre Estudiante
     $tableFirmas->addRow();
-    $tableFirmas->addCell(5000)->addText("Ing. Jonathan Cevallos Guambuguete, Mgs.", ['size' => 11,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
-    $tableFirmas->addCell(5000)->addText($row['estudiante_nombre'] . " " . $row['estudiante_apellidos'], ['size' => 11,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("Ing. Jonathan Cevallos Guambuguete, Mgs.", ['size' => 11, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    // 1) Combinar nombre y apellidos
+    $estudianteNombreCompleto = $row['estudiante_nombre'] . " " . $row['estudiante_apellidos'];
+
+    // 2) Convertir a Title Case (la primera letra de cada palabra a mayúscula)
+    $estudianteNombreCompleto = mb_convert_case($estudianteNombreCompleto, MB_CASE_TITLE, 'UTF-8');
+
+    // 3) Usar esa variable en el addText
+    $tableFirmas->addCell(5000)->addText(
+        $estudianteNombreCompleto,
+        ['size' => 11, 'name' => 'Calibri (Cuerpo)'],
+        $paragraphStyle
+    );
+
 
     // Cargos
     $tableFirmas->addRow();
-    $tableFirmas->addCell(5000)->addText("Coordinador de Carrera", ['bold' => true, 'size' => 10,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
-    $tableFirmas->addCell(5000)->addText("Alumno Egresado", ['bold' => true, 'size' => 10,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("Coordinador de Carrera", ['bold' => true, 'size' => 10, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("Alumno Egresado", ['bold' => true, 'size' => 10, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
 
     // Carrera
     $tableFirmas->addRow();
-    $tableFirmas->addCell(5000)->addText("Tecnología Superior en Desarrollo de Software", ['bold' => true, 'size' => 10,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
-    $tableFirmas->addCell(5000)->addText("Tecnología Superior en Desarrollo de Software", ['bold' => true, 'size' => 10,'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("Tecnología Superior en Desarrollo de Software", ['bold' => true, 'size' => 10, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
+    $tableFirmas->addCell(5000)->addText("Tecnología Superior en Desarrollo de Software", ['bold' => true, 'size' => 10, 'name' => 'Calibri (Cuerpo)'], $paragraphStyle);
 
     // Guardar en archivo
     $writer = IOFactory::createWriter($phpWord, 'Word2007');
@@ -331,19 +372,31 @@ $archivos[] = $rutaPostulante;
 
 // 2) Si existe pareja, generamos su acta
 if (!empty($row['pareja_id'])) {
+    // Copiamos todo lo que tiene $row
     $rowPareja = $row;
-    // Cambiamos sus datos
-    $rowPareja['estudiante_nombre']     = $row['pareja_nombre'];
-    $rowPareja['estudiante_apellidos']  = $row['pareja_apellidos'];
-    $rowPareja['cedula']                = $row['pareja_cedula'];
-    $rowPareja['postulante_id']         = $row['pareja_id'];
 
+    // Cambiamos nombres, apellidos y cédula al de la pareja
+    $rowPareja['estudiante_nombre']    = $row['pareja_nombre'];
+    $rowPareja['estudiante_apellidos'] = $row['pareja_apellidos'];
+    $rowPareja['cedula']              = $row['pareja_cedula'];
+    $rowPareja['postulante_id']       = $row['pareja_id'];
+
+    // CAMBIAR AHORA las notas del jurado a las *segunda* columnas
+    $rowPareja['nota_uno']  = $row['j1_nota_sustentar_2'];
+    $rowPareja['nota_dos']  = $row['j2_nota_sustentar_2'];
+    $rowPareja['nota_tres'] = $row['j3_nota_sustentar_2'];
+
+    // Preparamos ID formateado
     $id_formateado_pareja = sprintf("%03d", $row['pareja_id']);
-    $nombreArchivoPareja = "ACTA_DE_TITULACIÓN_ISTJBA_ISTJBA-GT-TDS-" . date("Y") . "-" . $id_formateado . ".docx";
+
+    // Nombre del archivo para la pareja
+    $nombreArchivoPareja = "ACTA_DE_TITULACIÓN_ISTJBA_ISTJBA-GT-TDS-" . date("Y") . "-" . $id_formateado_pareja . ".docx";
     $rutaPareja = "$directorioTemporal/$nombreArchivoPareja";
 
-    // Generar acta para la pareja
+    // Generar acta para la pareja (usa la MISMA función pero con rowPareja)
     generarActaCompleta($rowPareja, $rutaPareja, $id_formateado_pareja);
+
+    // Añadir al ZIP
     $archivos[] = $rutaPareja;
 }
 

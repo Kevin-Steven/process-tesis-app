@@ -8,18 +8,14 @@ class CustomPDF extends TCPDF
     {
         // Agregar el logo izquierdo
         $this->Image('../../images/logoJBA.png', 5, 7, 50);
-
         // Agregar el logo derecho
         $this->Image('../../images/TDSL.png', 140, 10, 60);
-        
-        // Salto de línea para separar el encabezado del contenido
         $this->Ln(10);
 
-        // Ajustar la posición del inicio del contenido después del encabezado
         if ($this->PageNo() == 1) {
-            $this->SetY(25); // Menor separación para la primera página
+            $this->SetY(25);
         } else {
-            $this->SetY(30); // Espaciado estándar para las siguientes páginas
+            $this->SetY(30);
         }
     }
 
@@ -27,14 +23,14 @@ class CustomPDF extends TCPDF
     {
         $nb = 0;
         foreach ($data as $key => $value) {
-            $nb = max($nb, $this->getNumLines($value, $widths[$key]));
+            $nb = max($nb, $this->getNumLines($value, $widths[$key] ?? 40));
         }
-        
+
         $h = $height * $nb;
         $this->CustomCheckPageBreak($h);
 
         foreach ($data as $key => $value) {
-            $w = $widths[$key];
+            $w = $widths[$key] ?? 40;
             $x = $this->GetX();
             $y = $this->GetY();
 
@@ -51,7 +47,7 @@ class CustomPDF extends TCPDF
     {
         if ($this->GetY() + $h > $this->getPageHeight() - $this->getBreakMargin()) {
             $this->AddPage($this->CurOrientation);
-            $this->SetY(30); // Ajusta la posición tras el encabezado en cada nueva página
+            $this->SetY(30);
         }
     }
 }
@@ -61,37 +57,28 @@ class CustomPDF extends TCPDF
 // ------------------------------
 $pdf = new CustomPDF();
 $pdf->AddPage();
-$pdf->SetY(25); // Ajuste para la primera página
+$pdf->SetY(25);
 
-// Configurar la fuente para el título de la tabla
-$pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 10, 'Jurado', 0, 1, 'C');
-$pdf->Ln(5); // Espacio debajo del título
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 10, 'Cronograma de Sustentación', 0, 1, 'C');
+$pdf->Ln(5);
 
-// ------------------------------
-// 2. ENCABEZADOS DE LA TABLA
-// ------------------------------
-$pdf->SetFont('helvetica', 'B', 12);
+$pdf->SetFont('helvetica', 'B', 10);
 
-// Ajusta el ancho de las 5 columnas según tus necesidades
-$widths = [40, 40, 35, 35, 35];
-$height = 7;
+// **Ajuste de columnas**
+$widths = [25, 25, 22, 22, 22, 17, 25, 19, 13];
+$height = 6;
 
-// Definir los textos de los encabezados
-$headers = ['Postulante 1', 'Postulante 2', 'Jurado 1', 'Jurado 2', 'Jurado 3'];
+// **Encabezados corregidos**
+$headers = ['Postulante 1', 'Postulante 2', 'Jurado 1', 'Jurado 2', 'Jurado 3', 'Sede', 'Aula', 'Fecha', 'Hora'];
 $pdf->MultiCellRow($headers, $widths, $height);
 
-// ------------------------------
-// 3. CONSULTA A LA BASE DE DATOS
-// ------------------------------
 $sql = "SELECT 
     t.id, 
     t.sede, 
     t.aula, 
     t.fecha_sustentar, 
     t.hora_sustentar, 
-    t.tema, 
-    t.estado_tema, 
     u.nombres AS postulante_nombres, 
     u.apellidos AS postulante_apellidos, 
     p.nombres AS pareja_nombres, 
@@ -113,33 +100,26 @@ $result = $conn->query($sql);
 // ------------------------------
 // 4. LLENAR EL CONTENIDO DE LA TABLA
 // ------------------------------
-$pdf->SetFont('helvetica', '', 12);
+$pdf->SetFont('helvetica', '', 9);
 
 while ($row = $result->fetch_assoc()) {
-    // Postulante 1
-    $postulante1 = $row['postulante_nombres'] . ' ' . $row['postulante_apellidos'];
-
-    // Postulante 2 (o "No aplica")
+    $postulante1 = trim($row['postulante_nombres'] . ' ' . $row['postulante_apellidos']);
     $postulante2 = (!empty($row['pareja_nombres']) && !empty($row['pareja_apellidos'])) 
-        ? $row['pareja_nombres'] . ' ' . $row['pareja_apellidos']
+        ? trim($row['pareja_nombres'] . ' ' . $row['pareja_apellidos']) 
         : 'No aplica';
 
-    // Jurado 1
     $jurado1 = $row['jurado1_nombre'] ? mb_strtoupper($row['jurado1_nombre']) : 'Sin asignar';
-
-    // Jurado 2
     $jurado2 = $row['jurado2_nombre'] ? mb_strtoupper($row['jurado2_nombre']) : 'Sin asignar';
-
-    // Jurado 3
     $jurado3 = $row['jurado3_nombre'] ? mb_strtoupper($row['jurado3_nombre']) : 'Sin asignar';
 
-    // Agregar la fila
+    $sede = $row['sede'] ?: 'Sin definir';
+    $aula = $row['aula'] ?: 'Sin definir';
+    $fecha = $row['fecha_sustentar'] ?: 'Pendiente';
+    $hora = $row['hora_sustentar'] ? date("g:i A", strtotime($row['hora_sustentar'])) : 'Pendiente';
+
     $pdf->MultiCellRow([
-        $postulante1,
-        $postulante2,
-        $jurado1,
-        $jurado2,
-        $jurado3
+        $postulante1, $postulante2, $jurado1, $jurado2, $jurado3,
+        $sede, $aula, $fecha, $hora
     ], $widths, $height);
 }
 

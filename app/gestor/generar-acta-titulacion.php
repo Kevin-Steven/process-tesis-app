@@ -8,25 +8,30 @@ if (!isset($_GET['id'])) {
 }
 $id = intval($_GET['id']);
 
-// Consulta para obtener datos (postulante y pareja)
 $sql = "SELECT 
-            t.tema,
-            t.j1_nota_sustentar AS nota_uno,
-            t.j2_nota_sustentar AS nota_dos,
-            t.j3_nota_sustentar AS nota_tres,
-            COALESCE(t.nota_revisor_tesis, 0) AS nota_doc, 
-            u.id AS postulante_id, 
-            u.cedula, 
-            u.nombres AS estudiante_nombre, 
-            u.apellidos AS estudiante_apellidos,
-            p.id AS pareja_id, 
-            p.cedula AS pareja_cedula, 
-            p.nombres AS pareja_nombre, 
-            p.apellidos AS pareja_apellidos
-        FROM tema t
-        JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN usuarios p ON t.pareja_id = p.id
-        WHERE t.id = $id";
+    t.tema,
+    t.j1_nota_sustentar AS nota_uno,
+    t.j2_nota_sustentar AS nota_dos,
+    t.j3_nota_sustentar AS nota_tres,
+    /* Agrega estas tres columnas */
+    t.j1_nota_sustentar_2,
+    t.j2_nota_sustentar_2,
+    t.j3_nota_sustentar_2,
+
+    COALESCE(t.nota_revisor_tesis, 0) AS nota_doc, 
+    u.id AS postulante_id, 
+    u.cedula, 
+    u.nombres AS estudiante_nombre, 
+    u.apellidos AS estudiante_apellidos,
+    p.id AS pareja_id, 
+    p.cedula AS pareja_cedula, 
+    p.nombres AS pareja_nombre, 
+    p.apellidos AS pareja_apellidos
+FROM tema t
+JOIN usuarios u ON t.usuario_id = u.id
+LEFT JOIN usuarios p ON t.pareja_id = p.id
+WHERE t.id = $id";
+
 $result = $conn->query($sql);
 if ($result->num_rows === 0) {
     die("No se encontró información para este ID.");
@@ -265,16 +270,23 @@ $pdfStringPostulante = generarPDFCompleto($row, $id_formateado_postulante);
 if (!empty($row['pareja_id'])) {
     // Hay pareja => generamos el PDF de la pareja y empaquetamos en ZIP
 
-    // Cambiar datos a la pareja
     $rowPareja = $row;
+
+    // Cambiar nombres, apellidos y cédula a la pareja
     $rowPareja['estudiante_nombre']    = $row['pareja_nombre'];
     $rowPareja['estudiante_apellidos'] = $row['pareja_apellidos'];
     $rowPareja['cedula']               = $row['pareja_cedula'];
     $rowPareja['postulante_id']        = $row['pareja_id'];
 
+    // **Reemplazar** notas del primer, segundo y tercer jurado con sus equivalentes _2
+    $rowPareja['nota_uno']  = $row['j1_nota_sustentar_2'];
+    $rowPareja['nota_dos']  = $row['j2_nota_sustentar_2'];
+    $rowPareja['nota_tres'] = $row['j3_nota_sustentar_2'];
+
+    // Generar ID formateado de la pareja
     $id_formateado_pareja = sprintf("%03d", $row['pareja_id']);
 
-    // Generamos su PDF (string binario)
+    // Generar el PDF para la pareja
     $pdfStringPareja = generarPDFCompleto($rowPareja, $id_formateado_pareja);
 
     // Crear en un directorio temporal dos archivos .pdf y luego meterlos a un ZIP
