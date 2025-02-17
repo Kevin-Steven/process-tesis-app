@@ -109,9 +109,20 @@ CREATE TABLE tema (
 	j1_nota_sustentar DECIMAL(4,2) DEFAULT NULL,
 	j2_nota_sustentar DECIMAL(4,2) DEFAULT NULL,
 	j3_nota_sustentar DECIMAL(4,2) DEFAULT NULL,
+    j1_nota_sustentar_2 DECIMAL(4,2) DEFAULT NULL,
+	j2_nota_sustentar_2 DECIMAL(4,2) DEFAULT NULL,
+	j3_nota_sustentar_2 DECIMAL(4,2) DEFAULT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (tutor_id) REFERENCES tutores(id) ON DELETE CASCADE
 );
+
+CREATE TABLE periodo_academico (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    periodo VARCHAR(255) NOT NULL
+);
+
+INSERT INTO procesotitulacion.periodo_academico (periodo) value ('II periodo académico del año 2024');
+INSERT INTO procesotitulacion.periodo_academico (periodo) value ('III periodo académico del año 2024');
 
 CREATE TABLE informes_tutores (
     id INT AUTO_INCREMENT PRIMARY KEY,
