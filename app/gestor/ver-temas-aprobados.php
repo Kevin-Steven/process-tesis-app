@@ -486,12 +486,12 @@ $result = $conn->query($sql);
                 <?php endwhile; ?>
               <?php else: ?>
                 <tr>
-                  <td colspan="19" class="text-center">No se encontraron temas aprobados.</td>
+                  <td colspan="24" class="text-center">No se encontraron temas aprobados.</td>
                 </tr>
               <?php endif; ?>
               <!-- Fila para "No se encontraron resultados" -->
               <tr id="noResultsRow" style="display: none;">
-                <td colspan="19" class="text-center">No se encontraron resultados.</td>
+                <td colspan="24" class="text-center">No se encontraron resultados.</td>
               </tr>
             </tbody>
           </table>
