@@ -501,8 +501,6 @@ $result = $conn->query($sql);
     </div>
   </div>
 
-
-
   <!-- Footer -->
   <footer class="footer mt-auto py-3 bg-light text-center">
     <div class="container">
