@@ -119,17 +119,23 @@ while ($row = $result->fetch_assoc()) {
     $jurado3 = $row['jurado3_nombre'] ? mb_strtoupper($row['jurado3_nombre']) : 'Sin asignar';
 
     // Notas sustentación estudiante 1
-    $nota1_1 = (float) ($row['j1_nota_sustentar'] ?? 0);
-    $nota2_1 = (float) ($row['j2_nota_sustentar'] ?? 0);
-    $nota3_1 = (float) ($row['j3_nota_sustentar'] ?? 0);
+    $nota1_1p = (float) ($row['j1_nota_sustentar'] ?? 0);
+    $nota2_1p = (float) ($row['j2_nota_sustentar'] ?? 0);
+    $nota3_1p = (float) ($row['j3_nota_sustentar'] ?? 0);
+    $nota1_1 = number_format($nota1_1p, 2);
+    $nota2_1 = number_format($nota2_1p, 2);
+    $nota3_1 = number_format($nota3_1p, 2);
 
     // Notas sustentación estudiante 2
-    $nota1_2 = (float) ($row['j1_nota_sustentar_2'] ?? 0);
-    $nota2_2 = (float) ($row['j2_nota_sustentar_2'] ?? 0);
-    $nota3_2 = (float) ($row['j3_nota_sustentar_2'] ?? 0);
+    $nota1_2p = (float) ($row['j1_nota_sustentar_2'] ?? 0);
+    $nota2_2p = (float) ($row['j2_nota_sustentar_2'] ?? 0);
+    $nota3_2p = (float) ($row['j3_nota_sustentar_2'] ?? 0);
+    $nota1_2 = number_format($nota1_2p, 2);
+    $nota2_2 = number_format($nota2_2p, 2);
+    $nota3_2 = number_format($nota3_2p, 2);
 
     $pdf->MultiCellRow([
-        $tema, $postulante1, $postulante2, $jurado1, $jurado2, $jurado3,
+        $postulante1, $postulante2, $jurado1, $jurado2, $jurado3,
         $nota1_1, $nota2_1, $nota3_1, $nota1_2, $nota2_2, $nota3_2,
     ], $widths, $height);
 }

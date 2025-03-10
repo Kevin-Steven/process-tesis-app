@@ -97,11 +97,9 @@ $correcciones_tesis = $tema['correcciones_tesis'] ?? null;
             <a class="nav-link" href="requisitos.php"><i class='bx bx-cube'></i> Requisitos</a>
             <a class="nav-link" href="inscripcion.php"><i class='bx bx-file'></i> Inscribirse</a>
             <a class="nav-link" href="enviar-tema.php"><i class='bx bx-file'></i> Enviar Tema</a>
-            <a class="nav-link" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
-            <?php if ($estado_tema === 'Aprobado'): ?>
-                <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
-                <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
-            <?php endif; ?>
+            <a class="nav-link active" href="enviar-documento-tesis.php"><i class='bx bx-file'></i> Documento Tesis</a>
+            <a class="nav-link" href="estado-plagio.php"><i class='bx bx-file'></i> Antiplagio</a>
+            <a class="nav-link" href="sustentacion.php"><i class='bx bx-file'></i> Sustentacion</a>
         </nav>
     </div>
 
