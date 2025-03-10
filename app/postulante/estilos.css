@@ -85,6 +85,9 @@ span {
   left: 0;
   padding-top: 20px;
   transition: all .6s;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding-bottom: 20px;
 }
 
 .sidebar-hidden {
@@ -442,6 +445,7 @@ span {
     transition: all .6s;
     z-index: 100;
     transform: translateX(-100%);
+    padding-bottom: 70px;
   }
 
   .sidebar-hidden {

@@ -29,7 +29,6 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
 
 <body>
 
-    <!-- Topbar con ícono de menú hamburguesa (fuera del menú) -->
     <div class="topbar z-1">
         <div class="menu-toggle">
             <i class='bx bx-menu'></i>
@@ -39,26 +38,24 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                 <span class="input-group-text" id="search-icon"><i class='bx bx-search'></i></span>
                 <input type="text" id="search" class="form-control" placeholder="Search">
             </div>
-            <!-- Iconos adicionales a la derecha -->
             <i class='bx bx-envelope'></i>
             <i class='bx bx-bell'></i>
-            <!-- Menú desplegable para el usuario -->
             <div class="user-profile dropdown">
                 <div class="d-flex align-items-center" data-bs-toggle="dropdown" id="user-profile-toggle" aria-expanded="false">
                     <img src="<?php echo $foto_perfil; ?>" alt="Foto de Perfil">
                     <span><?php echo $primer_nombre . ' ' . $primer_apellido; ?></span>
-                    <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i> <!-- Ícono agregado -->
+                    <i class='bx bx-chevron-down ms-1' id="chevron-icon"></i> 
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end mt-2">
                     <li>
                         <a class="dropdown-item d-flex align-items-center" href="perfil-gestor.php">
-                            <i class='bx bx-user me-2'></i> <!-- Ícono para "Perfil" -->
+                            <i class='bx bx-user me-2'></i>
                             Perfil
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item d-flex align-items-center" href="cambio-clave-gestor.php">
-                            <i class='bx bx-lock me-2'></i> <!-- Ícono para "Cambio de Clave" -->
+                            <i class='bx bx-lock me-2'></i>
                             Cambio de Clave
                         </a>
                     </li>
@@ -67,7 +64,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                     </li>
                     <li>
                         <a class="dropdown-item d-flex align-items-center" href="../cerrar-sesion/logout.php">
-                            <i class='bx bx-log-out me-2'></i> <!-- Ícono para "Cerrar Sesión" -->
+                            <i class='bx bx-log-out me-2'></i> 
                             Cerrar Sesión
                         </a>
                     </li>
@@ -136,6 +133,7 @@ $foto_perfil = isset($_SESSION['usuario_foto']) ? $_SESSION['usuario_foto'] : '.
                                 <option value="generar-pdf-notas-doc-tesis.php">Notas de Documentos de Tesis</option>
                                 <option value="generar-pdf-fechas-postulantes.php">Generar reporte Sustentación Estudiante</option>
                                 <option value="generar-pdf-jurado.php">Generar reporte Sustentación Docente</option>
+                                <option value="generar-pdf-notas-jurado.php">Generar reporte notas Jurados</option>
                                 <option value="generar-pdf-notas-sustentacion.php">Generar reporte nota Sustentación</option>
                             </select>
                             <div class="generar-reporte">
